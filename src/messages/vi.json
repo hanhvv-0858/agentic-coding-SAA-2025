@@ -1,0 +1,33 @@
+{
+  "login": {
+    "hero": {
+      "line1": "Bắt đầu hành trình của bạn cùng SAA 2025.",
+      "line2": "Đăng nhập để khám phá!"
+    },
+    "cta": {
+      "default": "ĐĂNG NHẬP với Google",
+      "loading": "Đang mở Google…"
+    },
+    "error": {
+      "access_denied": "Đăng nhập đã bị huỷ. Vui lòng thử lại.",
+      "network": "Không kết nối được tới Google. Hãy thử lại sau.",
+      "session_exchange_failed": "Phiên đăng nhập không hợp lệ.",
+      "cookie_blocked": "Trình duyệt của bạn đang chặn cookie — hãy bật cookie cho saa.sun-asterisk.com."
+    }
+  },
+  "common": {
+    "language": {
+      "label": {
+        "vi": "VN",
+        "en": "EN"
+      },
+      "toggle": {
+        "vi": "Chọn ngôn ngữ, hiện tại tiếng Việt",
+        "en": "Chọn ngôn ngữ, hiện tại tiếng Anh"
+      }
+    },
+    "footer": {
+      "copyright": "Bản quyền thuộc về Sun* © 2025"
+    }
+  }
+}

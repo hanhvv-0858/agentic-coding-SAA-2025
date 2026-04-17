@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+/* Tailwind v4 theme tokens — mirror of design-style.md for SAA 2025. */
+@theme inline {
+  /* Brand surfaces */
+  --color-brand-900: #00101a;
+  --color-brand-800: #0b0f12;
+
+  /* Accent */
+  --color-accent-cream: #ffea9e;
+  --color-accent-cream-hover: #ffe586;
+  --color-accent-cream-active: #ffdd6b;
+
+  /* Neutrals */
+  --color-divider: #2e3940;
+
+  /* Fonts — wired from next/font/google in src/app/layout.tsx */
+  --font-montserrat: var(--font-montserrat);
+  --font-montserrat-alt: var(--font-montserrat-alt);
+}
+
+body {
+  background: var(--color-brand-900);
+  color: #ffffff;
+  font-family: var(--font-montserrat), Arial, Helvetica, sans-serif;
+}

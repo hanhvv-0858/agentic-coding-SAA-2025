@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sun Annual Awards 2025
 
-## Getting Started
+Internal web app for SAA 2025, built with Next.js 16 + Supabase Auth + Cloudflare
+Workers. See [AGENTS.md](AGENTS.md) for the MoMorph agent workflow and
+[.momorph/constitution.md](.momorph/constitution.md) for the tech-stack non-negotiables.
 
-First, run the development server:
+## Quick start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Prerequisites: Node 22 LTS (Node 25 works but needs NODE_EXTRA_CA_CERTS
+# workaround, see "Node CA workaround" below), Yarn v1.22.x, Supabase CLI (optional).
+
+yarn install
+cp .env.example .env.local
+# Edit .env.local with your Supabase project URL + anon key.
+yarn dev                  # http://localhost:3000/login
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | Purpose |
+|---|---|
+| `yarn dev` | Next.js dev server with Turbopack |
+| `yarn build` | Production build |
+| `yarn test` | Vitest (watch mode) |
+| `yarn test:run` | Vitest one-shot for CI |
+| `yarn e2e` | Playwright against a running dev server |
+| `yarn lint` | ESLint (flat config, Next.js + jsx-a11y) |
+| `yarn typecheck` | `tsc --noEmit` |
+| `yarn analyze` | Bundle analyzer (`ANALYZE=true next build`) |
+| `make check` | Runs lint + typecheck + test (pre-push gate) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Documentation
 
-## Learn More
+- [docs/auth.md](docs/auth.md) — OAuth flow, allow-list management, Supabase key rotation
+- [.momorph/specs/](.momorph/specs/) — per-screen specs + design style + plans
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts in `scripts/`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `scripts/check-bundle-size.mjs` — fails CI if any route exceeds its gzipped
+  bundle budget (spec TR-010).
+- `scripts/check-bundle-secrets.mjs` — fails CI if server-only secret names
+  leak into the client bundle (spec SC-006).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Run after `yarn build`:
 
-## Deploy on Vercel
+```sh
+node scripts/check-bundle-size.mjs
+node scripts/check-bundle-secrets.mjs
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Analytics dashboard (SC-004 prerequisite)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Once an analytics vendor is chosen, build a dashboard showing:
+
+- **`login_attempt` rate** per minute (granularity: hourly buckets for weekly view).
+- **`login_error` rate** grouped by `error_code` (`access_denied`, `network`,
+  `session_exchange_failed`, `cookie_blocked`).
+- **Error ratio** = `login_error / login_attempt` — SC-004 target: < 2% after the
+  first 2 weeks, excluding deliberate `access_denied`.
+- **`language_change` events** per day — sanity check that US3 is being used.
+
+The events are already emitted from
+[src/libs/analytics/track.ts](src/libs/analytics/track.ts). Swap the sinks
+(currently `window.dataLayer` on the client, stdout JSON on the server) for your
+vendor of choice.
+
+## Node CA workaround
+
+Node 25.6.x ships a CA bundle missing the Google Trust Services root R1, which
+breaks TLS handshakes with npm/yarn registries and Supabase. Either downgrade to
+Node 22 LTS, or prefix commands with:
+
+```sh
+NODE_EXTRA_CA_CERTS=/tmp/node-ca/system-roots.pem yarn install
+```
+
+Generate the cert bundle once:
+
+```sh
+mkdir -p /tmp/node-ca
+security find-certificate -a -p \
+  /System/Library/Keychains/SystemRootCertificates.keychain \
+  > /tmp/node-ca/system-roots.pem
+```

@@ -1,0 +1,33 @@
+{
+  "login": {
+    "hero": {
+      "line1": "Start your journey with SAA 2025.",
+      "line2": "Sign in to explore!"
+    },
+    "cta": {
+      "default": "LOGIN With Google",
+      "loading": "Opening Google…"
+    },
+    "error": {
+      "access_denied": "Sign-in was cancelled. Please try again.",
+      "network": "Couldn't reach Google. Please try again later.",
+      "session_exchange_failed": "Your sign-in session is invalid.",
+      "cookie_blocked": "Your browser is blocking cookies — enable cookies for saa.sun-asterisk.com."
+    }
+  },
+  "common": {
+    "language": {
+      "label": {
+        "vi": "VN",
+        "en": "EN"
+      },
+      "toggle": {
+        "vi": "Select language, current Vietnamese",
+        "en": "Select language, current English"
+      }
+    },
+    "footer": {
+      "copyright": "© 2025 Sun* All rights reserved."
+    }
+  }
+}
