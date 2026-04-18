@@ -8,7 +8,10 @@ export type AnalyticsEvent =
   | { type: "login_attempt"; provider: "google" }
   | { type: "login_success"; user_id: string; email_domain: string }
   | { type: "login_error"; provider: "google"; error_code: string }
-  | { type: "language_change"; from: string; to: string };
+  | { type: "language_change"; from: string; to: string }
+  | { type: "rules_view"; source: "homepage" | "live-board" | "compose" | "direct" }
+  | { type: "rules_close"; via: "button" | "esc" | "backdrop" }
+  | { type: "rules_cta_write_kudos" };
 
 declare global {
   interface Window {

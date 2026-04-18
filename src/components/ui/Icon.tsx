@@ -8,6 +8,7 @@ export type IconName =
   | "spinner"
   | "bell"
   | "pencil"
+  | "close"
   | "arrow-right"
   | "arrow-up-right"
   | "saa"
@@ -121,6 +122,13 @@ export function Icon({ name, size = DEFAULT_SIZE, title, className, ...rest }: I
             d="M20.8067 6.72951C21.1967 6.33951 21.1967 5.68951 20.8067 5.31951L18.4667 2.97951C18.0967 2.58951 17.4467 2.58951 17.0567 2.97951L15.2167 4.80951L18.9667 8.55951M3.09668 16.9395V20.6895H6.84668L17.9067 9.61951L14.1567 5.86951L3.09668 16.9395Z"
             fill="currentColor"
           />
+        </svg>
+      );
+    case "close":
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <line x1="6" y1="6" x2="18" y2="18" />
+          <line x1="18" y1="6" x2="6" y2="18" />
         </svg>
       );
     case "arrow-right":

@@ -30,4 +30,10 @@ describe("<Icon />", () => {
     expect(svg).toHaveAttribute("width", "32");
     expect(svg).toHaveAttribute("height", "32");
   });
+
+  it("renders the close (X) icon via two <line> strokes", () => {
+    const { container } = render(<Icon name="close" />);
+    const lines = container.querySelectorAll("line");
+    expect(lines).toHaveLength(2);
+  });
 });

@@ -136,6 +136,60 @@
       "description": "Giải thưởng MVP vinh danh cá nhân xuất sắc nhất năm – gương mặt tiêu biểu đại diện cho toàn bộ tập thể Sun*. Họ là người đã thể hiện năng lực vượt trội, tinh thần cống hiến bền bỉ, và tầm ảnh hưởng sâu rộng, để lại dấu ấn mạnh mẽ trong hành trình của Sun* suốt năm qua.\n\nKhông chỉ nổi bật bởi hiệu suất và kết quả công việc, họ còn là nguồn cảm hứng lan tỏa – thông qua suy nghĩ, hành động và ảnh hưởng tích cực của mình đối với tập thể.\n\nMVP là người hội tụ đầy đủ phẩm chất của người Sun* ưu tú, đồng thời mang trên mình trọng trách lớn lao: trở thành hình mẫu đại diện cho con người và tinh thần Sun*, góp phần dẫn dắt tập thể vươn tới những đỉnh cao mới."
     }
   },
+  "rules": {
+    "meta": {
+      "title": "Thể lệ | SAA 2025",
+      "description": "Thể lệ chương trình Kudos SAA 2025 — Huy hiệu Hero, Secret Box và giải Kudos Quốc Dân."
+    },
+    "title": "Thể lệ",
+    "receiver": {
+      "heading": "NGƯỜI NHẬN KUDOS: HUY HIỆU HERO CHO NHỮNG ẢNH HƯỞNG TÍCH CỰC",
+      "intro": "Dựa trên số lượng đồng đội gửi trao Kudos, bạn sẽ sở hữu Huy hiệu Hero tương ứng, được hiển thị trực tiếp cạnh tên profile",
+      "tiers": {
+        "new": {
+          "label": "New Hero",
+          "count": "Có 1-4 người gửi Kudos cho bạn",
+          "description": "Hành trình lan tỏa điều tốt đẹp bắt đầu – những lời cảm ơn và ghi nhận đầu tiên đã tìm đến bạn."
+        },
+        "rising": {
+          "label": "Rising Hero",
+          "count": "Có 5-9 người gửi Kudos cho bạn",
+          "description": "Hình ảnh bạn đang lớn dần trong trái tim đồng đội bằng sự tử tế và cống hiến của mình."
+        },
+        "super": {
+          "label": "Super Hero",
+          "count": "Có 10–20 người gửi Kudos cho bạn",
+          "description": "Bạn đã trở thành biểu tượng được tin tưởng và yêu quý, người luôn sẵn sàng hỗ trợ và được nhiều đồng đội nhớ đến."
+        },
+        "legend": {
+          "label": "Legend Hero",
+          "count": "Có hơn 20 người gửi Kudos cho bạn",
+          "description": "Bạn đã trở thành huyền thoại – người để lại dấu ấn khó quên trong tập thể bằng trái tim và hành động của mình."
+        }
+      }
+    },
+    "sender": {
+      "heading": "NGƯỜI GỬI KUDOS: SƯU TẬP TRỌN BỘ 6 ICON, NHẬN NGAY PHẦN QUÀ BÍ ẨN",
+      "intro": "Mỗi lời Kudos bạn gửi sẽ được đăng tải trên hệ thống và nhận về những lượt ❤️ từ cộng đồng Sunner. Cứ mỗi 5 lượt ❤️, bạn sẽ được mở 1 Secret Box, với cơ hội nhận về một trong 6 icon độc quyền của SAA.",
+      "badges": {
+        "revival": { "label": "REVIVAL" },
+        "touch-of-light": { "label": "TOUCH OF LIGHT" },
+        "stay-gold": { "label": "STAY GOLD" },
+        "flow-to-horizon": { "label": "FLOW TO HORIZON" },
+        "beyond-the-boundary": { "label": "BEYOND THE BOUNDARY" },
+        "root-further": { "label": "ROOT FURTHER" }
+      },
+      "outro": "Những Sunner thu thập trọn bộ 6 icon sẽ nhận về một phần quà bí ẩn từ SAA 2025."
+    },
+    "quocDan": {
+      "heading": "KUDOS QUỐC DÂN",
+      "body": "5 Kudos nhận về nhiều ❤️ nhất toàn Sun* sẽ chính thức trở thành Kudos Quốc Dân và được trao phần quà đặc biệt từ SAA 2025: Root Further."
+    },
+    "actions": {
+      "close": "Đóng",
+      "writeKudos": "Viết KUDOS"
+    }
+  },
   "common": {
     "language": {
       "label": {
@@ -151,7 +205,8 @@
       "aboutSaa": "About SAA 2025",
       "awardsInfo": "Award Information",
       "sunKudos": "Sun* Kudos",
-      "standards": "Tiêu chuẩn chung"
+      "standards": "Tiêu chuẩn chung",
+      "rules": "Thể lệ"
     },
     "notification": {
       "unread": "{count} thông báo chưa đọc",

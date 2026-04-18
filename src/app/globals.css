@@ -22,6 +22,12 @@
      Awards-system §Colors, Figma node 313:8459). */
   --color-nav-dot: #d4271d;
 
+  /* Thể lệ — panel surface is slightly darker than brand-900 (Figma node
+     3204:6052) and the secondary-button border uses the warm desaturated
+     cream below. */
+  --color-panel-surface: #00070c;
+  --color-border-secondary: #998c5f;
+
   /* Fonts — wired from next/font/google in src/app/layout.tsx */
   --font-montserrat: var(--font-montserrat);
   --font-montserrat-alt: var(--font-montserrat-alt);

@@ -39,4 +39,39 @@ describe("<PrimaryButton />", () => {
     render(<PrimaryButton>Safe</PrimaryButton>);
     expect(screen.getByRole("button")).toHaveAttribute("type", "button");
   });
+
+  it("defaults to size='lg' (preserves legacy About-Awards treatment)", () => {
+    render(<PrimaryButton>Big</PrimaryButton>);
+    const cls = screen.getByRole("button").className;
+    expect(cls).toMatch(/h-\[60px\]/);
+    expect(cls).toMatch(/text-\[22px\]/);
+  });
+
+  it("applies size='md' sizing tokens for footer-bar buttons", () => {
+    render(<PrimaryButton size="md">Small</PrimaryButton>);
+    const cls = screen.getByRole("button").className;
+    expect(cls).toMatch(/h-14/);
+    expect(cls).toMatch(/text-base/);
+    expect(cls).toMatch(/rounded-\[4px\]/);
+    expect(cls).not.toMatch(/h-\[60px\]/);
+  });
+
+  it("applies variant='secondary' with alpha-10 cream bg + warm border + white text", () => {
+    render(<PrimaryButton variant="secondary">Đóng</PrimaryButton>);
+    const cls = screen.getByRole("button").className;
+    expect(cls).toContain("bg-[var(--color-accent-cream)]/10");
+    expect(cls).toContain("border-[var(--color-border-secondary)]");
+    expect(cls).toContain("text-white");
+  });
+
+  it("combines size='md' + variant='secondary' for the Đóng button spec", () => {
+    render(
+      <PrimaryButton size="md" variant="secondary">
+        Đóng
+      </PrimaryButton>,
+    );
+    const cls = screen.getByRole("button").className;
+    expect(cls).toMatch(/h-14/);
+    expect(cls).toContain("border-[var(--color-border-secondary)]");
+  });
 });

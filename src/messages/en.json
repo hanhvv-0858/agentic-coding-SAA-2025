@@ -136,6 +136,60 @@
       "description": "Giải thưởng MVP vinh danh cá nhân xuất sắc nhất năm – gương mặt tiêu biểu đại diện cho toàn bộ tập thể Sun*. Họ là người đã thể hiện năng lực vượt trội, tinh thần cống hiến bền bỉ, và tầm ảnh hưởng sâu rộng, để lại dấu ấn mạnh mẽ trong hành trình của Sun* suốt năm qua.\n\nKhông chỉ nổi bật bởi hiệu suất và kết quả công việc, họ còn là nguồn cảm hứng lan tỏa – thông qua suy nghĩ, hành động và ảnh hưởng tích cực của mình đối với tập thể.\n\nMVP là người hội tụ đầy đủ phẩm chất của người Sun* ưu tú, đồng thời mang trên mình trọng trách lớn lao: trở thành hình mẫu đại diện cho con người và tinh thần Sun*, góp phần dẫn dắt tập thể vươn tới những đỉnh cao mới."
     }
   },
+  "rules": {
+    "meta": {
+      "title": "Rules | SAA 2025",
+      "description": "SAA 2025 Kudos programme rules — Hero badges, Secret Box collectibles, and Kudos Quốc Dân prize."
+    },
+    "title": "Rules",
+    "receiver": {
+      "heading": "KUDOS RECEIVERS: HERO BADGES FOR POSITIVE IMPACT",
+      "intro": "Based on how many teammates send you Kudos, you receive a matching Hero badge, shown next to your profile name.",
+      "tiers": {
+        "new": {
+          "label": "New Hero",
+          "count": "1-4 people send Kudos to you",
+          "description": "The ripple of spreading good has begun — the first notes of thanks and recognition are finding their way to you."
+        },
+        "rising": {
+          "label": "Rising Hero",
+          "count": "5-9 people send Kudos to you",
+          "description": "Your image is growing in the hearts of your teammates through your kindness and contribution."
+        },
+        "super": {
+          "label": "Super Hero",
+          "count": "10-20 people send Kudos to you",
+          "description": "You have become a trusted and beloved symbol — always ready to help and remembered by many teammates."
+        },
+        "legend": {
+          "label": "Legend Hero",
+          "count": "More than 20 people send Kudos to you",
+          "description": "You have become a legend — someone whose heart and actions leave an unforgettable mark on the team."
+        }
+      }
+    },
+    "sender": {
+      "heading": "KUDOS SENDERS: COLLECT ALL 6 ICONS TO UNLOCK A MYSTERY PRIZE",
+      "intro": "Every Kudo you send is posted to the system and collects ❤️ from the Sunner community. Every 5 ❤️ opens one Secret Box, giving you a chance at one of six SAA exclusive icons.",
+      "badges": {
+        "revival": { "label": "REVIVAL" },
+        "touch-of-light": { "label": "TOUCH OF LIGHT" },
+        "stay-gold": { "label": "STAY GOLD" },
+        "flow-to-horizon": { "label": "FLOW TO HORIZON" },
+        "beyond-the-boundary": { "label": "BEYOND THE BOUNDARY" },
+        "root-further": { "label": "ROOT FURTHER" }
+      },
+      "outro": "Sunners who collect all 6 icons receive a mystery gift from SAA 2025."
+    },
+    "quocDan": {
+      "heading": "KUDOS QUỐC DÂN",
+      "body": "The 5 Kudos that receive the most ❤️ across Sun* become the official Kudos Quốc Dân and are awarded the special SAA 2025 prize: Root Further."
+    },
+    "actions": {
+      "close": "Close",
+      "writeKudos": "WRITE KUDOS"
+    }
+  },
   "common": {
     "language": {
       "label": {
@@ -151,7 +205,8 @@
       "aboutSaa": "About SAA 2025",
       "awardsInfo": "Award Information",
       "sunKudos": "Sun* Kudos",
-      "standards": "General Standards"
+      "standards": "General Standards",
+      "rules": "Rules"
     },
     "notification": {
       "unread": "{count} unread notifications",

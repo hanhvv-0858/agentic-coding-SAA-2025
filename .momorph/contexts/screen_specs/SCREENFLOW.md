@@ -7,7 +7,7 @@
 - **Figma URL**: https://www.figma.com/design/9ypp4enmFmdK3YAFJLIu6C
 - **MoMorph URL**: https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C
 - **Created**: 2026-04-17
-- **Last Updated**: 2026-04-17
+- **Last Updated**: 2026-04-19
 
 ---
 
@@ -31,10 +31,10 @@
 | Metric | Count |
 |--------|-------|
 | Total web screens (in scope) | 29 |
-| Discovered | 3 |
-| Implemented | 3 |
-| Remaining | 26 |
-| Completion | 10% |
+| Discovered | 4 |
+| Implemented | 4 |
+| Remaining | 25 |
+| Completion | 14% |
 
 Out-of-scope frames (informational): iOS 37 · design-system 45 · deferred
 overlays 42.
@@ -57,7 +57,7 @@ these before touching the deferred groups.
 | 7 | View Kudo | `onDIohs2bS` | screen | pending | — | Read a single kudo |
 | 8 | Profile bản thân | `3FoIx6ALVb` | screen | pending | — | Own profile |
 | 9 | Profile người khác | `w4WUvsJ9KI` | screen | pending | — | Other user's profile |
-| 10 | Thể lệ UPDATE | `b1Filzi9i6` | screen | pending | — | Event rules |
+| 10 | Thể lệ UPDATE | `b1Filzi9i6` | screen | **implemented** | [the-le.md](the-le.md) · [spec](../../specs/b1Filzi9i6-the-le/spec.md) · [page](../../../src/app/the-le/page.tsx) | Event rules / Hero badges / 6-icon collectible & Kudos Quốc Dân |
 | 11 | Countdown - Prelaunch page | `8PJQswPZmU` | screen | pending | — | Pre-event countdown |
 | 12 | Tất cả thông báo | `6-1LRz3vqr` | screen | pending | — | Notification centre |
 | 13 | Error page - 403 | `T3e_iS9PCL` | screen | stub | [page](../../../src/app/error/403/page.tsx) | Denied-domain redirect target |
@@ -106,7 +106,7 @@ All in-scope web screens including the MVP set above plus post-MVP items.
 | 18 | Tất cả thông báo | `6-1LRz3vqr` | pending | ✅ |
 | 19 | View thông báo | `gWBVcaSVIf` | pending | — |
 | 20 | Notification | `D_jgDqvIc8` | pending | — |
-| 21 | Thể lệ UPDATE | `b1Filzi9i6` | pending | ✅ |
+| 21 | Thể lệ UPDATE | `b1Filzi9i6` | implemented | ✅ |
 | 22 | Tiêu chuẩn cộng đồng | `Dpn7C89--r` | pending | — |
 | 23 | Chúc mừng | `SOzErYSp_S` | pending | — |
 | 24 | Details | `AyMaiSOBqz` | pending | — |
@@ -454,6 +454,8 @@ constitution reduces to **responsive web design**:
 | 2026-04-17 | Homepage SAA shipped (MVP + P2 + P3) | 1 implemented | Phase 1 assets, Phase 2 foundation (SiteHeader/Footer/NavLink + Icon/PrimaryButton extensions + i18n + tokens), Phase 3 US1+US2+US3 (hero, countdown, awards, Kudos promo, placeholder routes), Phase 4 US4 (LogoLink scroll-to-top, sticky header), Phase 5 US5 (LanguageToggle in header), Phase 6 US6 (NotificationBell), Phase 7 US7 (QuickActionsFab), Phase 8 FR-008 (ProfileMenu + signOut Server Action). Digital Numbers font: fallback only (Courier New tabular-nums). Playwright E2E suite deferred. |
 | 2026-04-18 | Awards System specs drafted | `zFYDgyj_pD` | Created spec.md + design-style.md for `/awards` (currently stub). Inventory: 3 user stories (2 P1, 1 P2), 15 FRs, 8 TRs, 8 open questions for Product/Design. Reuses SiteHeader/Footer/KudosPromoBlock/FAB from Homepage; new: AwardsCategoryNav (scroll-spy), AwardDetailSection (alternating 2-col), 3 new icons (target/diamond/license). Ready for `/momorph.plan`. |
 | 2026-04-18 | Awards System shipped | 1 implemented | Phase 1 assets (3 icon SVGs fetched), Phase 2 foundation (Award type extended with longDescKey/prizeCount/prizeUnit/prizeValues, Icon target/diamond/license added, awards.* i18n keys both locales, --color-nav-dot token), Phase 3 US1 (AwardsHeroBanner + AwardDetailSection + AwardContent + AwardPrizeValueRow, 6 sections static render), Phase 4 US2 (AwardsCategoryNav client with IntersectionObserver scroll-spy + history.replaceState + reduced-motion + scrollend fallback + hashchange listener). Homepage AwardCard regression-free (60 unit tests + manual smoke). Badge visual uses shared award-frame.png overlay until 6 unique assets ship. |
+| 2026-04-18 | Thể lệ UPDATE discovered | `b1Filzi9i6` | Fetched frame + node tree via MoMorph MCP. Created `the-le.md` detail. Layout: scrollable `A_Nội dung thể lệ` info_block + `B_Button` footer. 3 content sections: (1) Hero tier badges for receivers (New/Rising/Super/Legend — 1–4/5–9/10–20/20+ senders), (2) 6 collectible SAA icons for senders (REVIVAL, TOUCH OF LIGHT, STAY GOLD, FLOW TO HORIZON, BEYOND THE BOUNDARY, ROOT FUTHER) via Secret Box (every 5 ❤ = 1 box, full set → mystery gift), (3) KUDOS QUỐC DÂN — top 5 most-hearted win Root Further. Outgoing navs: "Đóng" → caller (High), "Viết KUDOS" → `ihQ26W78P2` (High; node spec declares `linkedFrameId=520:11602`). Reuse candidates: `<HeroBadge />`, `<CollectibleBadge />`, `<WriteKudosButton />`. No forms, no APIs for MVP (static i18n copy; possibly CMS-driven later via admin campaign). Ready for `/momorph.specify`. |
+| 2026-04-19 | Thể lệ UPDATE shipped (MVP) | `b1Filzi9i6` | Full phases 1–5 delivered as route-mode (`/the-le`) per plan Q1 Option B. Shipped: `<PrimaryButton>` extended with `size: "md" \| "lg"` + `variant: "secondary"` (+ 4 tests); new `close` icon; 2 new tokens `--color-panel-surface` + `--color-border-secondary`; 3 new analytics events (`rules_view` / `rules_close` / `rules_cta_write_kudos`); 18-key `rules.*` i18n namespace in vi + en; `common.nav.rules` label. New shared atoms `<HeroBadge>` + `<CollectibleBadge>` (CSS glow placeholders — swap in real exports per `assets-map.md`). Screen composed of RulesPanel/RulesContent/HeroTierCard + 3 sections + RulesDismisser (Esc → back) + CloseButton + WriteKudosButton. Route auth-gated via Supabase `getUser()`. Added `/the-le` to `FOOTER_NAV`. Tests: 5-case RulesPanel integration spec + extended Icon/PrimaryButton specs + 2 Playwright specs (`the-le.spec.ts` + `the-le.a11y.spec.ts`). All 91 Vitest tests green; tsc + lint clean. Deferred: Phase 0 asset fetch, Lighthouse run, SR-authenticated manual smoke. |
 
 ---
 
