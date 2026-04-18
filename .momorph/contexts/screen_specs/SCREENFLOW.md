@@ -32,9 +32,9 @@
 |--------|-------|
 | Total web screens (in scope) | 29 |
 | Discovered | 3 |
-| Implemented | 2 |
+| Implemented | 3 |
 | Remaining | 26 |
-| Completion | 7% |
+| Completion | 10% |
 
 Out-of-scope frames (informational): iOS 37 · design-system 45 · deferred
 overlays 42.
@@ -50,7 +50,7 @@ these before touching the deferred groups.
 |---|-------------|----------|------|--------|-------------|---------|
 | 1 | Login | `GzbNeVGJHz` | screen | **implemented** | [login.md](login.md) · [spec](../../specs/GzbNeVGJHz-login/spec.md) · [page](../../../src/app/(public)/login/page.tsx) | Google OAuth entry point |
 | 2 | Homepage SAA | `i87tDx10uM` | screen | **implemented** | [spec](../../specs/i87tDx10uM-homepage-saa/spec.md) · [design-style](../../specs/i87tDx10uM-homepage-saa/design-style.md) · [page](../../../src/app/page.tsx) | Post-login landing, event info, awards, kudos widget |
-| 3 | Hệ thống giải | `zFYDgyj_pD` | screen | **discovered** | [spec](../../specs/zFYDgyj_pD-awards-system/spec.md) · [design-style](../../specs/zFYDgyj_pD-awards-system/design-style.md) | Award categories list + detail cards |
+| 3 | Hệ thống giải | `zFYDgyj_pD` | screen | **implemented** | [spec](../../specs/zFYDgyj_pD-awards-system/spec.md) · [design-style](../../specs/zFYDgyj_pD-awards-system/design-style.md) · [page](../../../src/app/awards/page.tsx) | Award categories list + detail cards |
 | 4 | Sun* Kudos - Live board | `MaZUn5xHXZ` | screen | pending | — | Live kudos feed |
 | 5 | Viết Kudo | `ihQ26W78P2` | screen | pending | — | Compose a kudo |
 | 6 | Viết KUDO - Lỗi chưa điền đủ | `5c7PkAibyD` | screen | pending | — | Viết Kudo form error state |
@@ -453,6 +453,7 @@ constitution reduces to **responsive web design**:
 | 2026-04-17 | Homepage SAA specs drafted | `i87tDx10uM` | Created spec.md + design-style.md. Inventory: 7 user stories (2 P1 MVP, 2 P1, 2 P2, 1 P3), 13 FRs, 9 TRs, 30+ i18n keys. Open questions Q1–Q11 for Product/Design. Ready for `/momorph.plan`. |
 | 2026-04-17 | Homepage SAA shipped (MVP + P2 + P3) | 1 implemented | Phase 1 assets, Phase 2 foundation (SiteHeader/Footer/NavLink + Icon/PrimaryButton extensions + i18n + tokens), Phase 3 US1+US2+US3 (hero, countdown, awards, Kudos promo, placeholder routes), Phase 4 US4 (LogoLink scroll-to-top, sticky header), Phase 5 US5 (LanguageToggle in header), Phase 6 US6 (NotificationBell), Phase 7 US7 (QuickActionsFab), Phase 8 FR-008 (ProfileMenu + signOut Server Action). Digital Numbers font: fallback only (Courier New tabular-nums). Playwright E2E suite deferred. |
 | 2026-04-18 | Awards System specs drafted | `zFYDgyj_pD` | Created spec.md + design-style.md for `/awards` (currently stub). Inventory: 3 user stories (2 P1, 1 P2), 15 FRs, 8 TRs, 8 open questions for Product/Design. Reuses SiteHeader/Footer/KudosPromoBlock/FAB from Homepage; new: AwardsCategoryNav (scroll-spy), AwardDetailSection (alternating 2-col), 3 new icons (target/diamond/license). Ready for `/momorph.plan`. |
+| 2026-04-18 | Awards System shipped | 1 implemented | Phase 1 assets (3 icon SVGs fetched), Phase 2 foundation (Award type extended with longDescKey/prizeCount/prizeUnit/prizeValues, Icon target/diamond/license added, awards.* i18n keys both locales, --color-nav-dot token), Phase 3 US1 (AwardsHeroBanner + AwardDetailSection + AwardContent + AwardPrizeValueRow, 6 sections static render), Phase 4 US2 (AwardsCategoryNav client with IntersectionObserver scroll-spy + history.replaceState + reduced-motion + scrollend fallback + hashchange listener). Homepage AwardCard regression-free (60 unit tests + manual smoke). Badge visual uses shared award-frame.png overlay until 6 unique assets ship. |
 
 ---
 

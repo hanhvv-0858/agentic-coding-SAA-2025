@@ -18,6 +18,10 @@
   /* Neutrals */
   --color-divider: #2e3940;
 
+  /* Awards page — red dot indicator on active nav item (design-style
+     Awards-system §Colors, Figma node 313:8459). */
+  --color-nav-dot: #d4271d;
+
   /* Fonts — wired from next/font/google in src/app/layout.tsx */
   --font-montserrat: var(--font-montserrat);
   --font-montserrat-alt: var(--font-montserrat-alt);

@@ -10,19 +10,23 @@ export async function RootFurtherCard() {
   const rf = messages.homepage.rootFurther;
 
   return (
-    <section className="relative mx-auto w-full max-w-[1200px] px-6 sm:px-8 lg:px-16">
-      {/* Soft vignette for text legibility — sits on top of the shared
-          backdrop but below the content. */}
+    <section className="relative w-full">
+      {/* Top-transparent → bottom-solid gradient: the shared backdrop reads
+          clearly behind the ROOT FURTHER title, then fades to solid
+          brand-900 so the description paragraphs + quote sit on a clean
+          dark surface — matching the design. Spans the full viewport width
+          (not capped by max-w) so the solid dark floor meets the edges of
+          the backdrop wrapper. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at center, rgba(0,16,26,0.70) 0%, rgba(0,16,26,0.35) 60%, rgba(0,16,26,0) 100%)",
+            "linear-gradient(to bottom, rgba(0,16,26,0) 0%, rgba(0,16,26,0) 18%, rgba(0,16,26,0.85) 45%, rgba(0,16,26,1) 65%, rgba(0,16,26,1) 100%)",
         }}
       />
 
-      <div className="relative z-10 flex flex-col items-center py-16 sm:py-20 lg:py-24">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-col items-center px-6 py-16 sm:px-8 sm:py-20 lg:px-16 lg:py-24">
         <RootFurtherTitle className="text-center text-[var(--color-accent-cream)] text-4xl sm:text-5xl lg:text-6xl" />
 
         <div className="mx-auto mt-10 flex max-w-[920px] flex-col gap-5 text-center font-[family-name:var(--font-montserrat)] text-[15px] leading-7 font-normal tracking-[0.3px] text-white/95 sm:text-base sm:leading-[28px]">

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import type { Award } from "@/data/awards";
+import { splitOverlayTitle } from "@/components/awards/splitOverlayTitle";
 
 type AwardCardProps = {
   award: Award;
@@ -28,14 +29,18 @@ export function AwardCard({ award, title, description, detailLabel }: AwardCardP
           className="object-cover object-center"
         />
         <span
-          className="absolute inset-0 flex items-center justify-center px-4 text-center font-[family-name:var(--font-montserrat)] font-bold uppercase tracking-tight text-[var(--color-accent-cream)]"
+          className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center font-[family-name:var(--font-montserrat)] font-bold uppercase tracking-tight text-[var(--color-accent-cream)]"
           style={{
             fontSize: "clamp(15px, 1.9vw, 22px)",
             lineHeight: 1.1,
             textShadow: "0 2px 10px rgba(0,0,0,0.55)",
           }}
         >
-          {title}
+          {splitOverlayTitle(title).map((line, i) => (
+            <span key={i} className="block">
+              {line}
+            </span>
+          ))}
         </span>
       </div>
       <div className="flex flex-col gap-2">
