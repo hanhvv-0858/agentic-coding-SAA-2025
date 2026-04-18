@@ -5,6 +5,10 @@
   /* Brand surfaces */
   --color-brand-900: #00101a;
   --color-brand-800: #0b0f12;
+  --color-brand-700: #101417;  /* Homepage header variant (slight hue shift) */
+
+  /* Card surface for dark blocks on Homepage (Root Further card, Kudos promo) */
+  --color-card: #0b1419;
 
   /* Accent */
   --color-accent-cream: #ffea9e;
@@ -17,6 +21,9 @@
   /* Fonts — wired from next/font/google in src/app/layout.tsx */
   --font-montserrat: var(--font-montserrat);
   --font-montserrat-alt: var(--font-montserrat-alt);
+
+  /* Digital Numbers font — fallback to monospace until licensed */
+  --font-digital-numbers: "Digital Numbers", "Courier New", monospace;
 }
 
 body {

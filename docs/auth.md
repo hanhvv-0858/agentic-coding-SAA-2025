@@ -101,6 +101,53 @@ Google OAuth doesn't work out-of-the-box against local Supabase — for full aut
 testing, use a dedicated test project on supabase.com with a Google OAuth client
 configured against `http://localhost:54321/auth/v1/callback`.
 
+## Sign out
+
+Sign-out goes through a Server Action so the Supabase session cookie is
+cleared server-side before the browser ever sees the next page. The
+[`<ProfileMenu />`](../src/components/layout/ProfileMenu.tsx) dropdown in the
+header wraps the "Sign out" item in a form whose `action` is
+[`signOut`](../src/libs/auth/signOut.ts):
+
+```tsx
+<form action={signOut}>
+  <button type="submit">{labels.signOut}</button>
+</form>
+```
+
+`signOut` calls `supabase.auth.signOut()` and then `redirect("/login")`.
+Errors from Supabase are swallowed: we still redirect because the intent was
+"end this session", and the middleware session-refresh step will re-prompt on
+the next request if the cookie is somehow still live.
+
+## Admin role
+
+The `<ProfileMenu />` dropdown conditionally renders an **Admin Dashboard**
+link when the user has an admin role. The contract:
+
+- Role source of truth lives in Supabase's `auth.users.app_metadata.role`.
+- Servers (Server Components / Server Actions) read it via
+  `supabase.auth.getUser()` and `user.app_metadata.role === "admin"`.
+- `/admin/*` routes must re-verify server-side — never trust a client-rendered
+  UI gate, even though the menu item is hidden for non-admins.
+
+```ts
+// src/app/admin/page.tsx (pattern)
+const supabase = await createClient();
+const { data } = await supabase.auth.getUser();
+if (!data.user) redirect("/login");
+const role = (data.user.app_metadata as { role?: string } | null)?.role;
+if (role !== "admin") redirect("/error/403");
+```
+
+To grant admin:
+
+1. In Supabase dashboard → Authentication → Users → pick the user → **User
+   Metadata** → edit `app_metadata` → `{ "role": "admin" }`.
+2. Or via SQL: `update auth.users set raw_app_meta_data = raw_app_meta_data ||
+   '{"role":"admin"}'::jsonb where email = 'you@sun-asterisk.com';`
+3. The next `getUser()` call reflects the change — no redeploy needed.
+
 ## Security notes
 
 - The anon key is **safe** to expose to the browser as long as RLS is enabled on

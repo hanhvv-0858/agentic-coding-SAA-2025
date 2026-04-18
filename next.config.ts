@@ -6,6 +6,17 @@ import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 // Fire-and-forget (next.config.ts is compiled without top-level-await support).
 void initOpenNextCloudflareForDev();
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      // Google profile avatars (Supabase OAuth stores the URL in
+      // user_metadata.avatar_url / picture). Variants are lh3/lh4/lh5/lh6.
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", hostname: "lh4.googleusercontent.com" },
+      { protocol: "https", hostname: "lh5.googleusercontent.com" },
+      { protocol: "https", hostname: "lh6.googleusercontent.com" },
+    ],
+  },
+};
 
 export default nextConfig;

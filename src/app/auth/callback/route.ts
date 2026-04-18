@@ -31,6 +31,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(params.code);
   if (exchangeError) {
     // Supabase network failures surface with status/message hints we can use.
+    console.error("exchangeCodeForSession failed:", exchangeError);  // <-- thêm dòng này
     const isNetwork =
       exchangeError.status === 0 ||
       (exchangeError.status !== undefined && exchangeError.status >= 500) ||

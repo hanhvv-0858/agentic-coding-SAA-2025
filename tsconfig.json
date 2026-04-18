@@ -30,7 +30,10 @@
     "tests/**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    "*.ts",
+    "scripts/**/*.ts",
+    "scripts/**/*.mjs"
   ],
   "exclude": ["node_modules", ".next", ".open-next", ".wrangler"]
 }
