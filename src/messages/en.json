@@ -136,6 +136,15 @@
       "description": "Giải thưởng MVP vinh danh cá nhân xuất sắc nhất năm – gương mặt tiêu biểu đại diện cho toàn bộ tập thể Sun*. Họ là người đã thể hiện năng lực vượt trội, tinh thần cống hiến bền bỉ, và tầm ảnh hưởng sâu rộng, để lại dấu ấn mạnh mẽ trong hành trình của Sun* suốt năm qua.\n\nKhông chỉ nổi bật bởi hiệu suất và kết quả công việc, họ còn là nguồn cảm hứng lan tỏa – thông qua suy nghĩ, hành động và ảnh hưởng tích cực của mình đối với tập thể.\n\nMVP là người hội tụ đầy đủ phẩm chất của người Sun* ưu tú, đồng thời mang trên mình trọng trách lớn lao: trở thành hình mẫu đại diện cho con người và tinh thần Sun*, góp phần dẫn dắt tập thể vươn tới những đỉnh cao mới."
     }
   },
+  "countdown": {
+    "prelaunch": {
+      "meta": {
+        "title": "Countdown | SAA 2025",
+        "description": "SAA 2025 prelaunch countdown"
+      },
+      "headline": "Event starts in"
+    }
+  },
   "rules": {
     "meta": {
       "title": "Rules | SAA 2025",

@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+/* DSEG7 Classic — true 7-segment LCD face for countdown digits.
+   Self-hosted under /public/fonts (OFL, https://github.com/keshikan/DSEG). */
+@font-face {
+  font-family: "DSEG7 Classic";
+  src: url("/fonts/DSEG7Classic-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DSEG7 Classic";
+  src: url("/fonts/DSEG7Classic-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Tailwind v4 theme tokens — mirror of design-style.md for SAA 2025. */
 @theme inline {
   /* Brand surfaces */
@@ -32,8 +49,9 @@
   --font-montserrat: var(--font-montserrat);
   --font-montserrat-alt: var(--font-montserrat-alt);
 
-  /* Digital Numbers font — fallback to monospace until licensed */
-  --font-digital-numbers: "Digital Numbers", "Courier New", monospace;
+  /* 7-segment display font — DSEG7 Classic, self-hosted, OFL-licensed.
+     Registered via @font-face above. */
+  --font-digital-numbers: "DSEG7 Classic", "Courier New", monospace;
 }
 
 body {

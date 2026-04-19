@@ -31,10 +31,10 @@
 | Metric | Count |
 |--------|-------|
 | Total web screens (in scope) | 29 |
-| Discovered | 4 |
-| Implemented | 4 |
-| Remaining | 25 |
-| Completion | 14% |
+| Discovered | 5 |
+| Implemented | 5 |
+| Remaining | 24 |
+| Completion | 17% |
 
 Out-of-scope frames (informational): iOS 37 · design-system 45 · deferred
 overlays 42.
@@ -58,7 +58,7 @@ these before touching the deferred groups.
 | 8 | Profile bản thân | `3FoIx6ALVb` | screen | pending | — | Own profile |
 | 9 | Profile người khác | `w4WUvsJ9KI` | screen | pending | — | Other user's profile |
 | 10 | Thể lệ UPDATE | `b1Filzi9i6` | screen | **implemented** | [the-le.md](the-le.md) · [spec](../../specs/b1Filzi9i6-the-le/spec.md) · [page](../../../src/app/the-le/page.tsx) | Event rules / Hero badges / 6-icon collectible & Kudos Quốc Dân |
-| 11 | Countdown - Prelaunch page | `8PJQswPZmU` | screen | pending | — | Pre-event countdown |
+| 11 | Countdown - Prelaunch page | `8PJQswPZmU` | screen | **implemented** | [countdown.md](countdown.md) · [spec](../../specs/8PJQswPZmU-countdown/spec.md) · [page](../../../src/app/countdown/page.tsx) | Pre-event countdown |
 | 12 | Tất cả thông báo | `6-1LRz3vqr` | screen | pending | — | Notification centre |
 | 13 | Error page - 403 | `T3e_iS9PCL` | screen | stub | [page](../../../src/app/error/403/page.tsx) | Denied-domain redirect target |
 | 14 | Error page - 404 | `p0yJ89B-9_` | screen | stub | [page](../../../src/app/error/404/page.tsx) | Not found |
@@ -88,7 +88,7 @@ All in-scope web screens including the MVP set above plus post-MVP items.
 |---|-------------|----------|--------|------|
 | 1 | Login | `GzbNeVGJHz` | implemented | ✅ |
 | 2 | Homepage SAA | `i87tDx10uM` | pending | ✅ |
-| 3 | Countdown - Prelaunch page | `8PJQswPZmU` | pending | ✅ |
+| 3 | Countdown - Prelaunch page | `8PJQswPZmU` | implemented | ✅ |
 | 4 | Sun* Kudos - Live board | `MaZUn5xHXZ` | pending | ✅ |
 | 5 | Viết Kudo | `ihQ26W78P2` | pending | ✅ |
 | 6 | Viết KUDO - Lỗi chưa điền đủ | `5c7PkAibyD` | pending | ✅ |
@@ -455,7 +455,9 @@ constitution reduces to **responsive web design**:
 | 2026-04-18 | Awards System specs drafted | `zFYDgyj_pD` | Created spec.md + design-style.md for `/awards` (currently stub). Inventory: 3 user stories (2 P1, 1 P2), 15 FRs, 8 TRs, 8 open questions for Product/Design. Reuses SiteHeader/Footer/KudosPromoBlock/FAB from Homepage; new: AwardsCategoryNav (scroll-spy), AwardDetailSection (alternating 2-col), 3 new icons (target/diamond/license). Ready for `/momorph.plan`. |
 | 2026-04-18 | Awards System shipped | 1 implemented | Phase 1 assets (3 icon SVGs fetched), Phase 2 foundation (Award type extended with longDescKey/prizeCount/prizeUnit/prizeValues, Icon target/diamond/license added, awards.* i18n keys both locales, --color-nav-dot token), Phase 3 US1 (AwardsHeroBanner + AwardDetailSection + AwardContent + AwardPrizeValueRow, 6 sections static render), Phase 4 US2 (AwardsCategoryNav client with IntersectionObserver scroll-spy + history.replaceState + reduced-motion + scrollend fallback + hashchange listener). Homepage AwardCard regression-free (60 unit tests + manual smoke). Badge visual uses shared award-frame.png overlay until 6 unique assets ship. |
 | 2026-04-18 | Thể lệ UPDATE discovered | `b1Filzi9i6` | Fetched frame + node tree via MoMorph MCP. Created `the-le.md` detail. Layout: scrollable `A_Nội dung thể lệ` info_block + `B_Button` footer. 3 content sections: (1) Hero tier badges for receivers (New/Rising/Super/Legend — 1–4/5–9/10–20/20+ senders), (2) 6 collectible SAA icons for senders (REVIVAL, TOUCH OF LIGHT, STAY GOLD, FLOW TO HORIZON, BEYOND THE BOUNDARY, ROOT FUTHER) via Secret Box (every 5 ❤ = 1 box, full set → mystery gift), (3) KUDOS QUỐC DÂN — top 5 most-hearted win Root Further. Outgoing navs: "Đóng" → caller (High), "Viết KUDOS" → `ihQ26W78P2` (High; node spec declares `linkedFrameId=520:11602`). Reuse candidates: `<HeroBadge />`, `<CollectibleBadge />`, `<WriteKudosButton />`. No forms, no APIs for MVP (static i18n copy; possibly CMS-driven later via admin campaign). Ready for `/momorph.specify`. |
+| 2026-04-19 | Countdown - Prelaunch discovered | `8PJQswPZmU` | Fetched frame + node tree via MoMorph MCP. Created `countdown.md` detail. Layout: full-bleed `MM_MEDIA_BG` + dark `Cover` overlay, centered `CountdownBlock` with headline + 3-unit `Time` row (DAYS/HOURS/MINUTES — no SECONDS, distinct from Homepage SAA hero). Each unit = 2× `LedDigit` instances of shared `Group 4`/`Group 5` (`186:2616/2617`) + caption. No buttons/links/forms in frame; outgoing nav is implicit (auto-redirect to Homepage SAA at T-0, **not modelled in Figma** — open question). Reuse: lift `<CountdownTimer />` / `<CountdownUnit />` / `<LedDigit />` out of Homepage hero into `src/components/countdown/`; reuse Login hero cover/overlay pattern. 7 open questions (auth gating, route placement vs `/`, launch-timestamp source, D/H/M-vs-D/H/M/S parity, T-0 behavior, headline copy, background asset) blocking `momorph.specify`. No APIs needed for MVP (env-var timestamp). |
 | 2026-04-19 | Thể lệ UPDATE shipped (MVP) | `b1Filzi9i6` | Full phases 1–5 delivered as route-mode (`/the-le`) per plan Q1 Option B. Shipped: `<PrimaryButton>` extended with `size: "md" \| "lg"` + `variant: "secondary"` (+ 4 tests); new `close` icon; 2 new tokens `--color-panel-surface` + `--color-border-secondary`; 3 new analytics events (`rules_view` / `rules_close` / `rules_cta_write_kudos`); 18-key `rules.*` i18n namespace in vi + en; `common.nav.rules` label. New shared atoms `<HeroBadge>` + `<CollectibleBadge>` (CSS glow placeholders — swap in real exports per `assets-map.md`). Screen composed of RulesPanel/RulesContent/HeroTierCard + 3 sections + RulesDismisser (Esc → back) + CloseButton + WriteKudosButton. Route auth-gated via Supabase `getUser()`. Added `/the-le` to `FOOTER_NAV`. Tests: 5-case RulesPanel integration spec + extended Icon/PrimaryButton specs + 2 Playwright specs (`the-le.spec.ts` + `the-le.a11y.spec.ts`). All 91 Vitest tests green; tsc + lint clean. Deferred: Phase 0 asset fetch, Lighthouse run, SR-authenticated manual smoke. |
+| 2026-04-19 | Countdown Prelaunch shipped (MVP) | `8PJQswPZmU` | Public, chromeless `/countdown` route. Extracted shared `useCountdown()` hook to `src/hooks/` (constitution §I); Homepage `<Countdown>` refactored to consume it — no API change, 0 regressions. New glass-style atoms `<PrelaunchCountdownTile>` + `<CountdownUnit>` + `<PrelaunchCountdown>` client island. Reuses existing `homepage-hero.png` bg (`unoptimized` + `priority`) + cover gradient overlay. Middleware extended to rewrite `/` → `/countdown` while `now < NEXT_PUBLIC_EVENT_START_AT` (session-refresh tradeoff documented). Server-side post-launch redirect (`redirect("/login")`) covers direct `/countdown` visits after T-0; client island pushes to `/login` on tick boundary. 2 new analytics events (`prelaunch_view` / `prelaunch_launch_transition`). New `countdown.prelaunch.*` i18n namespace (3 keys × 2 locales) — unit labels reused from `homepage.countdown.*`. Tests: 8 useCountdown hook specs + 2 atom specs + 3 client-island specs = 13 new (104 total pass); 2 Playwright specs (`countdown.spec.ts` + `countdown.a11y.spec.ts`). Deferred: AVIF/WebP derivative of 4.4 MB hero (R2), Lighthouse capture, EN headline Marketing review. |
 
 ---
 

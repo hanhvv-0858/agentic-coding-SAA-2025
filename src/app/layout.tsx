@@ -15,6 +15,10 @@ const montserratAlt = Montserrat_Alternates({
   weight: ["400", "700"],
   display: "swap",
 });
+// DSEG7 Classic (true 7-segment LCD face) is self-hosted in
+// `public/fonts/` and registered via @font-face in globals.css —
+// matches the calculator/digital-clock look of the Figma countdown.
+// OFL licensed (https://github.com/keshikan/DSEG).
 
 export const metadata: Metadata = {
   title: "Sun Annual Awards 2025",
