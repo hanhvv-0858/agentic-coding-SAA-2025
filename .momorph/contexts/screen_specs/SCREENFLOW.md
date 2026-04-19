@@ -1,397 +1,320 @@
 # Screen Flow Overview
 
 ## Project Info
-
-- **Project Name**: Agentic Coding Hands-on (Sun Annual Awards 2025)
+- **Project Name**: Sun* Annual Awards (SAA) 2025
 - **Figma File Key**: `9ypp4enmFmdK3YAFJLIu6C`
 - **Figma URL**: https://www.figma.com/design/9ypp4enmFmdK3YAFJLIu6C
 - **MoMorph URL**: https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C
 - **Created**: 2026-04-17
-- **Last Updated**: 2026-04-19
+- **Last Updated**: 2026-04-19 (scope review v2: reconciled against Figma "With design" group — 16 frames)
 
 ---
 
 ## Scope
 
-- **In scope**: Website (responsive web app, desktop-first per Figma 1440×1024
-  design viewport — mobile/tablet breakpoints derived).
-- **Out of scope**: iOS native app (37 `[iOS]`-prefixed frames), any native
-  Android app.
-- **Deferred (post-MVP)**: Admin area, secret box / giftbox event interactions,
-  community standards pages, notification detail views. Kept in inventory for
-  traceability but not part of Phase 1 delivery.
-- **Hidden from this doc**: Design-system atoms (Button, Icon, Color,
-  Typography, Frame 477-554, …) — 45 frames. Handled during per-screen style
-  extraction, not as separate specs.
+This document tracks **only the Website deliverable** and **only frames
+whose design has been finalised and whose spec has been prepared on
+MoMorph**. Source of truth: the Figma sidebar's `Screens > With design`
+group (verified 2026-04-19 against a user screenshot — 16 frames).
+
+- **In scope**: 16 spec-ready frames (5 shipped screens + 2 next-up
+  screens + 1 compose-editor overlay + 6 dropdown overlays + 2 FAB
+  overlays + 1 secret-box animation overlay).
+- **Out of scope / not tracked here**: iOS native app (37 `[iOS]` frames),
+  design-system atoms (~45 frames), Admin full screens (Phase 2, 8
+  frames), remaining secret-box animation sequence (Phase 2, ~14 frames
+  — only the one in the `With design` group is tracked below), and any
+  web frame without a MoMorph spec (Profile, Notifications, View Kudo,
+  Chúc mừng, Ẩn danh, Tiêu chuẩn cộng đồng, KUDO variants, hover cards,
+  etc.).
+- **Error pages** (`T3e_iS9PCL` 403, `p0yJ89B-9_` 404) — listed below as
+  code stubs; they have a Figma frame but no MoMorph spec yet.
+
+### Identifier choice — screen_id vs node_id
+
+**Recommendation: keep using `screen_id`** (e.g. `MaZUn5xHXZ`) as the
+primary tracking key. Both are listed in the table below so you can
+deep-link into Figma when needed.
+
+| Aspect | `screen_id` (e.g. `MaZUn5xHXZ`) | `node_id` (e.g. `2940:13431`) |
+|--------|----------------------------------|--------------------------------|
+| MoMorph MCP tools input | ✅ required by every tool (`list_frame_styles`, `get_frame_node_tree`, `get_frame_image`, …) | ❌ not accepted |
+| Existing repo layout | ✅ `.momorph/specs/{screenId}-{name}/` — already the convention | ❌ not used |
+| Stability | ✅ stable across Figma renames / re-exports | ⚠️ can change if a frame is deleted + re-inserted |
+| Figma deep-linking | ⚠️ indirect — go via MoMorph URL | ✅ works natively (`?node-id=2940-13431` in Figma URL) |
+| Human readability | ⚠️ opaque string | ✅ slightly more recognisable when browsing Figma directly |
+
+Net: the friction is all on the MoMorph/tooling side if we switch to
+node_id, zero-friction if we stay on screen_id. We'll keep `screen_id`
+as the key and surface `node_id` in the table as a convenience column
+for Figma-side work.
 
 ---
 
 ## Discovery Progress
 
-| Metric | Count |
-|--------|-------|
-| Total web screens (in scope) | 29 |
-| Discovered | 5 |
-| Implemented | 5 |
-| Remaining | 24 |
-| Completion | 17% |
-
-Out-of-scope frames (informational): iOS 37 · design-system 45 · deferred
-overlays 42.
-
----
-
-## MVP Screens (Phase 1 priority)
-
-These are the screens required to ship a functional SAA 2025 website. Complete
-these before touching the deferred groups.
-
-| # | Screen Name | Frame ID | Type | Status | Detail File | Purpose |
-|---|-------------|----------|------|--------|-------------|---------|
-| 1 | Login | `GzbNeVGJHz` | screen | **implemented** | [login.md](login.md) · [spec](../../specs/GzbNeVGJHz-login/spec.md) · [page](../../../src/app/(public)/login/page.tsx) | Google OAuth entry point |
-| 2 | Homepage SAA | `i87tDx10uM` | screen | **implemented** | [spec](../../specs/i87tDx10uM-homepage-saa/spec.md) · [design-style](../../specs/i87tDx10uM-homepage-saa/design-style.md) · [page](../../../src/app/page.tsx) | Post-login landing, event info, awards, kudos widget |
-| 3 | Hệ thống giải | `zFYDgyj_pD` | screen | **implemented** | [spec](../../specs/zFYDgyj_pD-awards-system/spec.md) · [design-style](../../specs/zFYDgyj_pD-awards-system/design-style.md) · [page](../../../src/app/awards/page.tsx) | Award categories list + detail cards |
-| 4 | Sun* Kudos - Live board | `MaZUn5xHXZ` | screen | pending | — | Live kudos feed |
-| 5 | Viết Kudo | `ihQ26W78P2` | screen | pending | — | Compose a kudo |
-| 6 | Viết KUDO - Lỗi chưa điền đủ | `5c7PkAibyD` | screen | pending | — | Viết Kudo form error state |
-| 7 | View Kudo | `onDIohs2bS` | screen | pending | — | Read a single kudo |
-| 8 | Profile bản thân | `3FoIx6ALVb` | screen | pending | — | Own profile |
-| 9 | Profile người khác | `w4WUvsJ9KI` | screen | pending | — | Other user's profile |
-| 10 | Thể lệ UPDATE | `b1Filzi9i6` | screen | **implemented** | [the-le.md](the-le.md) · [spec](../../specs/b1Filzi9i6-the-le/spec.md) · [page](../../../src/app/the-le/page.tsx) | Event rules / Hero badges / 6-icon collectible & Kudos Quốc Dân |
-| 11 | Countdown - Prelaunch page | `8PJQswPZmU` | screen | **implemented** | [countdown.md](countdown.md) · [spec](../../specs/8PJQswPZmU-countdown/spec.md) · [page](../../../src/app/countdown/page.tsx) | Pre-event countdown |
-| 12 | Tất cả thông báo | `6-1LRz3vqr` | screen | pending | — | Notification centre |
-| 13 | Error page - 403 | `T3e_iS9PCL` | screen | stub | [page](../../../src/app/error/403/page.tsx) | Denied-domain redirect target |
-| 14 | Error page - 404 | `p0yJ89B-9_` | screen | stub | [page](../../../src/app/error/404/page.tsx) | Not found |
-
-MVP overlays (directly referenced by MVP screens):
-
-| Overlay | Frame ID | Used by |
-|---------|----------|---------|
-| Dropdown-ngôn ngữ | `hUyaaugye2` | Login, Homepage header, every authenticated screen |
-| Dropdown-profile | `z4sCl3_Qtk` | Header on authenticated screens |
-| Dropdown Hashtag filter | `JWpsISMAaM` | Live board |
-| Dropdown Phòng ban | `WXK5AYB_rG` | Live board |
-| Dropdown list hashtag | `p9zO-c4a4x` | Compose kudo |
-| Addlink Box | `OyDLDuSGEa` | Compose kudo / editor |
-| Alert Overlay | `ZUofoTelpc` | Error handling site-wide |
-| Floating Action Button | `_hphd32jN2` | Live board / homepage |
+| Metric                              | Count |
+|-------------------------------------|-------|
+| Spec-ready web frames (in scope)    | 16    |
+| Shipped                             | 7     |
+| Locally spec'd, impl pending        | 0     |
+| Next up (implementation pending)    | 2     |
+| Overlays pending implementation     | 7     |
+| Error-page stubs (awaiting spec)    | 2     |
+| Actionable completion               | 44%   |
 
 ---
 
-## Full Web Screen Inventory
+## Screens
 
-All in-scope web screens including the MVP set above plus post-MVP items.
+All 16 web frames from the Figma `Screens > With design` group. Primary
+key is `screen_id`; `node_id` is the Figma-native identifier, provided
+as a convenience for deep-linking into Figma
+(`?node-id=<node_id>` in the file URL).
 
-### Core user-facing (web)
+Status legend: 🟢 shipped · 🟡 next up · 📋 spec'd (local spec
+authored, implementation not started) · ⚪ spec-ready pending (overlay
+component not yet built) · 🔵 prototype (component exists in code but
+spec has not been reconciled against it).
 
-| # | Screen Name | Frame ID | Status | MVP? |
-|---|-------------|----------|--------|------|
-| 1 | Login | `GzbNeVGJHz` | implemented | ✅ |
-| 2 | Homepage SAA | `i87tDx10uM` | pending | ✅ |
-| 3 | Countdown - Prelaunch page | `8PJQswPZmU` | implemented | ✅ |
-| 4 | Sun* Kudos - Live board | `MaZUn5xHXZ` | pending | ✅ |
-| 5 | Viết Kudo | `ihQ26W78P2` | pending | ✅ |
-| 6 | Viết KUDO - Lỗi chưa điền đủ | `5c7PkAibyD` | pending | ✅ |
-| 7 | Gửi lời chúc Kudos (A) | `JsTvi8KVQA` | pending | — |
-| 8 | Gửi lời chúc Kudos (B) | `RO7O6QOhfJ` | pending | — |
-| 9 | View Kudo | `onDIohs2bS` | pending | ✅ |
-| 10 | KUDO | `Qhg3SUg_8L` | pending | — |
-| 11 | KUDO (b) | `49Qr2oIjMV` | pending | — |
-| 12 | KUDO - Highlight | `n56Yyp7Klu` | pending | — |
-| 13 | KUDO spam | `JYHZJyOwT-` | pending | — |
-| 14 | Màn Sửa bài viết (edit mode) | `419VXmMy6I` | pending | — |
-| 15 | Profile bản thân | `3FoIx6ALVb` | pending | ✅ |
-| 16 | Profile người khác | `w4WUvsJ9KI` | pending | ✅ |
-| 17 | Hệ thống giải | `zFYDgyj_pD` | pending | ✅ |
-| 18 | Tất cả thông báo | `6-1LRz3vqr` | pending | ✅ |
-| 19 | View thông báo | `gWBVcaSVIf` | pending | — |
-| 20 | Notification | `D_jgDqvIc8` | pending | — |
-| 21 | Thể lệ UPDATE | `b1Filzi9i6` | implemented | ✅ |
-| 22 | Tiêu chuẩn cộng đồng | `Dpn7C89--r` | pending | — |
-| 23 | Chúc mừng | `SOzErYSp_S` | pending | — |
-| 24 | Details | `AyMaiSOBqz` | pending | — |
-| 25 | Ẩn danh | `p9vFVBE_tc` | pending | — |
+| # | Screen Name | screen_id | node_id | MoMorph Link | Status | Detail File | Predicted APIs | Navigations To |
+|---|-------------|-----------|---------|--------------|--------|-------------|----------------|----------------|
+| 1 | Login | `GzbNeVGJHz` | `662:14387` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/GzbNeVGJHz) | 🟢 shipped | [login.md](login.md) · [spec](../../specs/GzbNeVGJHz-login/spec.md) · [page](../../../src/app/(public)/login/page.tsx) | Supabase `POST /auth/v1/authorize?provider=google`, `GET /auth/callback` | Homepage SAA, Dropdown-ngôn ngữ, Error 403 |
+| 2 | Homepage SAA | `i87tDx10uM` | `2167:9026` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/i87tDx10uM) | 🟢 shipped | [spec](../../specs/i87tDx10uM-homepage-saa/spec.md) · [design-style](../../specs/i87tDx10uM-homepage-saa/design-style.md) · [page](../../../src/app/page.tsx) | `GET /events/current`, `GET /awards`, `GET /kudos/summary`, `GET /notifications/unread`, `GET /users/me` | Hệ thống giải, Thể lệ UPDATE, Live board, Countdown (pre-launch rewrite), Dropdown-ngôn ngữ, Dropdown-profile, Viết Kudo (FAB) |
+| 3 | Countdown – Prelaunch page | `8PJQswPZmU` | `2268:35127` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/8PJQswPZmU) | 🟢 shipped | [countdown.md](countdown.md) · [spec](../../specs/8PJQswPZmU-countdown/spec.md) · [page](../../../src/app/countdown/page.tsx) | `GET /events/current` (env-var sourced for MVP) | Login (at T-0 auto-redirect) |
+| 4 | Hệ thống giải | `zFYDgyj_pD` | `313:8436` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/zFYDgyj_pD) | 🟢 shipped | [spec](../../specs/zFYDgyj_pD-awards-system/spec.md) · [design-style](../../specs/zFYDgyj_pD-awards-system/design-style.md) · [page](../../../src/app/awards/page.tsx) | `GET /awards`, `GET /notifications/unread`, `GET /users/me` | Homepage SAA, Sun* Kudos Live board, Dropdown-ngôn ngữ, Dropdown-profile |
+| 5 | Thể lệ UPDATE | `b1Filzi9i6` | _(fetch via MoMorph)_ | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/b1Filzi9i6) | 🟢 shipped | [the-le.md](the-le.md) · [spec](../../specs/b1Filzi9i6-the-le/spec.md) · [page](../../../src/app/the-le/page.tsx) | None (static content, MVP) | Homepage SAA (Đóng), Viết Kudo (CTA) |
+| 6 | Sun* Kudos – Live board | `MaZUn5xHXZ` | `2940:13431` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/MaZUn5xHXZ) | 🟡 next up | — | `GET /kudos`, `GET /kudos?hashtag=…`, `GET /kudos?department=…`, `POST /kudos/:id/hearts` | Viết Kudo, Dropdown Phòng ban, View Kudo (parked) |
+| 7 | Viết Kudo | `ihQ26W78P2` | `520:11602` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/ihQ26W78P2) | 🟡 next up | — | `POST /kudos`, `GET /users?search=…`, `GET /hashtags` | Live board, Dropdown list hashtag, Addlink Box, Viết Kudo error state (fold into same spec) |
+| 8 | Dropdown-ngôn ngữ | `hUyaaugye2` | `721:4942` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/hUyaaugye2) | 🔵 prototype | [src/components/login/LanguageDropdown.tsx](../../../src/components/login/LanguageDropdown.tsx) | `setLocale` Server Action | Parent: Login, Homepage header, every authenticated screen |
+| 9 | Dropdown-profile | `z4sCl3_Qtk` | `721:5223` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/z4sCl3_Qtk) | 🔵 prototype | [src/components/homepage/ProfileMenu.tsx](../../../src/components/homepage/ProfileMenu.tsx) | `signOut` Server Action | Parent: Authenticated header |
+| 10 | Dropdown-profile Admin | `54rekaCHG1` | `721:5277` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/54rekaCHG1) | ⚪ pending (admin) | — | `signOut` Server Action | Parent: Admin header (Phase 2) |
+| 11 | Dropdown Phòng ban | `WXK5AYB_rG` | `721:5684` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/WXK5AYB_rG) | ⚪ pending | — | `GET /departments` | Parent: Live board |
+| 12 | Dropdown list hashtag | `p9zO-c4a4x` | `1002:13013` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/p9zO-c4a4x) | ⚪ pending | — | `GET /hashtags` | Parent: Viết Kudo |
+| 13 | Addlink Box | `OyDLDuSGEa` | `1002:12917` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/OyDLDuSGEa) | ⚪ pending | — | None (client-side link-insert dialog) | Parent: Viết Kudo editor |
+| 14 | Floating Action Button – phím nổi chức năng (collapsed) | `_hphd32jN2` | `313:9137` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/_hphd32jN2) | 🟢 shipped | [spec](../../specs/_hphd32jN2-fab-collapsed/spec.md) · [design-style](../../specs/_hphd32jN2-fab-collapsed/design-style.md) · [plan](../../specs/_hphd32jN2-fab-collapsed/plan.md) · [page](../../../src/components/shell/QuickActionsFab.tsx) | None | Toggles to `Sv7DFwBw1h` expanded |
+| 15 | Floating Action Button – phím nổi chức năng 2 (expanded menu) | `Sv7DFwBw1h` | `313:9139` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/Sv7DFwBw1h) | 🟢 shipped | [spec](../../specs/Sv7DFwBw1h-fab-quick-actions/spec.md) · [design-style](../../specs/Sv7DFwBw1h-fab-quick-actions/design-style.md) · [page](../../../src/components/shell/QuickActionsFab.tsx) | None (pure navigation) | Thể lệ UPDATE, Viết Kudo |
+| 16 | Open secret box – chưa mở | `J3-4YFIpMM` | `1466:7676` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/J3-4YFIpMM) | ⚪ pending (animation, Phase 2-ish) | — | `POST /secret-boxes/:id/open` (predicted) | Parent: Profile bản thân (parked) |
 
-### Errors
+**Discrepancy flagged**: `Dropdown Hashtag filter` (`JWpsISMAaM`) was
+tagged `"Spec Created"` on MoMorph earlier but is **not** in the Figma
+`With design` group. Remove the tag on MoMorph, or add the frame to the
+group — either fix will reconcile the two sources. Treat the component
+as blocked on Design confirmation until then.
 
-| # | Screen Name | Frame ID | Status | MVP? |
-|---|-------------|----------|--------|------|
-| 26 | Error page - 403 | `T3e_iS9PCL` | stub (placeholder) | ✅ |
-| 27 | Error page - 404 | `p0yJ89B-9_` | stub (placeholder) | ✅ |
+Error-page stubs (code live, but awaiting a real MoMorph spec before we
+call them finished):
 
-### Admin (deferred to Phase 2)
-
-| # | Screen Name | Frame ID | Status |
-|---|-------------|----------|--------|
-| 28 | Admin - Overview | `9ja9g9iJLW` | deferred |
-| 29 | Admin - Review content | `MTExSUSdUn` | deferred |
-| 30 | Admin - Review content - Search | `kO5qYafrMh` | deferred |
-| 31 | Admin - Setting | `fTCVEC9aV_` | deferred |
-| 32 | Admin - Setting - add Campaign | `cb7kD3-Xr6` | deferred |
-| 33 | Admin - Setting - add new Campaign | `FVA7A5f8z8` | deferred |
-| 34 | Admin - Setting - Edit Campaign | `htgRaDTO2f` | deferred |
-| 35 | Admin - User | `-u1lKib0JL` | deferred |
-
-### Secret box / giftbox flow (deferred)
-
-Animation-heavy sequence (11 frames for open states, standby 1–8, gift unwrap).
-Deferred to Phase 2. Frames: `_YLVd7Ij6e`, `A3J33jY-Wp`, `hCRbDKyaoT`,
-`K-LuEblC08`, `p0qHd6DJ6A`, `m0zV-VstXX`, `J3-4YFIpMM`, `iJqdwTEiDj`,
-`P5b2MJQoW6`, `VsjjEDVgEx`, `iEhDBe3Id-`, `2i7DgydylV`, `cgeDZw-tDh`,
-`sACeeoE6Ge`, `AzMhNg8aqW`.
-
-### Legacy "Thể lệ - DONE" drafts
-
-Frames `4TMyWyKO1U`, `tajvZVN9v7`, `EWoWPJkDtV` are earlier drafts of the
-`Thể lệ UPDATE` screen (`b1Filzi9i6`). Use the UPDATE version; the DONE frames
-are archive references only.
+| # | Screen | Frame ID | MoMorph Link | Status | Detail File |
+|---|--------|----------|--------------|--------|-------------|
+| E1 | Error page – 403 | `T3e_iS9PCL` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/T3e_iS9PCL) | stub | [page](../../../src/app/error/403/page.tsx) |
+| E2 | Error page – 404 | `p0yJ89B-9_` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/p0yJ89B-9_) | stub | [page](../../../src/app/error/404/page.tsx) |
 
 ---
 
-## Overlays (Dropdowns / Popovers / Alerts)
-
-Implemented as components attached to their parent screens during detailed
-analysis — not separate routes. MVP overlays are listed above; the table below
-is the full inventory for reference.
-
-| Overlay | Frame ID | Category |
-|---------|----------|----------|
-| Dropdown-ngôn ngữ | `hUyaaugye2` | language |
-| Dropdown-profile | `z4sCl3_Qtk` | profile |
-| Dropdown-profile Admin | `54rekaCHG1` | profile (admin) |
-| Dropdown Hashtag filter | `JWpsISMAaM` | filter |
-| Dropdown list hashtag | `p9zO-c4a4x` | hashtag list |
-| Dropdown Phòng ban | `WXK5AYB_rG` | filter |
-| Dropdown-filter đã nhận/gửi | `rQqxNoXoii` | filter |
-| Dropdown chọn thời gian | `lJj0-WlUn5` | filter |
-| Dropdown level | `hb4kPwSKkk` | filter |
-| Dropdown-List | `MWNZNCBr8_` | generic |
-| Dropdown list người đã gửi | `neIUcD-nc-` | recipient |
-| Dropdown list người nhận | `zJzaC9GgXt` | recipient |
-| Dropdown list người nhận muốn gửi lời chúc | `QIMJNgFb8K` | recipient |
-| Dropdown list phòng ban | `eFStQCJZaQ` | filter |
-| Dropdown list status | `UBeTfWM-AP` | filter |
-| Dropdown Role | `GLgos3fOmz` | admin |
-| Dropdown search user admin | `BFf3J-wRPk` | admin |
-| Language Dropdown | `IiLVGkACbt` | language (duplicate) |
-| Language | `IfiszsIS8J` | language (label only) |
-| date picker | `uTv7uXESrg` | date |
-| pick date | `MUBrftq_gD` | date |
-| Addlink Box | `OyDLDuSGEa` | editor dialog |
-| Alert Overlay | `ZUofoTelpc` | alert |
-| Popup delete campaign | `ri1JUJwp3v` | admin confirm |
-| Floating Action Button | `_hphd32jN2` | FAB |
-| Floating Action Button 2 | `Sv7DFwBw1h` | FAB variant |
-| Action - Campaign | `Nj4PY0mUJJ` | FAB action menu |
-| Action - Public | `HvTGgQhpzx` | post action menu |
-| Action - Spam | `bdfLU1n1Tt` | moderation menu |
-| Hover Avatar info user | `Bf5XiTE7AO` | hover card |
-| Hover campain | `gI07KYVJWE` | hover card |
-| Hover danh hiệu Legend Hero | `XI0QKVv1qZ` | hover tooltip |
-| Hover danh hiệu New Hero | `twC9br89ra` | hover tooltip |
-| Hover danh hiệu Rising Hero | `IjeDnHmzou` | hover tooltip |
-| Hover danh hiệu Super Hero | `d6zEZ9ccoX` | hover tooltip |
-| Infor | `c9oN8CW9aa` | info panel |
-| Infor - HoverAvatar (a) | `XERzyqz7lT` | hover card |
-| Infor - HoverAvatar (b) | `Avr4N77jbF` | hover card |
-| NOTE Highlight (a) | `5i_H9Pks2a` | highlight |
-| NOTE Highlight (b) | `8cYoyqtAM6` | highlight |
-| NOTE Highlight (c) | `gawvLLlQ-o` | highlight |
-| C_Filter | `7zur22HAsh` | filter bar |
-
----
-
-## Out-of-Scope (reference only)
-
-### iOS native app — 37 frames, excluded from this project
-
-The Figma file contains a full iOS design set under `[iOS]` prefix. These
-screens are **not** part of this web project. If mobile support is needed,
-address via responsive web design on the in-scope screens above.
-
-<details>
-<summary>iOS frame list (click to expand)</summary>
-
-| Screen Name | Frame ID |
-|-------------|----------|
-| [iOS] Home | `OuH1BUTYT0` |
-| [iOS] Login | `8HGlvYGJWq` |
-| [iOS] Access denied | `k-7zJk2B7s` |
-| [iOS] Not Found | `sn2mdavs1a` |
-| [iOS] Notifications | `_b68CBWKl5` |
-| [iOS] Profile bản thân | `hSH7L8doXB` |
-| [iOS] Profile người khác | `bEpdheM0yU` |
-| [iOS] Thể lệ | `zIuFaHAid4` |
-| [iOS] Open secret box | `kQk65hSYF2` |
-| [iOS] Open secret box - action bấm mở | `KUmv414uC9` |
-| [iOS] Open secret box - Standby 1–7 | `-LIblaeusT`, `IXpGakYRm5`, `_cWAEarZPi`, `scvV-OQCAJ`, `wsI6gaO_yc`, `FvTOS7oCPU`, `xptNUunBS_` |
-| [iOS] Sun*Kudos | `fO0Kt19sZZ` |
-| [iOS] Sun*Kudos_All Kudos | `j_a2GQWKDJ` |
-| [iOS] Sun*Kudos_dropdown hashtag | `V5GRjAdJyb` |
-| [iOS] Sun*Kudos_dropdown phòng ban | `76k69LQPfj` |
-| [iOS] Sun*Kudos_Gửi lời chúc Kudos | `PV7jBVZU1N` |
-| [iOS] Sun*Kudos_Gửi lời chúc - dropdown hashtag | `aKWA2klsnt` |
-| [iOS] Sun*Kudos_Gửi lời chúc - dropdown tên người nhận | `5MU728Tjck` |
-| [iOS] Sun*Kudos_Lỗi chưa điền hết | `0le8xKnFE_` |
-| [iOS] Sun*Kudos_Searching | `hldqjHoSRH` |
-| [iOS] Sun*Kudos_Search Sunner | `3jgwke3E8O` |
-| [iOS] Sun*Kudos_Tiêu chuẩn cộng đồng | `xms7csmDhD` |
-| [iOS] Sun*Kudos_Viết Kudo_default | `7fFAb-K35a` |
-| [iOS] Sun*Kudos_View kudo | `T0TR16k0vH` |
-| [iOS] Sun*Kudos_View kudo ẩn danh | `5C2BL6GYXL` |
-| [iOS] Award_Best Manager | `7y195PPTxQ` |
-| [iOS] Award_MVP | `b2BuS8HYIt` |
-| [iOS] Award_Signature 2025 - Creator | `O98TwiHaJe` |
-| [iOS] Award_Top project | `FQoJZLkG_d` |
-| [iOS] Award_Top project leader | `QQvsfK3yaK` |
-| [iOS] Award_Top talent | `c-QM3_zjkG` |
-| [iOS] Language dropdown | `uUvW6Qm1ve` |
-
-</details>
-
-### Design system atoms — 45 frames, excluded
-
-Tokens, primitives, variants (Button, Icon, Color, Typography, Grid, LOGO,
-Frame 477–554, etc.) are not separate screen specs. They feed the style
-extraction phase — see [design-style.md](../../specs/GzbNeVGJHz-login/design-style.md)
-for how tokens are handled per screen.
-
----
-
-## Navigation Graph (web only)
+## Navigation Graph
 
 ```mermaid
 flowchart TD
     subgraph Auth["Authentication (web)"]
-        Login[Login\nGzbNeVGJHz\n✅ implemented]
-        LangDrop[Dropdown-ngôn ngữ\nhUyaaugye2]
-        Err403[Error 403\nT3e_iS9PCL\nstub]
-        Err404[Error 404\np0yJ89B-9_\nstub]
+        Login["Login 🟢\nGzbNeVGJHz"]
+        Err403["Error 403 (stub)\nT3e_iS9PCL"]
+        Err404["Error 404 (stub)\np0yJ89B-9_"]
     end
 
-    subgraph Core["Core Application (web)"]
-        Home[Homepage SAA\ni87tDx10uM]
-        Awards[Hệ thống giải\nzFYDgyj_pD]
-        Liveboard[Sun* Kudos Live board\nMaZUn5xHXZ]
-        Compose[Viết Kudo\nihQ26W78P2]
-        ComposeErr[Viết Kudo — error\n5c7PkAibyD]
-        View[View Kudo\nonDIohs2bS]
-        Profile[Profile bản thân\n3FoIx6ALVb]
-        ProfileOther[Profile người khác\nw4WUvsJ9KI]
-        Notifs[Tất cả thông báo\n6-1LRz3vqr]
-        Rules[Thể lệ\nb1Filzi9i6]
-        Countdown[Countdown\n8PJQswPZmU]
+    subgraph Shell["Shell / Overlays"]
+        LangDrop["Dropdown-ngôn ngữ 🔵\nhUyaaugye2"]
+        ProfDrop["Dropdown-profile 🔵\nz4sCl3_Qtk"]
+    end
+
+    subgraph Core["Core app (spec-ready)"]
+        Home["Homepage SAA 🟢\ni87tDx10uM"]
+        Countdown["Countdown – Prelaunch 🟢\n8PJQswPZmU"]
+        Awards["Hệ thống giải 🟢\nzFYDgyj_pD"]
+        Rules["Thể lệ UPDATE 🟢\nb1Filzi9i6"]
+        Liveboard["Live board 🟡 next\nMaZUn5xHXZ"]
+        Compose["Viết Kudo 🟡 next\nihQ26W78P2"]
+    end
+
+    subgraph FilterOverlays["Feed / compose overlays"]
+        DeptFilter["Dropdown Phòng ban ⚪\nWXK5AYB_rG"]
+        HashList["Dropdown list hashtag ⚪\np9zO-c4a4x"]
+        AddLink["Addlink Box ⚪\nOyDLDuSGEa"]
+    end
+
+    subgraph Actions["Action menus"]
+        FAB["FAB 🔵\n_hphd32jN2"]
+        FAB2["FAB variant ⚪\nSv7DFwBw1h"]
+    end
+
+    subgraph GameOverlays["Event / animation overlays"]
+        SecretBox["Open secret box – chưa mở ⚪\nJ3-4YFIpMM"]
     end
 
     Login -- Google OAuth success --> Home
-    Login -- click "VN" --> LangDrop
+    Login -- click locale --> LangDrop
     Login -- denied domain --> Err403
 
+    Home -- "/" pre-launch rewrite --> Countdown
+    Countdown -- T-0 auto-redirect --> Login
     Home --> Awards
-    Home --> Liveboard
     Home --> Rules
-    Home --> Notifs
-    Home --> Profile
-    Home --> Countdown
+    Home --> Liveboard
+    Home -- header --> LangDrop
+    Home -- header --> ProfDrop
+    Home -- FAB --> FAB
 
     Awards -.-> Liveboard
-    Liveboard --> View
+    Rules -- "Viết KUDOS" CTA --> Compose
+    Rules -- "Đóng" --> Home
+
+    Liveboard -- FAB --> FAB
+    Liveboard --> DeptFilter
     Liveboard --> Compose
-    Compose --> ComposeErr
-    Compose --> View
-    View --> ProfileOther
-    ProfileOther --> ProfileOther
+    FAB -- quick action --> Compose
+
+    Compose --> HashList
+    Compose --> AddLink
+
+    SecretBox -.-> Rules
 ```
 
-Only edges verified for the `Login` screen are **High** confidence (Google
-OAuth → Homepage; language toggle → Dropdown-ngôn ngữ). Other edges are
-informed guesses pending per-screen node-tree analysis.
+Legend: 🟢 shipped · 🟡 next up · ⚪ spec-ready pending · 🔵 prototype in
+code (spec not reconciled). Edges from shipped screens are High
+confidence (verified in code). Edges from 🟡/⚪ items are informed
+predictions until we run `/momorph.specify` on them.
 
 ---
 
-## Screen Groups (web-only)
+## In-Page Navigation (Hệ thống giải)
+
+```mermaid
+flowchart LR
+    subgraph Menu["Left Nav (scroll-spy)"]
+        M1[Top Talent]
+        M2[Top Project]
+        M3[Top Project Leader]
+        M4[Best Manager]
+        M5[Signature 2025]
+        M6[MVP]
+    end
+
+    subgraph Cards["Award Detail Sections"]
+        C1[D.1 Top Talent]
+        C2[D.2 Top Project]
+        C3[D.3 Top Project Leader]
+        C4[D.4 Best Manager]
+        C5[D.5 Signature 2025]
+        C6[D.6 MVP]
+    end
+
+    M1 -->|scroll to| C1
+    M2 -->|scroll to| C2
+    M3 -->|scroll to| C3
+    M4 -->|scroll to| C4
+    M5 -->|scroll to| C5
+    M6 -->|scroll to| C6
+
+    C1 -.->|scroll spy| M1
+    C2 -.->|scroll spy| M2
+    C3 -.->|scroll spy| M3
+    C4 -.->|scroll spy| M4
+    C5 -.->|scroll spy| M5
+    C6 -.->|scroll spy| M6
+```
+
+---
+
+## Screen Groups
 
 ### Group: Authentication
-
-| Screen | Frame ID | Purpose | Entry Points |
-|--------|----------|---------|--------------|
-| Login | `GzbNeVGJHz` | Google OAuth entry | App launch, logout, 403 |
-| Error page - 403 | `T3e_iS9PCL` | Forbidden / unauthorized | Auth failures |
-| Error page - 404 | `p0yJ89B-9_` | Not found | Invalid routes |
+| Screen | Frame ID | Status | Purpose | Entry Points |
+|--------|----------|--------|---------|--------------|
+| Login | `GzbNeVGJHz` | 🟢 shipped | Google OAuth entry | App launch, logout, Error 403 |
+| Error page – 403 | `T3e_iS9PCL` | stub | Denied domain / unauthorized | Auth failure |
+| Error page – 404 | `p0yJ89B-9_` | stub | Not found | Invalid routes |
 
 ### Group: Core App
+| Screen | Frame ID | Status | Purpose | Entry Points |
+|--------|----------|--------|---------|--------------|
+| Homepage SAA | `i87tDx10uM` | 🟢 shipped | Post-login landing (event info + awards + kudos promo + countdown) | After login |
+| Countdown – Prelaunch | `8PJQswPZmU` | 🟢 shipped | Full-bleed D/H/M tiles pre-event | Middleware rewrite `/` pre-launch, direct URL |
+| Hệ thống giải | `zFYDgyj_pD` | 🟢 shipped | Awards listing with scroll-spy | Homepage, header nav |
+| Thể lệ UPDATE | `b1Filzi9i6` | 🟢 shipped | Event rules / tiers / collectible badges / Kudos Quốc Dân | Homepage footer nav |
+| Sun* Kudos – Live board | `MaZUn5xHXZ` | 🟡 next up | Live kudos feed | Homepage, Awards |
+| Viết Kudo | `ihQ26W78P2` | 🟡 next up | Compose a kudo | FAB, header menu, Rules CTA |
 
-| Screen | Frame ID | Purpose | Entry Points |
-|--------|----------|---------|--------------|
-| Homepage SAA | `i87tDx10uM` | Post-login landing | After login |
-| Hệ thống giải | `zFYDgyj_pD` | Awards & heroes | Homepage |
-| Sun* Kudos - Live board | `MaZUn5xHXZ` | Live kudos feed | Homepage, Awards |
-| Viết Kudo | `ihQ26W78P2` | Compose kudo | FAB, menu |
-| Viết Kudo - error | `5c7PkAibyD` | Form validation error | Compose submit |
-| View Kudo | `onDIohs2bS` | Read a kudo | Live board |
-| Profile bản thân | `3FoIx6ALVb` | Own profile | Header menu |
-| Profile người khác | `w4WUvsJ9KI` | Other user profile | Kudo author click |
-| Tất cả thông báo | `6-1LRz3vqr` | Notification centre | Header bell |
-| View thông báo | `gWBVcaSVIf` | Single notification | Notification centre |
-| Thể lệ UPDATE | `b1Filzi9i6` | Rules / terms | Homepage |
-| Tiêu chuẩn cộng đồng | `Dpn7C89--r` | Community standards | Compose / footer |
-| Countdown - Prelaunch | `8PJQswPZmU` | Pre-event countdown | Direct URL |
-| Chúc mừng | `SOzErYSp_S` | Post-send celebration | After kudo submit |
-| Ẩn danh | `p9vFVBE_tc` | Anonymous kudo mode | Compose |
+### Group: Dropdowns & Overlays
+| Screen | Frame ID | Status | Purpose | Entry Points |
+|--------|----------|--------|---------|--------------|
+| Dropdown-ngôn ngữ | `hUyaaugye2` | 🔵 prototype | Locale toggle (vi / en) | Every screen header |
+| Dropdown-profile | `z4sCl3_Qtk` | 🔵 prototype | User menu + sign out | Authenticated header |
+| Dropdown-profile Admin | `54rekaCHG1` | ⚪ pending (admin) | Admin user menu | Admin header (Phase 2) |
+| Dropdown Phòng ban | `WXK5AYB_rG` | ⚪ pending | Filter feed by department | Live board |
+| Dropdown list hashtag | `p9zO-c4a4x` | ⚪ pending | Hashtag picker while composing | Viết Kudo |
+| Addlink Box | `OyDLDuSGEa` | ⚪ pending | Link-insert dialog for editor | Viết Kudo |
 
-### Group: Admin (deferred to Phase 2)
-
-| Screen | Frame ID | Purpose |
-|--------|----------|---------|
-| Admin - Overview | `9ja9g9iJLW` | Admin dashboard |
-| Admin - Review content | `MTExSUSdUn` | Moderation queue |
-| Admin - Review content - Search | `kO5qYafrMh` | Moderation search |
-| Admin - Setting | `fTCVEC9aV_` | Campaign/system settings |
-| Admin - Setting - add Campaign | `cb7kD3-Xr6` | Campaign picker |
-| Admin - Setting - add new Campaign | `FVA7A5f8z8` | Create campaign |
-| Admin - Setting - Edit Campaign | `htgRaDTO2f` | Edit campaign |
-| Admin - User | `-u1lKib0JL` | User management |
+### Group: Actions & animations
+| Screen | Frame ID | Status | Purpose | Entry Points |
+|--------|----------|--------|---------|--------------|
+| FAB – phím nổi chức năng (collapsed) | `_hphd32jN2` | 📋 spec'd (prototype) | Quick-actions pill, entry state; toggles the expanded menu | Homepage / Live board |
+| FAB – phím nổi chức năng 2 (expanded) | `Sv7DFwBw1h` | 📋 spec'd | Expanded menu with Thể lệ + Viết KUDOS + Cancel | Toggled from the collapsed FAB |
+| Open secret box – chưa mở | `J3-4YFIpMM` | ⚪ pending (Phase 2-ish) | Pre-open state of the secret-box gamification | Profile own (parked) |
 
 ---
 
 ## API Endpoints Summary
 
-Only endpoints with **high** or **medium** confidence are listed; the list
-will grow as more screens are analyzed.
+Only endpoints with high or medium confidence are listed — more will be
+added once Live board and Viết Kudo specs are run.
 
 | Endpoint | Method | Screens Using | Purpose |
 |----------|--------|---------------|---------|
-| Supabase Auth `/auth/v1/authorize?provider=google` | POST / redirect | Login | Initiate Google OAuth |
+| Supabase `/auth/v1/authorize?provider=google` | POST / redirect | Login | Initiate Google OAuth |
 | `/auth/callback` (Next.js Route Handler) | GET | Login | Exchange OAuth code for session |
-| `/auth/session` (Supabase SSR) | GET | Login, every authenticated screen | Read current session |
-| `setLocale` Server Action | POST (form) | Every screen (header) | Persist `NEXT_LOCALE` cookie |
+| `/auth/session` (Supabase SSR) | GET | Every authenticated screen | Read current session |
+| `setLocale` Server Action | POST (form) | Dropdown-ngôn ngữ | Persist `NEXT_LOCALE` cookie |
+| `signOut` Server Action | POST (form) | Dropdown-profile | Destroy Supabase session |
+| `/events/current` | GET | Homepage SAA, Countdown – Prelaunch | Event info + launch timestamp (env var for MVP) |
+| `/awards` | GET | Homepage SAA, Hệ thống giải | List award categories |
+| `/kudos/summary` | GET | Homepage SAA | Kudos initiative preview |
+| `/kudos` | GET | Live board (predicted) | Kudo feed (hashtag/department filters) |
+| `/kudos` | POST | Viết Kudo (predicted) | Create a kudo |
+| `/kudos/:id/hearts` | POST | Live board / View Kudo (predicted) | React / heart |
+| `/hashtags` | GET | Dropdown Hashtag filter, Dropdown list hashtag (predicted) | List hashtags |
+| `/departments` | GET | Dropdown Phòng ban (predicted) | List departments |
+| `/notifications/unread` | GET | Homepage, Hệ thống giải, shell | Bell badge count |
+| `/users/me` | GET | Shell | Current user profile |
 
 ---
 
-## Data Flow (web)
+## Data Flow
 
 ```mermaid
 flowchart LR
     subgraph Client["Frontend (Next.js 16 + Tailwind v4)"]
         LoginScreen[Login]
         AppShell[Authenticated app shell]
+        CountdownPage[/countdown/]
     end
 
     subgraph BFF["Next.js server routes"]
         Callback[/auth/callback/]
-        Middleware[middleware.ts<br/>session refresh]
+        Middleware[middleware.ts<br/>pre-launch rewrite +<br/>session refresh]
     end
 
     subgraph Supabase["Supabase"]
-        AuthSvc[Auth<br/>Google OAuth provider]
+        AuthSvc[Auth<br/>Google OAuth]
         DB[(Postgres<br/>with RLS)]
     end
 
-    LoginScreen -->|click 'LOGIN With Google'| AuthSvc
+    LoginScreen -->|click 'LOGIN with Google'| AuthSvc
     AuthSvc -->|OAuth redirect with code| Callback
     Callback -->|exchangeCodeForSession| AuthSvc
     AuthSvc -->|session cookie| Callback
-    Callback -->|302 to /| AppShell
+    Callback -->|302 to /| Middleware
+    Middleware -->|now < EVENT_START_AT| CountdownPage
+    Middleware -->|now >= EVENT_START_AT| AppShell
     AppShell --> Middleware
     Middleware -->|getUser refresh| AuthSvc
     AppShell -->|RLS-scoped queries| DB
@@ -402,44 +325,44 @@ flowchart LR
 ## Technical Notes
 
 ### Authentication Flow
-
 - Google OAuth via **Supabase Auth**. No username/password, no custom auth
-  logic (constitution Principle V).
-- Session cookie managed by `@supabase/ssr` (HttpOnly, Secure, SameSite=Lax).
-- Session re-verified on the server for every protected route; the root
-  `middleware.ts` calls `updateSession` on every request.
+  (constitution Principle V).
+- Session cookie managed by `@supabase/ssr` — HttpOnly, Secure,
+  SameSite=Lax.
+- Re-verified on the server for every protected route via
+  `middleware.ts` → `updateSession`.
+
+### Pre-launch routing
+- `middleware.ts` rewrites `/` → `/countdown` while
+  `Date.now() < NEXT_PUBLIC_EVENT_START_AT`. Documented trade-off: the
+  rewrite branch skips session refresh (accepted risk for MVP).
+- `/countdown` itself is chromeless + public; a server-side
+  `redirect("/login")` fires if someone opens it after T-0.
 
 ### State Management
-
-- Server state comes from Server Components + Server Actions (no client data
-  fetcher library in the base stack).
-- Client state: React hooks only, per `constitution.md` Principle V. No
-  global store introduced yet.
+- Server state = Server Components + Server Actions. No client data
+  fetcher in the base stack.
+- Client state = React hooks only (no global store).
 
 ### Routing
-
 - Next.js App Router (`src/app/`). Route-level UX uses `loading.tsx`,
   `error.tsx`, `not-found.tsx`.
-- Public routes: `/login`, `/error/403`, `/error/404`.
-- Post-login: `/` (Homepage), `/awards`, `/kudos/*`, `/profile/*`, etc. (wire
-  as screens get implemented).
+- Public routes: `/login`, `/countdown`, `/error/403`, `/error/404`.
+- Authenticated routes: `/`, `/awards`, `/the-le` (more to come with
+  Live board + Viết Kudo).
 
 ### i18n
-
-- Two locales in-scope: `vi` (default) and `en`.
-- Locale held in `NEXT_LOCALE` cookie, written by the `setLocale` Server
-  Action, consumed by `getMessages()` server-side.
-- Message catalogs live in [src/messages/](../../../src/messages/).
+- Two locales in scope: `vi` (default) and `en`.
+- Locale held in `NEXT_LOCALE` cookie, written by the `setLocale`
+  Server Action, consumed by `getMessages()` server-side.
+- Catalogs in [src/messages/](../../../src/messages/).
 
 ### Responsive strategy
-
-Since iOS is out of scope, the "platform-appropriate UI" principle from the
-constitution reduces to **responsive web design**:
-
-- Mobile-first Tailwind utilities (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`).
-- Layouts usable from 320 px to 1920 px wide.
+Website only — iOS frames are out of scope. Responsive breakpoints per
+constitution §II:
+- Mobile-first Tailwind utilities (`sm:`, `md:`, `lg:`, `xl:`).
 - Touch targets ≥ 44 × 44 px on touch viewports.
-- WCAG 2.2 AA; axe-core automated sweep gated in CI per spec SC-003.
+- WCAG 2.2 AA; axe-core automated sweep gated in CI.
 
 ---
 
@@ -447,32 +370,50 @@ constitution reduces to **responsive web design**:
 
 | Date | Action | Screens | Notes |
 |------|--------|---------|-------|
-| 2026-04-17 | Initial discovery + inventory | 1 of 165 raw frames | Seeded SCREENFLOW. Processed Login. |
-| 2026-04-17 | Login shipped | 1 implemented | Full Phase 1 + 2 + 3 + 4 + 5 delivered; 74/77 tasks done. |
-| 2026-04-17 | Scope narrowed to web-only | — | Dropped 37 iOS frames + 45 design-system frames from the inventory. Web scope: 29 screens + 42 overlays. |
-| 2026-04-17 | Homepage SAA specs drafted | `i87tDx10uM` | Created spec.md + design-style.md. Inventory: 7 user stories (2 P1 MVP, 2 P1, 2 P2, 1 P3), 13 FRs, 9 TRs, 30+ i18n keys. Open questions Q1–Q11 for Product/Design. Ready for `/momorph.plan`. |
-| 2026-04-17 | Homepage SAA shipped (MVP + P2 + P3) | 1 implemented | Phase 1 assets, Phase 2 foundation (SiteHeader/Footer/NavLink + Icon/PrimaryButton extensions + i18n + tokens), Phase 3 US1+US2+US3 (hero, countdown, awards, Kudos promo, placeholder routes), Phase 4 US4 (LogoLink scroll-to-top, sticky header), Phase 5 US5 (LanguageToggle in header), Phase 6 US6 (NotificationBell), Phase 7 US7 (QuickActionsFab), Phase 8 FR-008 (ProfileMenu + signOut Server Action). Digital Numbers font: fallback only (Courier New tabular-nums). Playwright E2E suite deferred. |
-| 2026-04-18 | Awards System specs drafted | `zFYDgyj_pD` | Created spec.md + design-style.md for `/awards` (currently stub). Inventory: 3 user stories (2 P1, 1 P2), 15 FRs, 8 TRs, 8 open questions for Product/Design. Reuses SiteHeader/Footer/KudosPromoBlock/FAB from Homepage; new: AwardsCategoryNav (scroll-spy), AwardDetailSection (alternating 2-col), 3 new icons (target/diamond/license). Ready for `/momorph.plan`. |
-| 2026-04-18 | Awards System shipped | 1 implemented | Phase 1 assets (3 icon SVGs fetched), Phase 2 foundation (Award type extended with longDescKey/prizeCount/prizeUnit/prizeValues, Icon target/diamond/license added, awards.* i18n keys both locales, --color-nav-dot token), Phase 3 US1 (AwardsHeroBanner + AwardDetailSection + AwardContent + AwardPrizeValueRow, 6 sections static render), Phase 4 US2 (AwardsCategoryNav client with IntersectionObserver scroll-spy + history.replaceState + reduced-motion + scrollend fallback + hashchange listener). Homepage AwardCard regression-free (60 unit tests + manual smoke). Badge visual uses shared award-frame.png overlay until 6 unique assets ship. |
-| 2026-04-18 | Thể lệ UPDATE discovered | `b1Filzi9i6` | Fetched frame + node tree via MoMorph MCP. Created `the-le.md` detail. Layout: scrollable `A_Nội dung thể lệ` info_block + `B_Button` footer. 3 content sections: (1) Hero tier badges for receivers (New/Rising/Super/Legend — 1–4/5–9/10–20/20+ senders), (2) 6 collectible SAA icons for senders (REVIVAL, TOUCH OF LIGHT, STAY GOLD, FLOW TO HORIZON, BEYOND THE BOUNDARY, ROOT FUTHER) via Secret Box (every 5 ❤ = 1 box, full set → mystery gift), (3) KUDOS QUỐC DÂN — top 5 most-hearted win Root Further. Outgoing navs: "Đóng" → caller (High), "Viết KUDOS" → `ihQ26W78P2` (High; node spec declares `linkedFrameId=520:11602`). Reuse candidates: `<HeroBadge />`, `<CollectibleBadge />`, `<WriteKudosButton />`. No forms, no APIs for MVP (static i18n copy; possibly CMS-driven later via admin campaign). Ready for `/momorph.specify`. |
-| 2026-04-19 | Countdown - Prelaunch discovered | `8PJQswPZmU` | Fetched frame + node tree via MoMorph MCP. Created `countdown.md` detail. Layout: full-bleed `MM_MEDIA_BG` + dark `Cover` overlay, centered `CountdownBlock` with headline + 3-unit `Time` row (DAYS/HOURS/MINUTES — no SECONDS, distinct from Homepage SAA hero). Each unit = 2× `LedDigit` instances of shared `Group 4`/`Group 5` (`186:2616/2617`) + caption. No buttons/links/forms in frame; outgoing nav is implicit (auto-redirect to Homepage SAA at T-0, **not modelled in Figma** — open question). Reuse: lift `<CountdownTimer />` / `<CountdownUnit />` / `<LedDigit />` out of Homepage hero into `src/components/countdown/`; reuse Login hero cover/overlay pattern. 7 open questions (auth gating, route placement vs `/`, launch-timestamp source, D/H/M-vs-D/H/M/S parity, T-0 behavior, headline copy, background asset) blocking `momorph.specify`. No APIs needed for MVP (env-var timestamp). |
-| 2026-04-19 | Thể lệ UPDATE shipped (MVP) | `b1Filzi9i6` | Full phases 1–5 delivered as route-mode (`/the-le`) per plan Q1 Option B. Shipped: `<PrimaryButton>` extended with `size: "md" \| "lg"` + `variant: "secondary"` (+ 4 tests); new `close` icon; 2 new tokens `--color-panel-surface` + `--color-border-secondary`; 3 new analytics events (`rules_view` / `rules_close` / `rules_cta_write_kudos`); 18-key `rules.*` i18n namespace in vi + en; `common.nav.rules` label. New shared atoms `<HeroBadge>` + `<CollectibleBadge>` (CSS glow placeholders — swap in real exports per `assets-map.md`). Screen composed of RulesPanel/RulesContent/HeroTierCard + 3 sections + RulesDismisser (Esc → back) + CloseButton + WriteKudosButton. Route auth-gated via Supabase `getUser()`. Added `/the-le` to `FOOTER_NAV`. Tests: 5-case RulesPanel integration spec + extended Icon/PrimaryButton specs + 2 Playwright specs (`the-le.spec.ts` + `the-le.a11y.spec.ts`). All 91 Vitest tests green; tsc + lint clean. Deferred: Phase 0 asset fetch, Lighthouse run, SR-authenticated manual smoke. |
-| 2026-04-19 | Countdown Prelaunch shipped (MVP) | `8PJQswPZmU` | Public, chromeless `/countdown` route. Extracted shared `useCountdown()` hook to `src/hooks/` (constitution §I); Homepage `<Countdown>` refactored to consume it — no API change, 0 regressions. New glass-style atoms `<PrelaunchCountdownTile>` + `<CountdownUnit>` + `<PrelaunchCountdown>` client island. Reuses existing `homepage-hero.png` bg (`unoptimized` + `priority`) + cover gradient overlay. Middleware extended to rewrite `/` → `/countdown` while `now < NEXT_PUBLIC_EVENT_START_AT` (session-refresh tradeoff documented). Server-side post-launch redirect (`redirect("/login")`) covers direct `/countdown` visits after T-0; client island pushes to `/login` on tick boundary. 2 new analytics events (`prelaunch_view` / `prelaunch_launch_transition`). New `countdown.prelaunch.*` i18n namespace (3 keys × 2 locales) — unit labels reused from `homepage.countdown.*`. Tests: 8 useCountdown hook specs + 2 atom specs + 3 client-island specs = 13 new (104 total pass); 2 Playwright specs (`countdown.spec.ts` + `countdown.a11y.spec.ts`). Deferred: AVIF/WebP derivative of 4.4 MB hero (R2), Lighthouse capture, EN headline Marketing review. |
+| 2026-04-17 | Initial discovery | Login | Migrated/seeded from previous SCREENFLOW. Login shipped (74/77 tasks). |
+| 2026-04-17 | Homepage SAA specs drafted + shipped | `i87tDx10uM` | Full 8-phase delivery including hero, countdown, awards, Kudos promo, header nav, profile menu. |
+| 2026-04-18 | Awards System specs drafted + shipped | `zFYDgyj_pD` | Scroll-spy left nav + 6 award sections + shared FAB/header/footer. |
+| 2026-04-18 | Thể lệ UPDATE discovered | `b1Filzi9i6` | Rules panel with Hero tier badges + 6 collectible badges + Kudos Quốc Dân. |
+| 2026-04-19 | Thể lệ UPDATE shipped (MVP) | `b1Filzi9i6` | Route-mode `/the-le`; PrimaryButton extended (md/lg × primary/secondary); 2 new tokens; 3 analytics events. |
+| 2026-04-19 | Countdown – Prelaunch discovered | `8PJQswPZmU` | Public/chromeless D/H/M LED countdown; shared `useCountdown()` hook extracted from Homepage. |
+| 2026-04-19 | Countdown – Prelaunch shipped (MVP) | `8PJQswPZmU` | DSEG7 Classic 7-segment font self-hosted; middleware rewrite for `/`; 2 new analytics events. |
+| 2026-04-19 | SCREENFLOW redefined (website-only + spec-ready) | — | Cross-checked `list_frames` tags. 13 spec-ready web frames (5 shipped + 2 next-up + 5 overlays + 1 admin overlay). Moved all non-spec'd in-scope frames out of the tracker (Profile, Notifications, View Kudo, KUDO variants, Chúc mừng, Ẩn danh, Tiêu chuẩn cộng đồng, FAB, hover cards) — awaiting Design to produce specs on MoMorph. Next up: Live board + Viết Kudo (paired sprint). |
+| 2026-04-19 | Reconciled scope against Figma `Screens > With design` | — | User provided Figma sidebar screenshot showing 16 frames in the `With design` group. Added 4 frames I'd parked: **Addlink Box** (`OyDLDuSGEa`), **FAB** (`_hphd32jN2`), **FAB variant** (`Sv7DFwBw1h`), **Open secret box – chưa mở** (`J3-4YFIpMM`). Flagged a discrepancy: `Dropdown Hashtag filter` (`JWpsISMAaM`) has MoMorph `"Spec Created"` tag but is NOT in the Figma With-design group — needs Design reconciliation. Also added `node_id` column for Figma deep-linking, and a short comparison explaining why we keep `screen_id` as the primary key. |
+| 2026-04-19 | FAB expanded (variant 2) specs drafted | `Sv7DFwBw1h` | Created [spec.md](../../specs/Sv7DFwBw1h-fab-quick-actions/spec.md) + [design-style.md](../../specs/Sv7DFwBw1h-fab-quick-actions/design-style.md). 6 user stories (3 × P1, 2 × P2, 1 × P3 reduced-motion), 11 FRs, 6 TRs, 4 SCs. Zero APIs (pure navigation). 3 tiles — A (Thể lệ → `/the-le`), B (Viết KUDOS → `/kudos/new`), C (red circular Cancel). Reuses `saa`/`pencil`/`close` icons from `Icon.tsx`; reuses `--color-accent-cream*` + `--color-nav-dot` tokens (no new tokens). Implementation will **replace** the current single-item dark-dropdown `QuickActionsFab` in `src/components/homepage/` — design diverges significantly. Open questions: EN translations, whether Thể lệ tile's icon should be `saa` or a generic info/book icon. |
+| 2026-04-20 | FAB collapsed (variant 1) specs drafted | `_hphd32jN2` | Created [spec.md](../../specs/_hphd32jN2-fab-collapsed/spec.md) + [design-style.md](../../specs/_hphd32jN2-fab-collapsed/design-style.md). 6 user stories (3 × P1, 2 × P2, 1 × P3 reduced-motion), 11 FRs, 7 TRs, 5 SCs. Zero APIs. Pill 106×64 `rounded-full`, three glyphs inside: pen + "/" + saa. Composite `box-shadow` (black drop + warm cream `#FAE287` glow) — new token `--shadow-fab-trigger`. Current `QuickActionsFab.tsx` prototype matches visually but missing glow layer and hover lift. Now that both FAB frames are spec'd, implementation bundles them as a single `<QuickActionsFab>` relocated to `src/components/shell/`. |
 
 ---
 
 ## Next Steps
 
-1. **Process `Homepage SAA` (`i87tDx10uM`)** via `/momorph.specify` — it's the
-   immediate post-login landing and unblocks `Hệ thống giải`, `Live board`,
-   `Profile`, `Notifications`.
-2. **Process `Dropdown-ngôn ngữ` (`hUyaaugye2`)** — Login already references it;
-   a real spec replaces the prototype in
-   [src/components/login/LanguageDropdown.tsx](../../../src/components/login/LanguageDropdown.tsx).
-3. **Process `Sun* Kudos - Live board` (`MaZUn5xHXZ`)** + **`Viết Kudo`
-   (`ihQ26W78P2`)** — the central product features.
-4. **Process `Hệ thống giải` (`zFYDgyj_pD`)** — awards listing with scroll-spy
-   navigation per the notes in earlier discovery.
-5. **Flesh out `Error 403` / `Error 404` Figma frames** (`T3e_iS9PCL`,
-   `p0yJ89B-9_`) — current implementations are minimal stubs.
-6. **Defer Admin group** until the public-facing MVP is shipped.
+- [ ] **Live board** (`MaZUn5xHXZ`) — run `/momorph.specify` → `/momorph.plan`
+      → `/momorph.tasks` → `/momorph.implement`. Central product surface;
+      unblocks feed + hashtag + department UX.
+- [ ] **Viết Kudo** (`ihQ26W78P2`) — same pipeline, paired with Live board
+      so compose → post → see-on-board lands in one coherent sprint. Fold
+      the `Viết KUDO – Lỗi chưa điền đủ` (`5c7PkAibyD`) error variant into
+      this spec.
+- [ ] **Feed + compose overlays** (`WXK5AYB_rG`, `p9zO-c4a4x`,
+      `OyDLDuSGEa`) — spec them together with their parent screens, not
+      as separate routes.
+- [ ] **Header dropdowns** (`hUyaaugye2`, `z4sCl3_Qtk`) — reconcile existing
+      prototypes against their specs via `/momorph.specify`.
+- [ ] **FAB — both states as one component** (`_hphd32jN2` + `Sv7DFwBw1h`) —
+      both local specs + design styles drafted. Next: run `/momorph.plan`
+      once covering both frames (they are two phases of one
+      `<QuickActionsFab>`), then `/momorph.tasks` + `/momorph.implement`.
+      Replaces the existing single-item dark dropdown prototype in
+      [src/components/homepage/QuickActionsFab.tsx](../../../src/components/homepage/QuickActionsFab.tsx);
+      relocates the component to `src/components/shell/`.
+- [ ] **Reconcile `Dropdown Hashtag filter`** (`JWpsISMAaM`) — ask Design
+      to either add the frame to the Figma `With design` group or remove
+      the MoMorph `"Spec Created"` tag. Blocks Live board filter UX.
+- [ ] **Chase Design for the parked list** — especially Profile own/other
+      (`3FoIx6ALVb`, `w4WUvsJ9KI`) and Notifications (`6-1LRz3vqr`,
+      `gWBVcaSVIf`). These are MVP-level but blocked on a MoMorph spec.
+- [ ] **Error pages** — ask Design for real specs for 403/404 before we
+      consider those screens finished.
+- [ ] **Dropdown-profile Admin** (`54rekaCHG1`) — spec-ready on MoMorph
+      but Admin group is Phase 2. Keep on ice.
+- [ ] **Open secret box – chưa mở** (`J3-4YFIpMM`) — gamification animation.
+      Low priority; depends on Profile-own (`3FoIx6ALVb`) which is parked.

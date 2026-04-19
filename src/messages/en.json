@@ -227,9 +227,11 @@
       "signOut": "Sign out",
       "adminDashboard": "Admin Dashboard"
     },
-    "widget": {
-      "openMenu": "Open quick menu",
-      "writeKudo": "Write Kudo"
+    "fab": {
+      "open": "Open quick actions menu",
+      "rules": "Rules",
+      "writeKudo": "Write KUDOS",
+      "close": "Close"
     },
     "footer": {
       "copyright": "© 2025 Sun* All rights reserved."

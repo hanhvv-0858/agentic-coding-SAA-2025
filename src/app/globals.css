@@ -52,6 +52,14 @@
   /* 7-segment display font — DSEG7 Classic, self-hosted, OFL-licensed.
      Registered via @font-face above. */
   --font-digital-numbers: "DSEG7 Classic", "Courier New", monospace;
+
+  /* Floating Action Button shadows (bundled spec _hphd32jN2 + Sv7DFwBw1h).
+     `pill` / `pill-hover` = composite drop + warm cream glow on the
+     collapsed trigger. `tile` = simple drop shadow for expanded menu
+     tiles. Values confirmed by Design, Q1/Q2 ✅ 2026-04-20. */
+  --shadow-fab-pill: 0 4px 4px 0 rgba(0, 0, 0, 0.25), 0 0 6px 0 #fae287;
+  --shadow-fab-pill-hover: 0 6px 10px 0 rgba(0, 0, 0, 0.3), 0 0 10px 0 #fae287;
+  --shadow-fab-tile: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 body {

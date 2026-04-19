@@ -13,7 +13,12 @@ export type AnalyticsEvent =
   | { type: "rules_close"; via: "button" | "esc" | "backdrop" }
   | { type: "rules_cta_write_kudos" }
   | { type: "prelaunch_view"; remaining_minutes: number }
-  | { type: "prelaunch_launch_transition" };
+  | { type: "prelaunch_launch_transition" }
+  // FAB quick-actions menu. Reserved for emission when Live board lands;
+  // see .momorph/specs/_hphd32jN2-fab-collapsed/plan.md §Phase 6 T032.
+  | { type: "fab_open" }
+  | { type: "fab_action_click"; action: "rules" | "write_kudo" }
+  | { type: "fab_close_cancel" };
 
 declare global {
   interface Window {

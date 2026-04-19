@@ -13,7 +13,7 @@ import { HeroSection } from "@/components/homepage/HeroSection";
 import { RootFurtherCard } from "@/components/homepage/RootFurtherCard";
 import { AwardsSection } from "@/components/homepage/AwardsSection";
 import { KudosPromoBlock } from "@/components/homepage/KudosPromoBlock";
-import { QuickActionsFab } from "@/components/homepage/QuickActionsFab";
+import { QuickActionsFab } from "@/components/shell/QuickActionsFab";
 
 type SupabaseUser = NonNullable<
   Awaited<ReturnType<Awaited<ReturnType<typeof createClient>>["auth"]["getUser"]>>["data"]["user"]
@@ -38,7 +38,7 @@ export default async function HomePage() {
   const { locale, messages } = await getMessages();
   const languageLabel = messages.common.language.label[locale];
   const languageAria = messages.common.language.toggle[locale];
-  const widgetLabels = messages.common.widget;
+  const fabLabels = messages.common.fab;
   const profileLabels = messages.common.profile;
   const notificationLabel = messages.common.notification.unread;
   const skipLabel = messages.homepage.skipToMain;
@@ -97,10 +97,7 @@ export default async function HomePage() {
         </div>
       </main>
       <SiteFooter navItems={FOOTER_NAV} showLogo />
-      <QuickActionsFab
-        openMenuLabel={widgetLabels.openMenu}
-        writeKudoLabel={widgetLabels.writeKudo}
-      />
+      <QuickActionsFab labels={fabLabels} />
     </>
   );
 }

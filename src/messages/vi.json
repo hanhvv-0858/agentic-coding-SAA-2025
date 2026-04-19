@@ -227,9 +227,11 @@
       "signOut": "Đăng xuất",
       "adminDashboard": "Trang quản trị"
     },
-    "widget": {
-      "openMenu": "Mở menu nhanh",
-      "writeKudo": "Viết Kudo"
+    "fab": {
+      "open": "Mở menu thao tác nhanh",
+      "rules": "Thể lệ",
+      "writeKudo": "Viết KUDOS",
+      "close": "Đóng"
     },
     "footer": {
       "copyright": "Bản quyền thuộc về Sun* © 2025"
