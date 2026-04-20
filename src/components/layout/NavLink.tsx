@@ -41,10 +41,12 @@ export function NavLink({ href, children, className }: NavLinkProps) {
       onKeyDown={handleKey}
       aria-current={isActive ? "page" : undefined}
       className={[
-        "font-[family-name:var(--font-montserrat)] text-sm leading-5 font-bold tracking-[0.1px] text-white",
+        "font-[family-name:var(--font-montserrat)] text-sm leading-5 font-bold tracking-[0.1px]",
         "px-3 py-2 rounded transition-colors hover:text-[var(--color-accent-cream)]",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-accent-cream)] focus-visible:outline-offset-2",
-        isActive ? "text-[var(--color-accent-cream)]" : "",
+        isActive
+          ? "text-[var(--color-accent-cream)] underline decoration-2 underline-offset-4"
+          : "text-white",
         className,
       ]
         .filter(Boolean)

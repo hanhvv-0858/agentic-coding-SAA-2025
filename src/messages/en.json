@@ -236,5 +236,96 @@
     "footer": {
       "copyright": "© 2025 Sun* All rights reserved."
     }
+  },
+  "kudos": {
+    "meta": {
+      "title": "Sun* Kudos — Live Board",
+      "description": "Live Kudos board — where Sunners send each other thanks throughout SAA 2025."
+    },
+    "hero": {
+      "h1": "A system to recognize and thank",
+      "decorative": "KUDOS",
+      "composerPlaceholder": "Today, who would you like to send a shout-out to?",
+      "searchPlaceholder": "Search Sunner profile"
+    },
+    "feed": {
+      "sectionCaption": "FEED",
+      "sectionTitle": "ALL KUDOS",
+      "endOfList": "You've reached the end of the feed.",
+      "loadMore": "Load more",
+      "bodyTruncated": "See more"
+    },
+    "filters": {
+      "hashtagLabel": "Hashtag",
+      "departmentLabel": "Department",
+      "clearLabel": "Clear filters",
+      "clearHashtagAria": "Clear hashtag filter",
+      "clearDepartmentAria": "Clear department filter",
+      "allHashtags": "All hashtags",
+      "allDepartments": "All departments",
+      "loadError": "Unable to load",
+      "retryLabel": "Retry",
+      "emptyList": "No options",
+      "activeFiltersAria": "Active filters"
+    },
+    "card": {
+      "heartAria": "Heart this kudo",
+      "heartAriaDisabled": "You can't heart a kudo you sent",
+      "copyLinkLabel": "Copy link",
+      "copyLinkSuccess": "Copied!",
+      "copyLinkToast": "Link copied — ready to share!",
+      "copyLinkError": "Couldn't copy the link. Try again.",
+      "imageAlt": "Kudo attachment",
+      "seeDetailLabel": "See detail",
+      "editAria": "Edit this Kudo",
+      "monogramAlt": "Default avatar"
+    },
+    "spotlight": {
+      "sectionCaption": "HONOUREES",
+      "sectionTitle": "SPOTLIGHT BOARD",
+      "counterSuffix": "KUDOS",
+      "recentUpdateTemplate": "{time} {name} just received a new Kudos",
+      "searchPlaceholder": "Find a Sunner",
+      "tooltipTemplate": "{name} — {count} Kudos",
+      "noResults": "No Sunners match that search.",
+      "panLabel": "Drag to pan",
+      "zoomInLabel": "Zoom in",
+      "zoomOutLabel": "Zoom out"
+    },
+    "highlight": {
+      "sectionCaption": "HIGHLIGHT",
+      "sectionTitle": "HIGHLIGHT KUDOS",
+      "pagerTemplate": "{current}/{total}",
+      "prevLabel": "Previous kudo",
+      "nextLabel": "Next kudo"
+    },
+    "sidebar": {
+      "statsTitle": "Your Kudos stats",
+      "statReceived": "Kudos received:",
+      "statSent": "Kudos sent:",
+      "statHearts": "Hearts received:",
+      "statBoxesOpened": "Secret Boxes opened:",
+      "statBoxesUnopened": "Secret Boxes unopened:",
+      "moQuaCta": "Open Secret Box",
+      "moQuaDisabledTooltip": "No gift boxes available to open.",
+      "latestGifteesTitle": "10 LATEST GIFT RECIPIENTS",
+      "noGiftees": "No Sunner has received a gift yet."
+    },
+    "empty": {
+      "feedEmpty": "No kudos yet.",
+      "spotlightEmpty": "No honourees yet.",
+      "gifteesEmpty": "No Sunner has received a gift yet."
+    },
+    "error": {
+      "feedError": "Couldn't load the kudos feed.",
+      "carouselError": "Couldn't load Highlight Kudos.",
+      "spotlightError": "Couldn't load the Spotlight Board.",
+      "statsError": "Couldn't load your stats.",
+      "retryLabel": "Retry",
+      "heartError": "Couldn't save your heart. Please try again.",
+      "offlineWarning": "You're offline — changes will sync when you're back online.",
+      "filterOfflineToast": "Can't load filters while offline.",
+      "parkedToast": "Coming soon — this feature is still in the works."
+    }
   }
 }

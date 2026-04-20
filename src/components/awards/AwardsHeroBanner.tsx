@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { HeroBackdrop } from "@/components/homepage/HeroBackdrop";
 import { getMessages } from "@/libs/i18n/getMessages";
 
@@ -18,17 +19,22 @@ export async function AwardsHeroBanner() {
     <section className="relative w-full overflow-hidden min-h-[420px] lg:min-h-[627px]">
       <HeroBackdrop />
 
-      {/* Decorative ROOT FURTHER wordmark top-left — aria-hidden, not a heading. */}
+      {/* Decorative ROOT FURTHER wordmark top-left — aria-hidden, not a
+          heading. Uses the canonical `root-further.png` asset
+          (451×200 intrinsic), rendered at the 338×150 design size on
+          desktop and clamped smaller on narrower viewports. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-24 left-6 z-10 sm:left-12 lg:top-28 lg:left-36"
+        className="pointer-events-none absolute top-16 left-6 z-10 sm:left-12 sm:top-20 lg:top-28 lg:left-36"
       >
-        <span className="block font-[family-name:var(--font-montserrat)] text-3xl leading-[0.9] font-bold uppercase tracking-[-0.03em] text-white sm:text-4xl lg:text-5xl">
-          ROOT
-        </span>
-        <span className="block font-[family-name:var(--font-montserrat)] text-3xl leading-[0.9] font-bold uppercase tracking-[-0.03em] text-white sm:text-4xl lg:text-5xl">
-          FURTHER
-        </span>
+        <Image
+          src="/images/root-further.png"
+          alt=""
+          width={338}
+          height={150}
+          priority
+          className="h-auto w-[200px] select-none sm:w-[260px] lg:w-[338px]"
+        />
       </div>
 
       {/* Center-bottom title block. */}

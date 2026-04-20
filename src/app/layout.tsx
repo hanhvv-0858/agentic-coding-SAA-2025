@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Montserrat_Alternates } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/Toaster";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -35,7 +36,13 @@ export default function RootLayout({
       lang="vi"
       className={`${montserrat.variable} ${montserratAlt.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        {/* Global toast region — see src/libs/toast.ts. Mounted at the
+            app root so any client island (HeartButton, CopyLinkButton,
+            future routes) can call `toast()` without provider plumbing. */}
+        <Toaster />
+      </body>
     </html>
   );
 }

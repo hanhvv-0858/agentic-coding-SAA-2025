@@ -15,7 +15,8 @@
     "analyze": "ANALYZE=true next build",
     "cf:build": "opennextjs-cloudflare build",
     "cf:preview": "opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare deploy"
+    "cf:deploy": "opennextjs-cloudflare deploy",
+    "seed": "tsx scripts/seed-kudos-fixtures.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",
@@ -46,6 +47,7 @@
     "happy-dom": "^20.9.0",
     "prettier": "^3.8.3",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^4.1.4",
     "wrangler": "^4.83.0"

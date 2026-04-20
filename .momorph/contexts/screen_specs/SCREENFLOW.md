@@ -56,12 +56,12 @@ for Figma-side work.
 | Metric                              | Count |
 |-------------------------------------|-------|
 | Spec-ready web frames (in scope)    | 16    |
-| Shipped                             | 7     |
+| Shipped                             | 8     |
 | Locally spec'd, impl pending        | 0     |
-| Next up (implementation pending)    | 2     |
+| Next up (implementation pending)    | 1     |
 | Overlays pending implementation     | 7     |
 | Error-page stubs (awaiting spec)    | 2     |
-| Actionable completion               | 44%   |
+| Actionable completion               | 50%   |
 
 ---
 
@@ -84,7 +84,7 @@ spec has not been reconciled against it).
 | 3 | Countdown – Prelaunch page | `8PJQswPZmU` | `2268:35127` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/8PJQswPZmU) | 🟢 shipped | [countdown.md](countdown.md) · [spec](../../specs/8PJQswPZmU-countdown/spec.md) · [page](../../../src/app/countdown/page.tsx) | `GET /events/current` (env-var sourced for MVP) | Login (at T-0 auto-redirect) |
 | 4 | Hệ thống giải | `zFYDgyj_pD` | `313:8436` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/zFYDgyj_pD) | 🟢 shipped | [spec](../../specs/zFYDgyj_pD-awards-system/spec.md) · [design-style](../../specs/zFYDgyj_pD-awards-system/design-style.md) · [page](../../../src/app/awards/page.tsx) | `GET /awards`, `GET /notifications/unread`, `GET /users/me` | Homepage SAA, Sun* Kudos Live board, Dropdown-ngôn ngữ, Dropdown-profile |
 | 5 | Thể lệ UPDATE | `b1Filzi9i6` | _(fetch via MoMorph)_ | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/b1Filzi9i6) | 🟢 shipped | [the-le.md](the-le.md) · [spec](../../specs/b1Filzi9i6-the-le/spec.md) · [page](../../../src/app/the-le/page.tsx) | None (static content, MVP) | Homepage SAA (Đóng), Viết Kudo (CTA) |
-| 6 | Sun* Kudos – Live board | `MaZUn5xHXZ` | `2940:13431` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/MaZUn5xHXZ) | 🟡 next up | — | `GET /kudos`, `GET /kudos?hashtag=…`, `GET /kudos?department=…`, `POST /kudos/:id/hearts` | Viết Kudo, Dropdown Phòng ban, View Kudo (parked) |
+| 6 | Sun* Kudos – Live board | `MaZUn5xHXZ` | `2940:13431` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/MaZUn5xHXZ) | 🟢 shipped | [spec](../../specs/MaZUn5xHXZ-kudos-live-board/spec.md) · [design-style](../../specs/MaZUn5xHXZ-kudos-live-board/design-style.md) · [plan](../../specs/MaZUn5xHXZ-kudos-live-board/plan.md) · [tasks](../../specs/MaZUn5xHXZ-kudos-live-board/tasks.md) · [DEPLOY](../../specs/MaZUn5xHXZ-kudos-live-board/DEPLOY.md) · [page](../../../src/app/kudos/page.tsx) | `GET /kudos`, `GET /kudos?hashtag=…`, `GET /kudos?department=…`, `POST /kudos/:id/hearts` | Viết Kudo, Dropdown Phòng ban, View Kudo (parked) |
 | 7 | Viết Kudo | `ihQ26W78P2` | `520:11602` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/ihQ26W78P2) | 🟡 next up | — | `POST /kudos`, `GET /users?search=…`, `GET /hashtags` | Live board, Dropdown list hashtag, Addlink Box, Viết Kudo error state (fold into same spec) |
 | 8 | Dropdown-ngôn ngữ | `hUyaaugye2` | `721:4942` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/hUyaaugye2) | 🔵 prototype | [src/components/login/LanguageDropdown.tsx](../../../src/components/login/LanguageDropdown.tsx) | `setLocale` Server Action | Parent: Login, Homepage header, every authenticated screen |
 | 9 | Dropdown-profile | `z4sCl3_Qtk` | `721:5223` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/z4sCl3_Qtk) | 🔵 prototype | [src/components/homepage/ProfileMenu.tsx](../../../src/components/homepage/ProfileMenu.tsx) | `signOut` Server Action | Parent: Authenticated header |
@@ -132,7 +132,7 @@ flowchart TD
         Countdown["Countdown – Prelaunch 🟢\n8PJQswPZmU"]
         Awards["Hệ thống giải 🟢\nzFYDgyj_pD"]
         Rules["Thể lệ UPDATE 🟢\nb1Filzi9i6"]
-        Liveboard["Live board 🟡 next\nMaZUn5xHXZ"]
+        Liveboard["Live board 🟢\nMaZUn5xHXZ"]
         Compose["Viết Kudo 🟡 next\nihQ26W78P2"]
     end
 
@@ -241,7 +241,7 @@ flowchart LR
 | Countdown – Prelaunch | `8PJQswPZmU` | 🟢 shipped | Full-bleed D/H/M tiles pre-event | Middleware rewrite `/` pre-launch, direct URL |
 | Hệ thống giải | `zFYDgyj_pD` | 🟢 shipped | Awards listing with scroll-spy | Homepage, header nav |
 | Thể lệ UPDATE | `b1Filzi9i6` | 🟢 shipped | Event rules / tiers / collectible badges / Kudos Quốc Dân | Homepage footer nav |
-| Sun* Kudos – Live board | `MaZUn5xHXZ` | 🟡 next up | Live kudos feed | Homepage, Awards |
+| Sun* Kudos – Live board | `MaZUn5xHXZ` | 🟢 shipped | Live kudos feed | Homepage, Awards |
 | Viết Kudo | `ihQ26W78P2` | 🟡 next up | Compose a kudo | FAB, header menu, Rules CTA |
 
 ### Group: Dropdowns & Overlays
@@ -380,15 +380,17 @@ constitution §II:
 | 2026-04-19 | SCREENFLOW redefined (website-only + spec-ready) | — | Cross-checked `list_frames` tags. 13 spec-ready web frames (5 shipped + 2 next-up + 5 overlays + 1 admin overlay). Moved all non-spec'd in-scope frames out of the tracker (Profile, Notifications, View Kudo, KUDO variants, Chúc mừng, Ẩn danh, Tiêu chuẩn cộng đồng, FAB, hover cards) — awaiting Design to produce specs on MoMorph. Next up: Live board + Viết Kudo (paired sprint). |
 | 2026-04-19 | Reconciled scope against Figma `Screens > With design` | — | User provided Figma sidebar screenshot showing 16 frames in the `With design` group. Added 4 frames I'd parked: **Addlink Box** (`OyDLDuSGEa`), **FAB** (`_hphd32jN2`), **FAB variant** (`Sv7DFwBw1h`), **Open secret box – chưa mở** (`J3-4YFIpMM`). Flagged a discrepancy: `Dropdown Hashtag filter` (`JWpsISMAaM`) has MoMorph `"Spec Created"` tag but is NOT in the Figma With-design group — needs Design reconciliation. Also added `node_id` column for Figma deep-linking, and a short comparison explaining why we keep `screen_id` as the primary key. |
 | 2026-04-19 | FAB expanded (variant 2) specs drafted | `Sv7DFwBw1h` | Created [spec.md](../../specs/Sv7DFwBw1h-fab-quick-actions/spec.md) + [design-style.md](../../specs/Sv7DFwBw1h-fab-quick-actions/design-style.md). 6 user stories (3 × P1, 2 × P2, 1 × P3 reduced-motion), 11 FRs, 6 TRs, 4 SCs. Zero APIs (pure navigation). 3 tiles — A (Thể lệ → `/the-le`), B (Viết KUDOS → `/kudos/new`), C (red circular Cancel). Reuses `saa`/`pencil`/`close` icons from `Icon.tsx`; reuses `--color-accent-cream*` + `--color-nav-dot` tokens (no new tokens). Implementation will **replace** the current single-item dark-dropdown `QuickActionsFab` in `src/components/homepage/` — design diverges significantly. Open questions: EN translations, whether Thể lệ tile's icon should be `saa` or a generic info/book icon. |
+| 2026-04-20 | Sun\* Kudos – Live board shipped | `MaZUn5xHXZ` | Full 11-phase delivery (US1..US9, 114 tasks). Ships feed + hashtag/department filters + optimistic heart (300 ms debounce) + copy-link + highlight carousel (5-slide pan/zoom) + spotlight word-cloud (pan/zoom, search, reduced-motion) + personal stats sidebar. Supabase-from-day-one (7 tables + RLS + 4 migrations + generated types), 11 new design tokens, ~70 i18n leaves × 2 locales, 8 typed analytics events. Test count 256 → 275 after Phase 10 motion + focus-visible sweep; axe-core + responsive E2E files added (gated on `SUPABASE_TEST_SESSION_TOKEN`). See [DEPLOY.md](../../specs/MaZUn5xHXZ-kudos-live-board/DEPLOY.md) for prod runbook. |
 | 2026-04-20 | FAB collapsed (variant 1) specs drafted | `_hphd32jN2` | Created [spec.md](../../specs/_hphd32jN2-fab-collapsed/spec.md) + [design-style.md](../../specs/_hphd32jN2-fab-collapsed/design-style.md). 6 user stories (3 × P1, 2 × P2, 1 × P3 reduced-motion), 11 FRs, 7 TRs, 5 SCs. Zero APIs. Pill 106×64 `rounded-full`, three glyphs inside: pen + "/" + saa. Composite `box-shadow` (black drop + warm cream `#FAE287` glow) — new token `--shadow-fab-trigger`. Current `QuickActionsFab.tsx` prototype matches visually but missing glow layer and hover lift. Now that both FAB frames are spec'd, implementation bundles them as a single `<QuickActionsFab>` relocated to `src/components/shell/`. |
 
 ---
 
 ## Next Steps
 
-- [ ] **Live board** (`MaZUn5xHXZ`) — run `/momorph.specify` → `/momorph.plan`
-      → `/momorph.tasks` → `/momorph.implement`. Central product surface;
-      unblocks feed + hashtag + department UX.
+- [x] **Live board** (`MaZUn5xHXZ`) — shipped 2026-04-20. 114-task,
+      11-phase delivery; 275 unit/integration tests; Supabase-from-day-one
+      (migrations + RLS + generated types). See
+      [DEPLOY.md](../../specs/MaZUn5xHXZ-kudos-live-board/DEPLOY.md).
 - [ ] **Viết Kudo** (`ihQ26W78P2`) — same pipeline, paired with Live board
       so compose → post → see-on-board lands in one coherent sprint. Fold
       the `Viết KUDO – Lỗi chưa điền đủ` (`5c7PkAibyD`) error variant into

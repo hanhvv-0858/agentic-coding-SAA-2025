@@ -156,7 +156,7 @@ No drop shadows. Depth via the same techniques as Homepage (gradient vignettes +
 The hero is **shorter than Homepage hero** (627 vs 720+) and contains the Root Further artwork + two stacked headlines. No countdown, no CTAs.
 
 **Two distinct visual anchor points:**
-1. **Top-left**: "ROOT FURTHER" decorative wordmark — **decorative, aria-hidden, NOT an `<h1>`** (see spec FR-016). Rendered as `<div aria-hidden="true">` with the same Montserrat display styling as Homepage `<RootFurtherTitle>`, but at reduced size. This is brand decoration; the page's real `<h1>` is the center-bottom title.
+1. **Top-left**: "ROOT FURTHER" decorative wordmark — **decorative, aria-hidden, NOT an `<h1>`** (see spec FR-016). Rendered as a `<div aria-hidden="true">` wrapping `<Image src="/images/root-further.png" width={338} height={150}>` so the engraved/outline logotype matches the Figma source pixel-for-pixel rather than approximating it with live text. The 338×150 design size is applied on desktop (`lg:w-[338px]`) with clamped widths for smaller breakpoints (`w-[200px] sm:w-[260px]`).
 2. **Center-bottom**: Two-line stacked title block — caption `<p>` above, headline `<h1>` below. This is the **only `<h1>`** on the page.
 
 | Property | Value | Tailwind |
@@ -164,8 +164,8 @@ The hero is **shorter than Homepage hero** (627 vs 720+) and contains the Root F
 | width × height | 1440 × 627 | `w-full h-[480px] lg:h-[627px]` |
 | background image | `homepage-hero.png` `object-cover object-right` | (next/image fill) |
 | gradient cover | `linear-gradient(0deg, #00101A -4.23%, rgba(0,19,32,0) 52.79%)` | absolute inset |
-| ROOT FURTHER wordmark position | top-left, padding 32px / 144px (desktop) | `absolute top-8 left-36` |
-| ROOT FURTHER scale | smaller than Homepage hero (roughly 40% size) | `text-4xl lg:text-5xl` |
+| ROOT FURTHER wordmark position | top-left, padding 32px / 144px (desktop) | `absolute top-16 left-6 sm:top-20 sm:left-12 lg:top-28 lg:left-36` |
+| ROOT FURTHER asset | `/images/root-further.png` (451×200 intrinsic, 338×150 on desktop) | `<Image width={338} height={150}>` with responsive `w-[200px] sm:w-[260px] lg:w-[338px]` |
 | Title block position | centred horizontally, 80px from bottom | `absolute bottom-20 inset-x-0 text-center` |
 | caption | "Sun\* annual awards 2025" 24/32 700 white, margin-bottom 8px | `text-2xl font-bold mb-2` |
 | title | "Hệ thống giải thưởng SAA 2025" 57/64 700 cream | `text-[57px] font-bold text-[var(--color-accent-cream)]` |

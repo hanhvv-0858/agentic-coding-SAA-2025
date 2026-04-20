@@ -27,7 +27,7 @@ export async function RootFurtherCard() {
       />
 
       <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-col items-center px-6 py-16 sm:px-8 sm:py-20 lg:px-16 lg:py-24">
-        <RootFurtherTitle className="text-center text-[var(--color-accent-cream)] text-4xl sm:text-5xl lg:text-6xl" />
+        <RootFurtherTitle variant="small" className="flex justify-center" />
 
         <div className="mx-auto mt-10 flex max-w-[920px] flex-col gap-5 text-center font-[family-name:var(--font-montserrat)] text-[15px] leading-7 font-normal tracking-[0.3px] text-white/95 sm:text-base sm:leading-[28px]">
           {rf.paragraphs.map((p, i) => (

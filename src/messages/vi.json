@@ -236,5 +236,96 @@
     "footer": {
       "copyright": "Bản quyền thuộc về Sun* © 2025"
     }
+  },
+  "kudos": {
+    "meta": {
+      "title": "Sun* Kudos — Live Board",
+      "description": "Bảng Kudos trực tiếp — nơi Sunner trao nhau lời cảm ơn trong suốt SAA 2025."
+    },
+    "hero": {
+      "h1": "Hệ thống ghi nhận và cảm ơn",
+      "decorative": "KUDOS",
+      "composerPlaceholder": "Hôm nay, bạn muốn gửi lời cảm ơn và ghi nhận đến ai?",
+      "searchPlaceholder": "Tìm kiếm profile Sunner"
+    },
+    "feed": {
+      "sectionCaption": "DÒNG CHẢY",
+      "sectionTitle": "ALL KUDOS",
+      "endOfList": "Bạn đã xem hết tất cả Kudos.",
+      "loadMore": "Xem thêm",
+      "bodyTruncated": "Xem thêm"
+    },
+    "filters": {
+      "hashtagLabel": "Hashtag",
+      "departmentLabel": "Bộ phận",
+      "clearLabel": "Xoá bộ lọc",
+      "clearHashtagAria": "Xoá bộ lọc hashtag",
+      "clearDepartmentAria": "Xoá bộ lọc bộ phận",
+      "allHashtags": "Tất cả hashtag",
+      "allDepartments": "Tất cả bộ phận",
+      "loadError": "Không tải được",
+      "retryLabel": "Thử lại",
+      "emptyList": "Chưa có lựa chọn",
+      "activeFiltersAria": "Bộ lọc đang áp dụng"
+    },
+    "card": {
+      "heartAria": "Thả tim kudo này",
+      "heartAriaDisabled": "Không thể thả tim cho kudo do chính bạn gửi",
+      "copyLinkLabel": "Sao chép link",
+      "copyLinkSuccess": "Đã copy!",
+      "copyLinkToast": "Đã sao chép link — sẵn sàng chia sẻ!",
+      "copyLinkError": "Không sao chép được link. Thử lại sau.",
+      "imageAlt": "Ảnh đính kèm kudo",
+      "seeDetailLabel": "Xem chi tiết",
+      "editAria": "Chỉnh sửa Kudo này",
+      "monogramAlt": "Ảnh đại diện mặc định"
+    },
+    "spotlight": {
+      "sectionCaption": "NGƯỜI ĐƯỢC VINH DANH",
+      "sectionTitle": "SPOTLIGHT BOARD",
+      "counterSuffix": "KUDOS",
+      "recentUpdateTemplate": "{time} {name} đã nhận được một Kudos mới",
+      "searchPlaceholder": "Tìm tên Sunner",
+      "tooltipTemplate": "{name} — {count} Kudos",
+      "noResults": "Không tìm thấy Sunner phù hợp.",
+      "panLabel": "Kéo để di chuyển",
+      "zoomInLabel": "Phóng to",
+      "zoomOutLabel": "Thu nhỏ"
+    },
+    "highlight": {
+      "sectionCaption": "NỔI BẬT",
+      "sectionTitle": "HIGHLIGHT KUDOS",
+      "pagerTemplate": "{current}/{total}",
+      "prevLabel": "Kudo trước",
+      "nextLabel": "Kudo sau"
+    },
+    "sidebar": {
+      "statsTitle": "Thống kê Kudos cá nhân",
+      "statReceived": "Số Kudos bạn nhận được:",
+      "statSent": "Số Kudos bạn đã gửi:",
+      "statHearts": "Số tim bạn nhận được:",
+      "statBoxesOpened": "Số Secret Box bạn đã mở:",
+      "statBoxesUnopened": "Số Secret Box chưa mở:",
+      "moQuaCta": "Mở Secret Box",
+      "moQuaDisabledTooltip": "Chưa có hộp quà nào để mở.",
+      "latestGifteesTitle": "10 SUNNER NHẬN QUÀ MỚI NHẤT",
+      "noGiftees": "Chưa có Sunner nào nhận quà."
+    },
+    "empty": {
+      "feedEmpty": "Hiện tại chưa có Kudos nào.",
+      "spotlightEmpty": "Chưa có Sunner nào được vinh danh.",
+      "gifteesEmpty": "Chưa có Sunner nào nhận quà."
+    },
+    "error": {
+      "feedError": "Không tải được danh sách Kudos.",
+      "carouselError": "Không tải được Highlight Kudos.",
+      "spotlightError": "Không tải được Spotlight Board.",
+      "statsError": "Không tải được thống kê của bạn.",
+      "retryLabel": "Thử lại",
+      "heartError": "Không thả được tim. Vui lòng thử lại.",
+      "offlineWarning": "Bạn đang offline — thao tác sẽ được đồng bộ khi có mạng.",
+      "filterOfflineToast": "Không tải được bộ lọc khi offline.",
+      "parkedToast": "Đang xây dựng — tính năng sẽ sớm ra mắt."
+    }
   }
 }

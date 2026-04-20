@@ -497,26 +497,29 @@ New assets needed (existing login assets still used: `saa-logo.png`,
 All downloadable via `mcp__momorph__get_media_files` at implementation time —
 but expect the hero + B4 images to fail extraction (same pattern as Login).
 
-### Asset Notes — hero "ROOT FURTHER" title
+### Asset Notes — hero "ROOT FURTHER" title (resolved 2026-04-21)
 
-The Homepage Figma design shows "ROOT FURTHER" prominently in the hero, but:
-- The `list_frame_styles` scan of the whole frame returned **NO TEXT node**
-  matching "ROOT FURTHER". This suggests the title is either:
-  - **(a)** baked into the hero background PNG (`2167:9028`) — inspect the
-    PNG after export to confirm; or
-  - **(b)** a separate image overlay (possibly the `Group 434` at
-    `3204:10153`, 290×134, inside the B4 content block — but that block is
-    BELOW the hero, not above).
-- If (a), the hero title is "free" — rendering the hero BG image is enough.
-- If (b), export that Group 434 as a separate PNG and overlay it on the
-  hero at the appropriate position.
-- Login's `root-further.png` (451×200, used in `<KeyVisual />`) is NOT
-  directly reusable — different dimensions, different context (the Login
-  hero uses it as the primary content; Homepage hero treats it as baked
-  artwork).
-- **Action**: after export, open `public/images/homepage-hero.jpg` and check
-  visually whether the title is already there. If not, inspect the Figma
-  layer tree at `2167:9027` to find the overlay layer.
+**Resolution**: Option (b) confirmed — "ROOT FURTHER" is a separate
+image overlay, **not** baked into the hero PNG. Two distinct
+exports are used across Homepage:
+
+- `/images/root-further_big@2x.png` (902×400 intrinsic, 2× the
+  **451×200** design size) — hero top-left, rendered by
+  `<RootFurtherTitle variant="big">` (default) inside `<HeroSection>`.
+- `/images/root-further_small@2x.png` (580×268 intrinsic, 2× the
+  **290×134** design size) — Root Further narrative card, rendered by
+  `<RootFurtherTitle variant="small">` centered inside
+  `<RootFurtherCard>`.
+
+`RootFurtherTitle` keeps its `<h1 aria-label="ROOT FURTHER">` wrapper
+so the page still exposes a proper heading to assistive tech; the
+inner `<Image>` carries `alt="ROOT FURTHER"` as a secondary anchor.
+Responsive widths clamp on narrow viewports:
+`big` → `w-[260px] sm:w-[340px] lg:w-[451px]`,
+`small` → `w-[180px] sm:w-[230px] lg:w-[290px]`.
+
+Login's `root-further.png` (451×200) remains separate — Login owns its
+own asset under a different render context.
 
 ---
 

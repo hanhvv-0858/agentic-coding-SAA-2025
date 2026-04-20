@@ -18,7 +18,36 @@ export type AnalyticsEvent =
   // see .momorph/specs/_hphd32jN2-fab-collapsed/plan.md §Phase 6 T032.
   | { type: "fab_open" }
   | { type: "fab_action_click"; action: "rules" | "write_kudo" }
-  | { type: "fab_close_cancel" };
+  | { type: "fab_close_cancel" }
+  // Kudos Live board (spec MaZUn5xHXZ) — plan §Analytics events.
+  // 8 new typed events; no runtime change in this file — consumers emit
+  // via the existing `track()` below. `kudos_compose_open` supersedes the
+  // FR-021 placeholders (feed view / heart / filter preserved; granularity
+  // now covers composer hand-off, copy-link, carousel/spotlight gestures).
+  | {
+      type: "kudos_feed_view";
+      filters?: { hashtag?: string; department?: string };
+    }
+  | {
+      type: "kudos_filter_apply";
+      kind: "hashtag" | "department";
+      value: string;
+    }
+  | {
+      type: "kudos_heart_toggle";
+      id: string;
+      action: "add" | "remove";
+      multiplier?: 1 | 2;
+    }
+  | { type: "kudos_card_open"; id: string; source: "feed" | "carousel" }
+  | { type: "kudos_copy_link"; id: string }
+  | { type: "kudos_spotlight_pan"; delta_x: number; delta_y: number }
+  | {
+      type: "kudos_carousel_scroll";
+      from_index: number;
+      to_index: number;
+    }
+  | { type: "kudos_compose_open"; source: "liveboard_pill" | "fab" };
 
 declare global {
   interface Window {

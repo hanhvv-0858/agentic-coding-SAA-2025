@@ -14,7 +14,21 @@ export type IconName =
   | "saa"
   | "target"
   | "diamond"
-  | "license";
+  | "license"
+  // Kudos Live board (spec MaZUn5xHXZ) — sprite additions per plan
+  // §Source code — modified files + design-style §Icons.
+  | "heart"
+  | "heart-filled"
+  | "search"
+  | "hashtag"
+  | "building"
+  | "arrow-left"
+  | "chevron-left"
+  | "chevron-right"
+  | "copy-link"
+  | "check"
+  | "eye"
+  | "gift";
 
 type IconProps = Omit<SVGProps<SVGSVGElement>, "xmlns" | "viewBox"> & {
   name: IconName;
@@ -62,6 +76,30 @@ export function Icon({ name, size = DEFAULT_SIZE, title, className, ...rest }: I
       return (
         <svg {...common} fill="none">
           <path d="M7 10L12 15L17 10H7Z" fill="currentColor" />
+        </svg>
+      );
+    case "chevron-left":
+      return (
+        <svg {...common} fill="none">
+          <path
+            d="M15 6L9 12L15 18"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    case "chevron-right":
+      return (
+        <svg {...common} fill="none">
+          <path
+            d="M9 6L15 12L9 18"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       );
     case "google":
@@ -188,6 +226,98 @@ export function Icon({ name, size = DEFAULT_SIZE, title, className, ...rest }: I
             d="M12.3 4.1l3.2 4.6 5.5 0.5-4 3.9 1.1 5.4-4.9-2.7-4.9 2.7 1.1-5.4-4-3.9 5.5-0.5 3.2-4.6z"
             fill="currentColor"
           />
+        </svg>
+      );
+    case "heart":
+      // Outline heart — Kudos action bar idle state (C.4.1).
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg>
+      );
+    case "heart-filled":
+      // Filled heart — Kudos action bar active state (C.4.1).
+      return (
+        <svg {...common} fill="none">
+          <path
+            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+            fill="currentColor"
+          />
+        </svg>
+      );
+    case "search":
+      // Magnifier — A.1 Sunner search + B.7.3 spotlight search.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M21 21l-4.35-4.35" />
+        </svg>
+      );
+    case "hashtag":
+      // Hashtag glyph — B.1.1 filter chip + C.3.7 hashtag pill prefix.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 9h16" />
+          <path d="M4 15h16" />
+          <path d="M10 3L8 21" />
+          <path d="M16 3l-2 18" />
+        </svg>
+      );
+    case "building":
+      // Department glyph — B.1.2 department filter chip.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <rect x="4" y="3" width="16" height="18" rx="1" />
+          <path d="M9 7h2" />
+          <path d="M13 7h2" />
+          <path d="M9 11h2" />
+          <path d="M13 11h2" />
+          <path d="M9 15h2" />
+          <path d="M13 15h2" />
+          <path d="M10 21v-3h4v3" />
+        </svg>
+      );
+    case "arrow-left":
+      // B.5.1 carousel previous arrow (mirror of arrow-right).
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 12H5" />
+          <path d="M11 6l-6 6 6 6" />
+        </svg>
+      );
+    case "copy-link":
+      // C.4.2 copy link button (link-like glyph).
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10 14a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5" />
+          <path d="M14 10a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5" />
+        </svg>
+      );
+    case "check":
+      // C.4.2 CopyLinkButton "Đã copy!" success state — replaces the
+      // copy-link glyph for the 1.5 s confirmation window.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 12l5 5L20 7" />
+        </svg>
+      );
+    case "eye":
+      // Gift/visibility glyph — sidebar "see detail" CTA fallback.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      );
+    case "gift":
+      // D.1.8 Mở quà CTA + decorative glyph in sidebar.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="8" width="18" height="4" rx="1" />
+          <path d="M12 8v13" />
+          <path d="M19 12v9H5v-9" />
+          <path d="M7.5 8a2.5 2.5 0 0 1 0-5c2 0 4.5 3 4.5 5" />
+          <path d="M16.5 8a2.5 2.5 0 0 0 0-5c-2 0-4.5 3-4.5 5" />
         </svg>
       );
   }

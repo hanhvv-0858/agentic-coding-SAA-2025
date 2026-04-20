@@ -60,6 +60,47 @@
   --shadow-fab-pill: 0 4px 4px 0 rgba(0, 0, 0, 0.25), 0 0 6px 0 #fae287;
   --shadow-fab-pill-hover: 0 6px 10px 0 rgba(0, 0, 0, 0.3), 0 0 10px 0 #fae287;
   --shadow-fab-tile: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Kudos Live board (spec MaZUn5xHXZ) — design-style §TR-008.
+     11 NEW tokens lifted from plan.md §Token & i18n plan. */
+  --color-kudo-card: #fff8e1;
+  --color-muted-grey: #999999;
+  --color-secondary-btn-fill: rgba(255, 234, 158, 0.10);
+  --color-heart-active: var(--color-nav-dot); /* Q10 default — alias to nav-dot red */
+  --radius-kudo-card: 24px;
+  --radius-highlight-card: 16px;
+  --radius-sidebar-card: 17px;
+  --radius-spotlight: 47px;
+  --radius-pill: 68px;
+  --radius-filter-chip: 4px;
+  --shadow-kudo-card: 0 4px 12px rgba(0, 0, 0, 0.25); /* OQ-DS-2 default */
+}
+
+/* C.4.1 HeartButton click keyframes — 250 ms scale 1 → 1.25 → 1 per
+   design-style §Motion #1. Reduced-motion callers skip the animation. */
+@keyframes kudo-heart-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  @keyframes kudo-heart-pulse {
+    0%, 100% { transform: scale(1); }
+  }
+}
+
+/* Toaster slide-in (top-right). Reduced-motion path collapses to a
+   plain fade — Toaster.tsx skips the inline animation when the hook
+   reports `reduce`. */
+@keyframes kudo-toast-enter {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  @keyframes kudo-toast-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 }
 
 body {

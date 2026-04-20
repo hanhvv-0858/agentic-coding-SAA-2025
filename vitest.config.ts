@@ -16,7 +16,11 @@ export default defineConfig({
     environment: "happy-dom",
     globals: true,
     setupFiles: ["./tests/setup/vitest.setup.ts"],
-    include: ["src/**/*.spec.{ts,tsx}", "tests/unit/**/*.spec.{ts,tsx}"],
+    include: [
+      "src/**/*.spec.{ts,tsx}",
+      "tests/unit/**/*.spec.{ts,tsx}",
+      "tests/integration/**/*.spec.{ts,tsx}",
+    ],
     exclude: ["tests/e2e/**", "node_modules/**", ".next/**", ".open-next/**"],
   },
 });
