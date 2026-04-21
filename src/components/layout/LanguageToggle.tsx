@@ -33,8 +33,8 @@ export function LanguageToggle({ locale, label, ariaLabel }: LanguageToggleProps
         close();
       }
     };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
+    window.addEventListener("mousedown", onClick);
+    return () => window.removeEventListener("mousedown", onClick);
   }, [open, close]);
 
   const handleKey = (e: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -69,7 +69,7 @@ export function LanguageToggle({ locale, label, ariaLabel }: LanguageToggleProps
         className="h-full w-full flex items-center justify-between gap-0.5 p-4 rounded text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-accent-cream)] focus-visible:outline-offset-2 cursor-pointer transition-colors"
       >
         <span className="inline-flex items-center gap-1">
-          <Icon name={locale === "vi" ? "flag-vn" : "globe"} />
+          <Icon name={locale === "vi" ? "flag-vn" : "flag-gb"} />
           <span className="font-[family-name:var(--font-montserrat)] text-base leading-6 font-bold tracking-[0.15px]">
             {label}
           </span>

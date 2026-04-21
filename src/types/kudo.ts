@@ -12,8 +12,12 @@ type KudoStatsRow = Database["public"]["Views"]["kudos_with_stats"]["Row"];
 
 export type KudoUser = Pick<
   ProfileRow,
-  "id" | "display_name" | "avatar_url" | "department_id" | "honour_code"
+  "id" | "display_name" | "avatar_url" | "department_id"
 > & {
+  /** Department code resolved from the `profiles.department_id` FK
+   * join — e.g. "CEVC1", "STVC - EE". Consolidated the former
+   * `profiles.honour_code` column (migration 0013 dropped it). */
+  department_code: string | null;
   /** Honour tier enum ("Legend Hero", "Rising Hero", "Super Hero",
    * "New Hero"). Widened to `string | null` so raw Supabase payloads
    * type-check; the DB enum enforces the closed set server-side. */

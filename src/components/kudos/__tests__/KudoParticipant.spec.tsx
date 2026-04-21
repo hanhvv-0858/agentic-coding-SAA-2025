@@ -8,7 +8,7 @@ const WITH_AVATAR: KudoUser = {
   display_name: "Nguyen Van A",
   avatar_url: "/images/avatar-a.png",
   department_id: null,
-  honour_code: null,
+  department_code: null,
   honour_title: null,
 };
 const NO_AVATAR: KudoUser = {
@@ -16,7 +16,7 @@ const NO_AVATAR: KudoUser = {
   display_name: "Tran Thi B",
   avatar_url: null,
   department_id: null,
-  honour_code: null,
+  department_code: null,
   honour_title: null,
 };
 

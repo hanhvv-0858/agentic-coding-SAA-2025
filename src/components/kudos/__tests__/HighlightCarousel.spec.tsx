@@ -22,7 +22,7 @@ const user = (id: string, name: string): KudoUser => ({
   display_name: name,
   avatar_url: null,
   department_id: null,
-  honour_code: null,
+  department_code: null,
   honour_title: null,
 });
 

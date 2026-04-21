@@ -361,11 +361,13 @@ brand-new user lands on `/kudos` before anything else.
 
 `seed.sql` populates:
 
-- **6 departments** — canonical Sun* list (codes + VI/EN labels):
-  `SVN-ENG` (Engineering / Kỹ thuật), `SVN-DES` (Design / Thiết kế),
-  `SVN-PM` (Product / Sản phẩm), `SVN-QA` (QA / Kiểm thử), `SVN-BIZ`
-  (Business / Kinh doanh), `SVN-HR` (HR / Nhân sự). *Final names pending
-  HR confirmation — flag as an Open Question if values drift.*
+- **Departments** — originally 6 generic `SVN-*` placeholders; replaced
+  on 2026-04-21 by migration `0011_seed_real_departments.sql` (spec
+  `WXK5AYB_rG`) with the 49 canonical Sun\* organisational codes
+  (`CTO`, `SPD`, `FCOV`, `CEVC1`, `CEVC2`, `STVC - R&D`, ...). Department
+  codes are proper nouns: `name_vi == name_en == code`. Migration
+  `0012_purge_legacy_departments.sql` cleans up 5 pre-SVN legacy
+  rows (`BIZ`, `DES`, `HR`, `PM`, `QA`).
 - **~10 popular hashtags** — seeded from the Q4 default set: `dedicated`,
   `creative`, `teamwork`, `mentor`, `ontime`, `leadership`, `innovation`,
   `customer-first`, `wellness`, `fun` (slugs lowercased; `label` holds

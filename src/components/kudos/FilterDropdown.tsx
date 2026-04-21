@@ -267,6 +267,7 @@ export function FilterDropdown({
                   data-active={active ? "true" : undefined}
                   onMouseEnter={() => setActiveIndex(idx)}
                   onClick={() => commit(idx)}
+                  title={opt.label}
                   className={[
                     "flex h-14 w-full cursor-pointer items-center gap-1 rounded p-4",
                     "font-[family-name:var(--font-montserrat)] text-base font-bold leading-6 tracking-[0.5px] text-white",
@@ -278,7 +279,11 @@ export function FilterDropdown({
                       : "",
                   ].join(" ")}
                 >
-                  {opt.label}
+                  {/* Truncate long labels (spec WXK5AYB_rG FR-011) — e.g.
+                      `CEVC1 - DSV - UI/UX 1` exceeds the ~171 px content
+                      width at Montserrat 16 bold. `title` attribute
+                      surfaces full text on hover. */}
+                  <span className="min-w-0 flex-1 truncate">{opt.label}</span>
                 </li>
               );
             })

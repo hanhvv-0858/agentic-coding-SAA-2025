@@ -2,6 +2,7 @@ import type { SVGProps } from "react";
 
 export type IconName =
   | "flag-vn"
+  | "flag-gb"
   | "chevron-down"
   | "google"
   | "globe"
@@ -67,6 +68,25 @@ export function Icon({ name, size = DEFAULT_SIZE, title, className, ...rest }: I
           </g>
           <defs>
             <clipPath id="icon-flag-vn-clip">
+              <rect width="20" height="15" x="2" y="5" fill="#fff" />
+            </clipPath>
+          </defs>
+        </svg>
+      );
+    case "flag-gb":
+      return (
+        <svg {...common} fill="none">
+          <g clipPath="url(#icon-flag-gb-clip)">
+            <rect width="20" height="15" x="2" y="5" fill="#012169" />
+            <path d="M2,5 L22,20 M22,5 L2,20" stroke="#FFFFFF" strokeWidth="3" />
+            <path d="M2,5 L22,20 M22,5 L2,20" stroke="#C8102E" strokeWidth="1" />
+            <rect x="2" y="11" width="20" height="3" fill="#FFFFFF" />
+            <rect x="10.5" y="5" width="3" height="15" fill="#FFFFFF" />
+            <rect x="2" y="11.75" width="20" height="1.5" fill="#C8102E" />
+            <rect x="11.25" y="5" width="1.5" height="15" fill="#C8102E" />
+          </g>
+          <defs>
+            <clipPath id="icon-flag-gb-clip">
               <rect width="20" height="15" x="2" y="5" fill="#fff" />
             </clipPath>
           </defs>

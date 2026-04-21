@@ -1,11 +1,23 @@
--- supabase/seed.sql
--- Local-dev seed for Sun* Kudos Live board. Production deploy runs
--- schema migrations only — seed is gated to non-production via
--- `supabase db reset` (never run in production). Plan.md §Seed strategy.
+-- 0011_seed_real_departments.sql
+-- Replace the 6 generic `SVN-*` department seed rows with the 49
+-- canonical Sun* organisational codes (spec WXK5AYB_rG — Dropdown
+-- Phòng ban, user-confirmed Option B 2026-04-21).
+--
+-- `name_vi == name_en == code` because department codes are proper
+-- nouns / internal org identifiers, not translatable text.
+--
+-- 3-step non-reversible migration:
+--   1. INSERT the 49 new rows (idempotent via ON CONFLICT on `code`).
+--   2. NULL out `profiles.department_id` where it still points to the
+--      old `SVN-*` rows (the `profiles.department_id → departments.id`
+--      FK defaults to ON DELETE NO ACTION so step 3 would fail
+--      otherwise).
+--   3. DELETE the 6 old rows.
+--
+-- Fixture profiles are re-attached to real codes at seed time via
+-- `scripts/seed-kudos-fixtures.ts` (updated in the same commit).
 
--- 49 canonical Sun* departments — kept in sync with migration
--- 0011_seed_real_departments.sql (spec WXK5AYB_rG). `name_vi` and
--- `name_en` equal `code` because department codes are proper nouns.
+-- Step 1: insert canonical 49 codes.
 insert into departments (code, name_vi, name_en) values
   ('CTO',                    'CTO',                    'CTO'),
   ('SPD',                    'SPD',                    'SPD'),
@@ -58,43 +70,13 @@ insert into departments (code, name_vi, name_en) values
   ('CPV',                    'CPV',                    'CPV')
 on conflict (code) do nothing;
 
--- 13 canonical Sun* Q4 2025 hashtags — VN/EN localized (spec
--- JWpsISMAaM FR-010). Kept in sync with migration 0010.
-insert into hashtags (slug, label_vi, label_en) values
-  ('comprehensive',        'Toàn diện',          'Comprehensive'),
-  ('expertise',            'Giỏi chuyên môn',    'Expertise'),
-  ('high-performance',     'Hiệu suất cao',      'High Performance'),
-  ('inspiring',            'Truyền cảm hứng',    'Inspiring'),
-  ('dedicated',            'Cống hiến',          'Dedicated'),
-  ('aim-high',             'Aim High',           'Aim High'),
-  ('be-agile',             'Be Agile',           'Be Agile'),
-  ('wasshoi',              'Wasshoi',            'Wasshoi'),
-  ('goal-oriented',        'Hướng mục tiêu',     'Goal-Oriented'),
-  ('customer-focused',     'Hướng khách hàng',   'Customer-Focused'),
-  ('process-driven',       'Chuẩn quy trình',    'Process-Driven'),
-  ('creative-solution',    'Giải pháp sáng tạo', 'Creative Solution'),
-  ('excellent-management', 'Quản lý xuất sắc',   'Excellent Management')
-on conflict (slug) do nothing;
+-- Step 2: break FK so step 3's DELETE doesn't fail. Fixture profiles
+-- are re-attached after `yarn seed` runs against the migrated DB.
+update profiles
+set department_id = null
+where department_id in (
+  select id from departments where code like 'SVN-%'
+);
 
--- Sample kudos seed
--- ----------------------------------------------------------------------
--- Sample kudos and profile fixtures depend on auth.users rows existing
--- first (profiles.id references auth.users). Creating auth.users
--- requires `auth.admin.createUser()` from the Supabase Admin API, which
--- can't be invoked from seed.sql directly. Keep the block below as a
--- TODO stub — a companion script (supabase/scripts/seed-fixtures.ts or
--- a post-reset hook) should run via `supabase functions invoke` once
--- the CLI is available.
---
--- do $$ begin
---   if current_setting('app.environment', true) <> 'production' then
---     -- TODO(phase-1.5): insert ~30 sample kudos distributed across
---     -- the 6 seeded departments and 10 seeded hashtags with varied
---     -- hearts_count so the highlight carousel has ordering + the
---     -- spotlight word-cloud has non-uniform weights.
---     -- TODO(phase-1.5): seed 2 RLS fixture users
---     --   rls-user-a@test.sun / rls-user-b@test.sun
---     -- for tests/integration/rls/*.
---     null;
---   end if;
--- end $$;
+-- Step 3: drop the 6 generic seed rows.
+delete from departments where code like 'SVN-%';

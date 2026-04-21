@@ -111,8 +111,8 @@ export async function getKudoFeed(
     .from("kudos_with_stats")
     .select(
       `id, body, title, created_at, sender_id, hearts_count,
-       sender:profiles!sender_id ( id, display_name, avatar_url, department_id, honour_code, honour_title ),
-       kudo_recipients ( recipient:profiles!recipient_id ( id, display_name, avatar_url, department_id, honour_code, honour_title ) ),
+       sender:profiles!sender_id ( id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code ) ),
+       kudo_recipients ( recipient:profiles!recipient_id ( id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code ) ) ),
        kudo_hashtags ( hashtags ( id, slug, label_vi, label_en ) ),
        kudo_images ( url, position )`,
     )
@@ -157,8 +157,8 @@ export async function getKudoFeed(
     display_name: string | null;
     avatar_url: string | null;
     department_id: string | null;
-    honour_code: string | null;
     honour_title: string | null;
+    department: { code: string } | { code: string }[] | null;
   };
   type RelatedHashtag = { id: string; slug: string; label_vi: string; label_en: string };
   type RelatedImage = { url: string; position: number };
@@ -205,7 +205,7 @@ export async function getKudoFeed(
             display_name: senderProfile.display_name,
             avatar_url: senderProfile.avatar_url,
             department_id: senderProfile.department_id,
-            honour_code: senderProfile.honour_code,
+            department_code: pickOne(senderProfile.department)?.code ?? null,
             honour_title: senderProfile.honour_title,
           }
         : {
@@ -213,7 +213,7 @@ export async function getKudoFeed(
             display_name: null,
             avatar_url: null,
             department_id: null,
-            honour_code: null,
+            department_code: null,
             honour_title: null,
           },
       recipients: (r.kudo_recipients ?? [])
@@ -224,7 +224,7 @@ export async function getKudoFeed(
           display_name: p.display_name,
           avatar_url: p.avatar_url,
           department_id: p.department_id,
-          honour_code: p.honour_code,
+          department_code: pickOne(p.department)?.code ?? null,
           honour_title: p.honour_title,
         })),
       hashtags: (r.kudo_hashtags ?? [])
@@ -310,8 +310,8 @@ export async function getHighlightKudos(
     .from("kudos_with_stats")
     .select(
       `id, body, title, created_at, sender_id, hearts_count,
-       sender:profiles!sender_id ( id, display_name, avatar_url, department_id, honour_code, honour_title ),
-       kudo_recipients ( recipient:profiles!recipient_id ( id, display_name, avatar_url, department_id, honour_code, honour_title ) ),
+       sender:profiles!sender_id ( id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code ) ),
+       kudo_recipients ( recipient:profiles!recipient_id ( id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code ) ) ),
        kudo_hashtags ( hashtags ( id, slug, label_vi, label_en ) ),
        kudo_images ( url, position )`,
     )
@@ -350,8 +350,8 @@ export async function getHighlightKudos(
     display_name: string | null;
     avatar_url: string | null;
     department_id: string | null;
-    honour_code: string | null;
     honour_title: string | null;
+    department: { code: string } | { code: string }[] | null;
   };
   type RelatedHashtag = { id: string; slug: string; label_vi: string; label_en: string };
   type RelatedImage = { url: string; position: number };
@@ -396,7 +396,7 @@ export async function getHighlightKudos(
             display_name: senderProfile.display_name,
             avatar_url: senderProfile.avatar_url,
             department_id: senderProfile.department_id,
-            honour_code: senderProfile.honour_code,
+            department_code: pickOne(senderProfile.department)?.code ?? null,
             honour_title: senderProfile.honour_title,
           }
         : {
@@ -404,7 +404,7 @@ export async function getHighlightKudos(
             display_name: null,
             avatar_url: null,
             department_id: null,
-            honour_code: null,
+            department_code: null,
             honour_title: null,
           },
       recipients: (r.kudo_recipients ?? [])
@@ -415,7 +415,7 @@ export async function getHighlightKudos(
           display_name: p.display_name,
           avatar_url: p.avatar_url,
           department_id: p.department_id,
-          honour_code: p.honour_code,
+          department_code: pickOne(p.department)?.code ?? null,
           honour_title: p.honour_title,
         })),
       hashtags: (r.kudo_hashtags ?? [])
@@ -590,19 +590,31 @@ export async function searchSunner(query: string): Promise<KudoUser[]> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, avatar_url, department_id, honour_code, honour_title")
+    .select(
+      "id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code )",
+    )
     .ilike("display_name", pattern)
     .order("display_name", { ascending: true })
     .limit(10);
   if (error) {
     throw new Error(`searchSunner: ${error.message}`);
   }
-  return (data ?? []).map((row) => ({
+  type Row = {
+    id: string;
+    display_name: string | null;
+    avatar_url: string | null;
+    department_id: string | null;
+    honour_title: string | null;
+    department: { code: string } | { code: string }[] | null;
+  };
+  const pickOne = <T,>(v: T | T[] | null): T | null =>
+    Array.isArray(v) ? (v[0] ?? null) : v;
+  return ((data ?? []) as unknown as Row[]).map((row) => ({
     id: row.id,
     display_name: row.display_name,
     avatar_url: row.avatar_url,
     department_id: row.department_id,
-    honour_code: row.honour_code,
+    department_code: pickOne(row.department)?.code ?? null,
     honour_title: row.honour_title,
   }));
 }

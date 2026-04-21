@@ -75,15 +75,18 @@ const admin = createClient(SUPABASE_URL, SERVICE_ROLE, {
 
 // -------- fixture data -----------------------------------------------
 
+// Fixture Sunners mapped to real Sun* department codes after
+// migration 0011_seed_real_departments.sql. Keep in sync with
+// spec .momorph/specs/WXK5AYB_rG-dropdown-phong-ban/spec.md §Migration Plan.
 const FIXTURE_USERS = [
-  { email: "alice@kudos.test",  displayName: "Alice Nguyen",  deptCode: "SVN-ENG" },
-  { email: "bob@kudos.test",    displayName: "Bob Tran",      deptCode: "SVN-DES" },
-  { email: "charlie@kudos.test",displayName: "Charlie Le",    deptCode: "SVN-PM"  },
-  { email: "diana@kudos.test",  displayName: "Diana Pham",    deptCode: "SVN-QA"  },
-  { email: "ethan@kudos.test",  displayName: "Ethan Vo",      deptCode: "SVN-BIZ" },
-  { email: "fiona@kudos.test",  displayName: "Fiona Bui",     deptCode: "SVN-HR"  },
-  { email: "george@kudos.test", displayName: "George Hoang",  deptCode: "SVN-ENG" },
-  { email: "hanna@kudos.test",  displayName: "Hanna Do",      deptCode: "SVN-DES" },
+  { email: "alice@kudos.test",  displayName: "Alice Nguyen",  deptCode: "CEVC1" },
+  { email: "bob@kudos.test",    displayName: "Bob Tran",      deptCode: "CEVC1 - DSV" },
+  { email: "charlie@kudos.test",displayName: "Charlie Le",    deptCode: "SPD" },
+  { email: "diana@kudos.test",  displayName: "Diana Pham",    deptCode: "STVC - EE" },
+  { email: "ethan@kudos.test",  displayName: "Ethan Vo",      deptCode: "BDV" },
+  { email: "fiona@kudos.test",  displayName: "Fiona Bui",     deptCode: "OPDC - HRD" },
+  { email: "george@kudos.test", displayName: "George Hoang",  deptCode: "CEVC2" },
+  { email: "hanna@kudos.test",  displayName: "Hanna Do",      deptCode: "CEVC1 - DSV - UI/UX 1" },
 ] as const;
 
 const SAMPLE_BODIES = [
@@ -150,7 +153,6 @@ async function ensureFixtureUser(
   return data.user.id;
 }
 
-const HONOUR_CODES = ["CECV10", "CECV07", "CECV05", "CECV12", "CECV03"] as const;
 const HONOUR_TITLES = [
   "Legend Hero",
   "Rising Hero",
@@ -171,14 +173,15 @@ async function backfillProfile(
   depts: Dept[],
 ): Promise<void> {
   const dept = depts.find((d) => d.code === deptCode);
-  const honourCode = HONOUR_CODES[hashIndex(userId, HONOUR_CODES.length)];
+  // The UI-displayed department code is now derived at read time from
+  // the `departments` join via `profiles.department_id` — no separate
+  // column to populate. Migration 0013 dropped `profiles.honour_code`.
   const honourTitle = HONOUR_TITLES[hashIndex(userId, HONOUR_TITLES.length)];
   const { error } = await admin
     .from("profiles")
     .update({
       display_name: displayName,
       department_id: dept?.id ?? null,
-      honour_code: honourCode,
       honour_title: honourTitle,
     })
     .eq("id", userId);
@@ -189,7 +192,6 @@ async function backfillProfile(
       email: `${displayName.toLowerCase().replace(/\s+/g, ".")}@kudos.test`,
       display_name: displayName,
       department_id: dept?.id ?? null,
-      honour_code: honourCode,
       honour_title: honourTitle,
     });
   }

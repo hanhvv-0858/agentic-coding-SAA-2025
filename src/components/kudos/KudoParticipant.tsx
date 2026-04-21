@@ -48,7 +48,7 @@ export function KudoParticipant({ user, monogramAlt }: KudoParticipantProps) {
   const initials = getInitials(name);
   const bg = pickMonogramColor(user.id);
   const hasAvatar = Boolean(user.avatar_url);
-  const honourCode = user.honour_code ?? null;
+  const honourCode = user.department_code ?? null;
   const honourTitle = user.honour_title ?? null;
 
   return (

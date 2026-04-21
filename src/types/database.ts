@@ -310,7 +310,6 @@ export type Database = {
           department_id: string | null
           display_name: string | null
           email: string
-          honour_code: string | null
           honour_title:
             | "Legend Hero"
             | "Rising Hero"
@@ -325,7 +324,6 @@ export type Database = {
           department_id?: string | null
           display_name?: string | null
           email: string
-          honour_code?: string | null
           honour_title?:
             | "Legend Hero"
             | "Rising Hero"
@@ -340,7 +338,6 @@ export type Database = {
           department_id?: string | null
           display_name?: string | null
           email?: string
-          honour_code?: string | null
           honour_title?:
             | "Legend Hero"
             | "Rising Hero"

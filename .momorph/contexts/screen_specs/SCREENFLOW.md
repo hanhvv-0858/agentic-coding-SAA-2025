@@ -6,7 +6,7 @@
 - **Figma URL**: https://www.figma.com/design/9ypp4enmFmdK3YAFJLIu6C
 - **MoMorph URL**: https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C
 - **Created**: 2026-04-17
-- **Last Updated**: 2026-04-20 (added `Dropdown Hashtag filter` `JWpsISMAaM` as a Live-board popover — 17 frames)
+- **Last Updated**: 2026-04-21 (formally added `Dropdown Phòng ban` `WXK5AYB_rG` as a Live-board popover sibling of the Hashtag filter at row #13 — 18 frames tracked)
 
 ---
 
@@ -17,8 +17,8 @@ whose design has been finalised and whose spec has been prepared on
 MoMorph**. Source of truth: the Figma sidebar's `Screens > With design`
 group (verified 2026-04-19 against a user screenshot — 16 frames).
 
-- **In scope**: 17 spec-ready frames (5 shipped screens + 2 next-up
-  screens + 1 compose-editor overlay + 7 dropdown overlays + 2 FAB
+- **In scope**: 18 spec-ready frames (5 shipped screens + 2 next-up
+  screens + 1 compose-editor overlay + 8 dropdown overlays + 2 FAB
   overlays + 1 secret-box animation overlay).
 - **Out of scope / not tracked here**: iOS native app (37 `[iOS]` frames),
   design-system atoms (~45 frames), Admin full screens (Phase 2, 8
@@ -55,11 +55,11 @@ for Figma-side work.
 
 | Metric                              | Count |
 |-------------------------------------|-------|
-| Spec-ready web frames (in scope)    | 17    |
+| Spec-ready web frames (in scope)    | 18    |
 | Shipped                             | 8     |
 | Locally spec'd, impl pending        | 0     |
 | Next up (implementation pending)    | 1     |
-| Overlays pending implementation     | 8     |
+| Overlays pending implementation     | 9     |
 | Error-page stubs (awaiting spec)    | 2     |
 | Actionable completion               | 50%   |
 
@@ -67,7 +67,7 @@ for Figma-side work.
 
 ## Screens
 
-All 17 web frames from the Figma `Screens > With design` group. Primary
+All 18 web frames from the Figma `Screens > With design` group. Primary
 key is `screen_id`; `node_id` is the Figma-native identifier, provided
 as a convenience for deep-linking into Figma
 (`?node-id=<node_id>` in the file URL).
@@ -86,12 +86,12 @@ spec has not been reconciled against it).
 | 5 | Thể lệ UPDATE | `b1Filzi9i6` | _(fetch via MoMorph)_ | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/b1Filzi9i6) | 🟢 shipped | [the-le.md](the-le.md) · [spec](../../specs/b1Filzi9i6-the-le/spec.md) · [page](../../../src/app/the-le/page.tsx) | None (static content, MVP) | Homepage SAA (Đóng), Viết Kudo (CTA) |
 | 6 | Sun* Kudos – Live board | `MaZUn5xHXZ` | `2940:13431` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/MaZUn5xHXZ) | 🟢 shipped | [spec](../../specs/MaZUn5xHXZ-kudos-live-board/spec.md) · [design-style](../../specs/MaZUn5xHXZ-kudos-live-board/design-style.md) · [plan](../../specs/MaZUn5xHXZ-kudos-live-board/plan.md) · [tasks](../../specs/MaZUn5xHXZ-kudos-live-board/tasks.md) · [DEPLOY](../../specs/MaZUn5xHXZ-kudos-live-board/DEPLOY.md) · [page](../../../src/app/kudos/page.tsx) | `GET /kudos`, `GET /kudos?hashtag=…`, `GET /kudos?department=…`, `POST /kudos/:id/hearts` | Viết Kudo, Dropdown Phòng ban, Dropdown Hashtag filter, View Kudo (parked) |
 | 7 | Viết Kudo | `ihQ26W78P2` | `520:11602` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/ihQ26W78P2) | 🟡 next up | — | `POST /kudos`, `GET /users?search=…`, `GET /hashtags` | Live board, Dropdown list hashtag, Addlink Box, Viết Kudo error state (fold into same spec) |
-| 8 | Dropdown-ngôn ngữ | `hUyaaugye2` | `721:4942` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/hUyaaugye2) | 🔵 prototype | [src/components/login/LanguageDropdown.tsx](../../../src/components/login/LanguageDropdown.tsx) | `setLocale` Server Action | Parent: Login, Homepage header, every authenticated screen |
+| 8 | Dropdown-ngôn ngữ | `hUyaaugye2` | `721:4942` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/hUyaaugye2) | 📋 spec'd (prototype) | [spec](../../specs/hUyaaugye2-dropdown-ngon-ngu/spec.md) · [design-style](../../specs/hUyaaugye2-dropdown-ngon-ngu/design-style.md) · [prototype](../../../src/components/login/LanguageDropdown.tsx) | `setLocale` Server Action | Parent: Login, Homepage header, every authenticated screen |
 | 9 | Dropdown-profile | `z4sCl3_Qtk` | `721:5223` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/z4sCl3_Qtk) | 🔵 prototype | [src/components/homepage/ProfileMenu.tsx](../../../src/components/homepage/ProfileMenu.tsx) | `signOut` Server Action | Parent: Authenticated header |
 | 10 | Dropdown-profile Admin | `54rekaCHG1` | `721:5277` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/54rekaCHG1) | ⚪ pending (admin) | — | `signOut` Server Action | Parent: Admin header (Phase 2) |
-| 11 | Dropdown Phòng ban | `WXK5AYB_rG` | `721:5684` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/WXK5AYB_rG) | ⚪ pending | — | `GET /departments` | Parent: Live board |
-| 12 | Dropdown Hashtag filter | `JWpsISMAaM` | _(fetch via MoMorph)_ | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/JWpsISMAaM) | ⚪ pending | — | `GET /hashtags` | Parent: Live board (FilterBar) |
-| 13 | Dropdown list hashtag | `p9zO-c4a4x` | `1002:13013` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/p9zO-c4a4x) | ⚪ pending | — | `GET /hashtags` | Parent: Viết Kudo |
+| 11 | Dropdown list hashtag | `p9zO-c4a4x` | `1002:13013` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/p9zO-c4a4x) | ⚪ pending | — | `GET /hashtags` | Parent: Viết Kudo |
+| 12 | Dropdown Hashtag filter | `JWpsISMAaM` | _(fetch via MoMorph)_ | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/JWpsISMAaM) | ⚪ pending | — | `GET /hashtags` | Parent: Live board (FilterBar) — popover; select → apply + close, outside / ESC → close, click selected → clear |
+| 13 | Dropdown Phòng ban | `WXK5AYB_rG` | `721:5684` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/WXK5AYB_rG) | ⚪ pending | — | `GET /departments` | Parent: Live board (FilterBar) — popover sibling of Hashtag filter; click Bộ phận chip → open, select department → apply + close, outside / ESC → close, click selected → clear |
 | 14 | Addlink Box | `OyDLDuSGEa` | `1002:12917` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/OyDLDuSGEa) | ⚪ pending | — | None (client-side link-insert dialog) | Parent: Viết Kudo editor |
 | 15 | Floating Action Button – phím nổi chức năng (collapsed) | `_hphd32jN2` | `313:9137` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/_hphd32jN2) | 🟢 shipped | [spec](../../specs/_hphd32jN2-fab-collapsed/spec.md) · [design-style](../../specs/_hphd32jN2-fab-collapsed/design-style.md) · [plan](../../specs/_hphd32jN2-fab-collapsed/plan.md) · [page](../../../src/components/shell/QuickActionsFab.tsx) | None | Toggles to `Sv7DFwBw1h` expanded |
 | 16 | Floating Action Button – phím nổi chức năng 2 (expanded menu) | `Sv7DFwBw1h` | `313:9139` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/Sv7DFwBw1h) | 🟢 shipped | [spec](../../specs/Sv7DFwBw1h-fab-quick-actions/spec.md) · [design-style](../../specs/Sv7DFwBw1h-fab-quick-actions/design-style.md) · [page](../../../src/components/shell/QuickActionsFab.tsx) | None (pure navigation) | Thể lệ UPDATE, Viết Kudo |
@@ -101,6 +101,13 @@ spec has not been reconciled against it).
 (`JWpsISMAaM`) is now tracked as a Live-board popover (row #12). It
 opens from the Kudos Live board (`/kudos`) when the user clicks the
 "Hashtag" chip in the `FilterBar`; it is not a route.
+
+**Sibling added (2026-04-21)**: `Dropdown Phòng ban` (`WXK5AYB_rG`) is
+now tracked as the other Live-board popover (row #13) — same popover
+pattern as the Hashtag filter, different content (department codes
+like `SVN-ENG` / `SVN-DES` / … with locale-resolved VN/EN labels). It
+opens from the Kudos Live board (`/kudos`) when the user clicks the
+"Bộ phận" chip in the `FilterBar`; it is not a route.
 
 Error-page stubs (code live, but awaiting a real MoMorph spec before we
 call them finished):
@@ -170,7 +177,8 @@ flowchart TD
     Rules -- "Đóng" --> Home
 
     Liveboard -- FAB --> FAB
-    Liveboard --> DeptFilter
+    Liveboard -- click Bộ phận chip --> DeptFilter
+    DeptFilter -- select / clear --> Liveboard
     Liveboard -- click Hashtag chip --> HashFilter
     HashFilter -- select / clear --> Liveboard
     Liveboard --> Compose
@@ -250,11 +258,11 @@ flowchart LR
 ### Group: Dropdowns & Overlays
 | Screen | Frame ID | Status | Purpose | Entry Points |
 |--------|----------|--------|---------|--------------|
-| Dropdown-ngôn ngữ | `hUyaaugye2` | 🔵 prototype | Locale toggle (vi / en) | Every screen header |
+| Dropdown-ngôn ngữ | `hUyaaugye2` | 📋 spec'd (prototype) | Locale toggle (vi / en) | Every screen header |
 | Dropdown-profile | `z4sCl3_Qtk` | 🔵 prototype | User menu + sign out | Authenticated header |
 | Dropdown-profile Admin | `54rekaCHG1` | ⚪ pending (admin) | Admin user menu | Admin header (Phase 2) |
-| Dropdown Phòng ban | `WXK5AYB_rG` | ⚪ pending | Filter feed by department | Live board |
 | Dropdown Hashtag filter | `JWpsISMAaM` | ⚪ pending | Filter Live board feed by hashtag (popover from FilterBar); select → apply + close, click outside → close, clear → reset | Live board FilterBar |
+| Dropdown Phòng ban | `WXK5AYB_rG` | ⚪ pending | Filter Live board feed by department (popover sibling of Hashtag filter); click Bộ phận chip → open, select department → apply + close, outside / ESC → close, click selected → clear | Live board FilterBar |
 | Dropdown list hashtag | `p9zO-c4a4x` | ⚪ pending | Hashtag picker while composing | Viết Kudo |
 | Addlink Box | `OyDLDuSGEa` | ⚪ pending | Link-insert dialog for editor | Viết Kudo |
 
@@ -387,6 +395,8 @@ constitution §II:
 | 2026-04-20 | Sun\* Kudos – Live board shipped | `MaZUn5xHXZ` | Full 11-phase delivery (US1..US9, 114 tasks). Ships feed + hashtag/department filters + optimistic heart (300 ms debounce) + copy-link + highlight carousel (5-slide pan/zoom) + spotlight word-cloud (pan/zoom, search, reduced-motion) + personal stats sidebar. Supabase-from-day-one (7 tables + RLS + 4 migrations + generated types), 11 new design tokens, ~70 i18n leaves × 2 locales, 8 typed analytics events. Test count 256 → 275 after Phase 10 motion + focus-visible sweep; axe-core + responsive E2E files added (gated on `SUPABASE_TEST_SESSION_TOKEN`). See [DEPLOY.md](../../specs/MaZUn5xHXZ-kudos-live-board/DEPLOY.md) for prod runbook. |
 | 2026-04-20 | FAB collapsed (variant 1) specs drafted | `_hphd32jN2` | Created [spec.md](../../specs/_hphd32jN2-fab-collapsed/spec.md) + [design-style.md](../../specs/_hphd32jN2-fab-collapsed/design-style.md). 6 user stories (3 × P1, 2 × P2, 1 × P3 reduced-motion), 11 FRs, 7 TRs, 5 SCs. Zero APIs. Pill 106×64 `rounded-full`, three glyphs inside: pen + "/" + saa. Composite `box-shadow` (black drop + warm cream `#FAE287` glow) — new token `--shadow-fab-trigger`. Current `QuickActionsFab.tsx` prototype matches visually but missing glow layer and hover lift. Now that both FAB frames are spec'd, implementation bundles them as a single `<QuickActionsFab>` relocated to `src/components/shell/`. |
 | 2026-04-20 | Dropdown Hashtag filter added to tracker | `JWpsISMAaM` | Reconciled the earlier discrepancy by formally adding the popover as row #12 under Dropdowns & Overlays. Sub-screen of Live board (`MaZUn5xHXZ`, `/kudos`): opens from `FilterBar` "Hashtag" chip; exit transitions are select-hashtag (filters feed + closes), click-outside (closes), clear-selection (resets filter). Predicted API: `GET /hashtags`. Still ⚪ pending — spec to be drafted via `/momorph.specify`. |
+| 2026-04-21 | Dropdown Phòng ban added to tracker | `WXK5AYB_rG` | Formally added the popover as row #13 under Dropdowns & Overlays, sibling of the Hashtag filter. Sub-screen of Live board (`MaZUn5xHXZ`, `/kudos`): opens from `FilterBar` "Bộ phận" chip; department codes (e.g. `SVN-ENG`, `SVN-DES`, …) with locale-resolved VN/EN labels. Exit transitions: select-department (filters feed by department + closes), click-outside / ESC (closes), click-selected (clears filter). Predicted API: `GET /departments`. Mermaid Navigation Graph now wires `Liveboard -- click Bộ phận chip --> DeptFilter` and `DeptFilter -- select / clear --> Liveboard`. Frame count 17 → 18; overlays pending 8 → 9. Still ⚪ pending — spec to be drafted via `/momorph.specify`, paired with `JWpsISMAaM` so the Live board FilterBar gets both filter dropdowns in one pass. |
+| 2026-04-21 | Dropdown-ngôn ngữ specs drafted | `hUyaaugye2` | Reconciled the existing prototype ([src/components/login/LanguageDropdown.tsx](../../../src/components/login/LanguageDropdown.tsx)) against Figma via `/momorph.specify`. Created [spec.md](../../specs/hUyaaugye2-dropdown-ngon-ngu/spec.md) + [design-style.md](../../specs/hUyaaugye2-dropdown-ngon-ngu/design-style.md). 4 user stories (2 × P1 — switch locale + dismiss-without-select; 2 × P2 — keyboard nav + prototype reconciliation), 12 FRs, 5 TRs, 4 SCs. Zero APIs (reuses existing `setLocale` Server Action). Zero new design tokens — reuses `--color-panel-surface` / `--color-border-secondary` / `--color-accent-cream` already landed for Thể lệ + Kudos. Key divergences from the current prototype: (a) visible labels MUST be 2-letter codes `"VN"` / `"EN"` not full names (full name moves to `aria-label`), (b) panel surface switches from `--color-brand-800` to `--color-panel-surface` with the gold `--color-border-secondary` border, (c) EN row needs a new `flag-gb-nir` Icon (currently falls back to `globe`), (d) re-selecting the active locale MUST be a no-op (FR-006). Row #8 flipped from 🔵 prototype to 📋 spec'd (prototype). Paired with `z4sCl3_Qtk` Dropdown-profile as the two header-dropdown reconciliations still pending. |
 
 ---
 

@@ -21,7 +21,7 @@ const user = (
   display_name: name,
   avatar_url: avatar,
   department_id: null,
-  honour_code: null,
+  department_code: null,
   honour_title: null,
 });
 

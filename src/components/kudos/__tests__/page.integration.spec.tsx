@@ -31,7 +31,7 @@ const sampleKudo: Kudo = {
     display_name: "Alice",
     avatar_url: null,
     department_id: null,
-    honour_code: null,
+    department_code: null,
     honour_title: null,
   },
   recipients: [
@@ -40,7 +40,7 @@ const sampleKudo: Kudo = {
       display_name: "Bob",
       avatar_url: null,
       department_id: null,
-      honour_code: null,
+      department_code: null,
       honour_title: null,
     },
   ],
