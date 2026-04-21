@@ -38,6 +38,7 @@ export async function getKudoFeed(
   cursor?: string | null,
 ): Promise<FeedPage> {
   const supabase = await createClient();
+  const locale = await getLocale();
 
   // Base SELECT joins kudos_with_stats → profiles (sender + recipients)
   // + kudo_hashtags → hashtags. `has_hearted` is computed post-query
@@ -112,7 +113,7 @@ export async function getKudoFeed(
       `id, body, title, created_at, sender_id, hearts_count,
        sender:profiles!sender_id ( id, display_name, avatar_url, department_id, honour_code, honour_title ),
        kudo_recipients ( recipient:profiles!recipient_id ( id, display_name, avatar_url, department_id, honour_code, honour_title ) ),
-       kudo_hashtags ( hashtags ( id, slug, label ) ),
+       kudo_hashtags ( hashtags ( id, slug, label_vi, label_en ) ),
        kudo_images ( url, position )`,
     )
     .order("created_at", { ascending: false })
@@ -159,7 +160,7 @@ export async function getKudoFeed(
     honour_code: string | null;
     honour_title: string | null;
   };
-  type RelatedHashtag = { id: string; slug: string; label: string };
+  type RelatedHashtag = { id: string; slug: string; label_vi: string; label_en: string };
   type RelatedImage = { url: string; position: number };
   type RawRow = {
     id: string | null;
@@ -229,7 +230,10 @@ export async function getKudoFeed(
       hashtags: (r.kudo_hashtags ?? [])
         .map((kh) => pickOne(kh.hashtags))
         .filter((h): h is RelatedHashtag => !!h)
-        .map((h) => ({ slug: h.slug, label: h.label })),
+        .map((h) => ({
+          slug: h.slug,
+          label: locale === "en" ? h.label_en : h.label_vi,
+        })),
       images: orderedImages,
       has_hearted: heartedIds.has(r.id ?? ""),
     };
@@ -253,6 +257,7 @@ export async function getHighlightKudos(
   filters: FilterState,
 ): Promise<Kudo[]> {
   const supabase = await createClient();
+  const locale = await getLocale();
 
   // Mirror getKudoFeed's filter-pre-query strategy (server-side slug
   // → kudo_ids / code → sender_ids narrowing). Keeps the carousel
@@ -307,7 +312,7 @@ export async function getHighlightKudos(
       `id, body, title, created_at, sender_id, hearts_count,
        sender:profiles!sender_id ( id, display_name, avatar_url, department_id, honour_code, honour_title ),
        kudo_recipients ( recipient:profiles!recipient_id ( id, display_name, avatar_url, department_id, honour_code, honour_title ) ),
-       kudo_hashtags ( hashtags ( id, slug, label ) ),
+       kudo_hashtags ( hashtags ( id, slug, label_vi, label_en ) ),
        kudo_images ( url, position )`,
     )
     .order("hearts_count", { ascending: false })
@@ -348,7 +353,7 @@ export async function getHighlightKudos(
     honour_code: string | null;
     honour_title: string | null;
   };
-  type RelatedHashtag = { id: string; slug: string; label: string };
+  type RelatedHashtag = { id: string; slug: string; label_vi: string; label_en: string };
   type RelatedImage = { url: string; position: number };
   type RawRow = {
     id: string | null;
@@ -416,7 +421,10 @@ export async function getHighlightKudos(
       hashtags: (r.kudo_hashtags ?? [])
         .map((kh) => pickOne(kh.hashtags))
         .filter((h): h is RelatedHashtag => !!h)
-        .map((h) => ({ slug: h.slug, label: h.label })),
+        .map((h) => ({
+          slug: h.slug,
+          label: locale === "en" ? h.label_en : h.label_vi,
+        })),
       images: orderedImages,
       has_hearted: heartedIds.has(r.id ?? ""),
     };
@@ -532,14 +540,21 @@ export async function toggleKudoHeart(
 
 export async function getKudoHashtags(): Promise<Hashtag[]> {
   const supabase = await createClient();
+  // Locale-resolve the display label (spec JWpsISMAaM FR-010).
+  // Mirrors the `getKudoDepartments()` pattern below.
+  const locale = await getLocale();
+  const labelCol = locale === "en" ? "label_en" : "label_vi";
   const { data, error } = await supabase
     .from("hashtags")
-    .select("slug, label")
-    .order("label", { ascending: true });
+    .select(`slug, label_vi, label_en`)
+    .order(labelCol, { ascending: true });
   if (error) {
     throw new Error(`getKudoHashtags: ${error.message}`);
   }
-  return (data ?? []).map((r) => ({ slug: r.slug, label: r.label }));
+  return (data ?? []).map((r) => ({
+    slug: r.slug,
+    label: locale === "en" ? r.label_en : r.label_vi,
+  }));
 }
 
 export async function getKudoDepartments(): Promise<Department[]> {

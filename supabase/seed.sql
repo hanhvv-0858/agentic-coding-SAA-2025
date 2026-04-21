@@ -13,18 +13,22 @@ insert into departments (code, name_vi, name_en) values
   ('SVN-HR',  'Nhân sự', 'HR')
 on conflict (code) do nothing;
 
--- 10 popular hashtags (Q4 default set).
-insert into hashtags (slug, label) values
-  ('dedicated',     'Dedicated'),
-  ('creative',      'Creative'),
-  ('teamwork',      'Teamwork'),
-  ('mentor',        'Mentor'),
-  ('ontime',        'OnTime'),
-  ('leadership',    'Leadership'),
-  ('innovation',    'Innovation'),
-  ('customer-first','CustomerFirst'),
-  ('wellness',      'Wellness'),
-  ('fun',           'Fun')
+-- 13 canonical Sun* Q4 2025 hashtags — VN/EN localized (spec
+-- JWpsISMAaM FR-010). Kept in sync with migration 0010.
+insert into hashtags (slug, label_vi, label_en) values
+  ('comprehensive',        'Toàn diện',          'Comprehensive'),
+  ('expertise',            'Giỏi chuyên môn',    'Expertise'),
+  ('high-performance',     'Hiệu suất cao',      'High Performance'),
+  ('inspiring',            'Truyền cảm hứng',    'Inspiring'),
+  ('dedicated',            'Cống hiến',          'Dedicated'),
+  ('aim-high',             'Aim High',           'Aim High'),
+  ('be-agile',             'Be Agile',           'Be Agile'),
+  ('wasshoi',              'Wasshoi',            'Wasshoi'),
+  ('goal-oriented',        'Hướng mục tiêu',     'Goal-Oriented'),
+  ('customer-focused',     'Hướng khách hàng',   'Customer-Focused'),
+  ('process-driven',       'Chuẩn quy trình',    'Process-Driven'),
+  ('creative-solution',    'Giải pháp sáng tạo', 'Creative Solution'),
+  ('excellent-management', 'Quản lý xuất sắc',   'Excellent Management')
 on conflict (slug) do nothing;
 
 -- Sample kudos seed

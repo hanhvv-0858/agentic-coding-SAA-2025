@@ -80,8 +80,8 @@ export function FilterBar({
   const hasActive = !!hashtag || !!department;
 
   return (
-    <div className="flex w-full flex-col items-start gap-4" data-testid="kudos-filter-bar">
-      <div className="flex w-full flex-wrap items-center gap-3">
+    <div className="flex w-full flex-col items-start gap-4 overflow-visible" data-testid="kudos-filter-bar">
+      <div className="flex w-full flex-wrap items-center gap-3 overflow-visible">
         <FilterDropdown
           kind="hashtag"
           options={hashtagOptions}

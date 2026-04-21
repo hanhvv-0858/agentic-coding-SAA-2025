@@ -8,7 +8,7 @@
 // + error branches (rendering the full RSC requires many Next
 // internals); the RSC export test below guards the route shape.
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import viMessages from "@/messages/vi.json";
 import type { Messages } from "@/libs/i18n/getMessages";
@@ -139,6 +139,18 @@ describe("/kudos feed composition (Phase 3 — US1)", () => {
 // department → profiles → sender_ids) lands on the main select.
 
 describe("getKudoFeed — server-side hashtag + department filter (Phase 4 / US2+US3)", () => {
+  // Both paths now call `getLocale()` (which reads `next/headers` cookies)
+  // to resolve the nested-hashtag label column. Mock it so Vitest doesn't
+  // need a Next.js request scope.
+  beforeEach(() => {
+    vi.doMock("next/headers", () => ({
+      cookies: async () => ({ get: () => undefined }),
+    }));
+  });
+  afterEach(() => {
+    vi.doUnmock("next/headers");
+  });
+
   // Recorded PostgREST-style chain builder. Captures each `.eq/.in/.lt`
   // call so assertions below can check the final filter set.
   type Recorded = {
@@ -232,14 +244,24 @@ describe("getKudoFeed — server-side hashtag + department filter (Phase 4 / US2
 });
 
 describe("getKudoHashtags + getKudoDepartments (Phase 4 / T049 + T050)", () => {
-  it("getKudoHashtags returns slug+label rows", async () => {
+  it("getKudoHashtags returns slug+label rows with locale-resolved label (vi default)", async () => {
+    // Mock the locale cookie to default `vi` so the action picks `label_vi`.
+    vi.doMock("next/headers", () => ({
+      cookies: async () => ({ get: () => undefined }),
+    }));
     const supabase = {
       from: (t: string) => {
         expect(t).toBe("hashtags");
         return {
           select: () => ({
             order: async () => ({
-              data: [{ slug: "dedicated", label: "Dedicated" }],
+              data: [
+                {
+                  slug: "dedicated",
+                  label_vi: "Cống hiến",
+                  label_en: "Dedicated",
+                },
+              ],
               error: null,
             }),
           }),
@@ -253,8 +275,9 @@ describe("getKudoHashtags + getKudoDepartments (Phase 4 / T049 + T050)", () => {
     }));
     const { getKudoHashtags } = await import("@/app/kudos/actions");
     const rows = await getKudoHashtags();
-    expect(rows).toEqual([{ slug: "dedicated", label: "Dedicated" }]);
+    expect(rows).toEqual([{ slug: "dedicated", label: "Cống hiến" }]);
     vi.doUnmock("@/libs/supabase/server");
+    vi.doUnmock("next/headers");
   });
 
   it("getKudoDepartments resolves the locale-appropriate label (vi default)", async () => {

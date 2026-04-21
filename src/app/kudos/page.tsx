@@ -115,26 +115,39 @@ export default async function KudosPage({
     [feedPage, hashtags, departments, highlights, spotlight, stats, giftees] =
       await Promise.all([
         getKudoFeed(filters, null),
-        getKudoHashtags().catch(() => [] as Hashtag[]),
-        getKudoDepartments().catch(() => [] as Department[]),
-        getHighlightKudos(filters).catch(() => {
+        getKudoHashtags().catch((err) => {
+          console.error("[kudos] getKudoHashtags failed:", err);
+          return [] as Hashtag[];
+        }),
+        getKudoDepartments().catch((err) => {
+          console.error("[kudos] getKudoDepartments failed:", err);
+          return [] as Department[];
+        }),
+        getHighlightKudos(filters).catch((err) => {
           // Highlight failure is non-fatal — degrade to hidden section.
+          console.error("[kudos] getHighlightKudos failed:", err);
           highlightsErrored = true;
           return [] as Kudo[];
         }),
-        getSpotlight().catch(() => {
+        getSpotlight().catch((err) => {
           // Spotlight failure is non-fatal (FR-022, plan §Data flow).
+          console.error("[kudos] getSpotlight failed:", err);
           spotlightErrored = true;
           return null;
         }),
-        getMyKudosStats().catch(() => {
+        getMyKudosStats().catch((err) => {
+          console.error("[kudos] getMyKudosStats failed:", err);
           statsErrored = true;
           return null;
         }),
-        getLatestGiftees(10).catch(() => [] as LatestGiftee[]),
+        getLatestGiftees(10).catch((err) => {
+          console.error("[kudos] getLatestGiftees failed:", err);
+          return [] as LatestGiftee[];
+        }),
       ]);
-  } catch {
+  } catch (err) {
     // FR-022: graceful failure — per-block inline error below.
+    console.error("[kudos] getKudoFeed failed (fatal path):", err);
     feedErrored = true;
   }
 

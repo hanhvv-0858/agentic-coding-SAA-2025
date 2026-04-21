@@ -99,17 +99,22 @@ const SAMPLE_BODIES = [
   "You made the client demo feel effortless today — thank you!",
 ];
 
+// Canonical Sun* Q4 2025 hashtag slugs (13) — kept in sync with
+// `supabase/seed.sql` and migration 0010_hashtags_localize.sql.
 const HASHTAG_SLUGS = [
+  "comprehensive",
+  "expertise",
+  "high-performance",
+  "inspiring",
   "dedicated",
-  "creative",
-  "teamwork",
-  "mentor",
-  "ontime",
-  "leadership",
-  "innovation",
-  "customer-first",
-  "wellness",
-  "fun",
+  "aim-high",
+  "be-agile",
+  "wasshoi",
+  "goal-oriented",
+  "customer-focused",
+  "process-driven",
+  "creative-solution",
+  "excellent-management",
 ];
 
 // -------- helpers ----------------------------------------------------

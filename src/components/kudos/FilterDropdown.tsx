@@ -12,7 +12,9 @@ export type FilterDropdownOption = {
    */
   value: string;
   /**
-   * Human-readable label (locale-resolved for departments by the caller).
+   * Human-readable label (locale-resolved for both hashtags + departments
+   * by the caller's Server Action — see `getKudoHashtags()` /
+   * `getKudoDepartments()`).
    */
   label: string;
 };
@@ -40,9 +42,21 @@ type FilterDropdownProps = {
  * §B.1.1 HashtagFilterButton / §B.1.2 DepartmentFilterButton — single
  * combobox component parameterised by `kind`. Behaves as a popover
  * listbox with single-select; the parent owns the active value + URL
- * writes. ARIA: `role="combobox"`, `aria-haspopup="listbox"`,
- * `aria-expanded`, keyboard ArrowUp/ArrowDown/Enter/Escape, outside-
- * click closes.
+ * writes.
+ *
+ * Visual design per spec JWpsISMAaM (Dropdown Hashtag filter):
+ * dark-navy panel `#00070C`, cream `#998C5F` border, selected item
+ * carries cream-tint 10 % fill + text-shadow glow. Both Hashtag and
+ * Department chips render via this same component.
+ *
+ * Clearing the filter is done by re-selecting the currently-active
+ * item (toggle-off, FR-003). There is NO virtual "All hashtags /
+ * All departments" first row — the active-chip ✕ button in
+ * `FilterBar` is the alternative clear path.
+ *
+ * ARIA: `role="combobox"`, `aria-haspopup="listbox"`, `aria-expanded`,
+ * keyboard ArrowUp/ArrowDown/Home/End/Enter/Escape, outside-click
+ * closes (via `window` listener so iOS Safari body taps register).
  */
 export function FilterDropdown({
   kind,
@@ -56,22 +70,15 @@ export function FilterDropdown({
   const filters = messages.kudos.filters;
   const label = kind === "hashtag" ? filters.hashtagLabel : filters.departmentLabel;
   const iconName = kind === "hashtag" ? "hashtag" : "building";
-  const allLabel = kind === "hashtag" ? filters.allHashtags : filters.allDepartments;
 
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number>(() => {
     const idx = options.findIndex((o) => o.value === value);
-    return idx >= 0 ? idx + 1 : 0;
+    return idx >= 0 ? idx : 0;
   });
   const listboxId = useId();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  // Virtual first option → "All hashtags" / "All departments" which clears the filter.
-  const allOptions = useMemo<FilterDropdownOption[]>(
-    () => [{ value: "", label: allLabel }, ...options],
-    [options, allLabel],
-  );
 
   const activeLabel = useMemo(() => {
     if (!value) return label;
@@ -79,7 +86,9 @@ export function FilterDropdown({
     return hit ? `${label}: ${hit.label}` : label;
   }, [options, value, label]);
 
-  // Outside-click closes the popover.
+  // Outside-click closes the popover. Bound to `window` (not `document`)
+  // so iOS Safari body-click-through taps also close reliably
+  // (spec TR-003).
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent | TouchEvent) => {
@@ -87,11 +96,11 @@ export function FilterDropdown({
       if (!node) return;
       if (!node.contains(e.target as Node)) setOpen(false);
     };
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("touchstart", onDown);
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("touchstart", onDown);
     return () => {
-      document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("touchstart", onDown);
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("touchstart", onDown);
     };
   }, [open]);
 
@@ -99,23 +108,26 @@ export function FilterDropdown({
     if (disabled) return;
     setOpen((prev) => {
       if (!prev) {
-        const idx = allOptions.findIndex((o) => o.value === (value ?? ""));
+        const idx = options.findIndex((o) => o.value === (value ?? ""));
         setActiveIndex(idx >= 0 ? idx : 0);
       }
       return !prev;
     });
-  }, [disabled, allOptions, value]);
+  }, [disabled, options, value]);
 
   const commit = useCallback(
     (idx: number) => {
-      const opt = allOptions[idx];
+      const opt = options[idx];
       if (!opt) return;
-      onSelect(opt.value === "" ? null : opt.value);
+      // Toggle-off (FR-003): clicking the currently-selected item
+      // clears the filter; any other item applies its slug/code.
+      const next = opt.value === value ? null : opt.value;
+      onSelect(next);
       setOpen(false);
       // Restore focus to the trigger for keyboard users.
       queueMicrotask(() => buttonRef.current?.focus());
     },
-    [allOptions, onSelect],
+    [options, onSelect, value],
   );
 
   const handleKeyDown = useCallback(
@@ -132,7 +144,7 @@ export function FilterDropdown({
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
-          setActiveIndex((i) => Math.min(i + 1, allOptions.length - 1));
+          setActiveIndex((i) => Math.min(i + 1, options.length - 1));
           break;
         case "ArrowUp":
           e.preventDefault();
@@ -144,7 +156,7 @@ export function FilterDropdown({
           break;
         case "End":
           e.preventDefault();
-          setActiveIndex(allOptions.length - 1);
+          setActiveIndex(Math.max(0, options.length - 1));
           break;
         case "Enter":
         case " ":
@@ -158,7 +170,7 @@ export function FilterDropdown({
           break;
       }
     },
-    [open, disabled, allOptions.length, activeIndex, commit],
+    [open, disabled, options.length, activeIndex, commit],
   );
 
   const isSelected = value !== null && value !== "";
@@ -231,18 +243,20 @@ export function FilterDropdown({
           tabIndex={-1}
           onKeyDown={handleKeyDown}
           className={[
-            "absolute left-0 top-[calc(100%+8px)] z-30 flex max-h-[320px] min-w-full flex-col overflow-y-auto",
-            "rounded-[var(--radius-sidebar-card,8px)] bg-[var(--color-panel-surface,#FFF9E8)] py-2",
-            "shadow-[var(--shadow-fab-tile,0_8px_24px_rgba(0,0,0,0.15))]",
+            // Dark-navy popover panel — spec JWpsISMAaM §B.1.
+            "absolute left-0 top-[calc(100%+8px)] z-50 flex w-[215px] min-w-full max-w-[260px] flex-col items-start overflow-y-auto",
+            "max-h-[min(640px,calc(100vh-160px))]",
+            "rounded-lg border border-[var(--color-border-secondary,#998C5F)] bg-[var(--color-details-container-2,#00070C)] p-1.5",
+            "shadow-[0_8px_24px_rgba(0,0,0,0.35)]",
           ].join(" ")}
           data-testid={`filter-dropdown-${kind}-listbox`}
         >
-          {allOptions.length === 0 ? (
-            <li className="px-4 py-2 text-sm text-[var(--color-brand-900)]/70">
+          {options.length === 0 ? (
+            <li className="px-4 py-2 text-sm text-white/60">
               {filters.emptyList}
             </li>
           ) : (
-            allOptions.map((opt, idx) => {
+            options.map((opt, idx) => {
               const selected = (value ?? "") === opt.value;
               const active = idx === activeIndex;
               return (
@@ -254,10 +268,14 @@ export function FilterDropdown({
                   onMouseEnter={() => setActiveIndex(idx)}
                   onClick={() => commit(idx)}
                   className={[
-                    "cursor-pointer px-4 py-2 font-[family-name:var(--font-montserrat)] text-sm leading-5",
-                    "text-[var(--color-brand-900)]",
-                    active ? "bg-[var(--color-accent-cream)]/40" : "",
-                    selected ? "font-bold" : "font-medium",
+                    "flex h-14 w-full cursor-pointer items-center gap-1 rounded p-4",
+                    "font-[family-name:var(--font-montserrat)] text-base font-bold leading-6 tracking-[0.5px] text-white",
+                    "hover:bg-[var(--color-accent-cream)]/8",
+                    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-cream)]",
+                    active ? "bg-[var(--color-accent-cream)]/8" : "",
+                    selected
+                      ? "bg-[var(--color-accent-cream)]/10 [text-shadow:_0_4px_4px_rgba(0,0,0,0.25),_0_0_6px_#FAE287]"
+                      : "",
                   ].join(" ")}
                 >
                   {opt.label}

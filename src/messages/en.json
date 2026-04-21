@@ -261,8 +261,6 @@
       "clearLabel": "Clear filters",
       "clearHashtagAria": "Clear hashtag filter",
       "clearDepartmentAria": "Clear department filter",
-      "allHashtags": "All hashtags",
-      "allDepartments": "All departments",
       "loadError": "Unable to load",
       "retryLabel": "Retry",
       "emptyList": "No options",

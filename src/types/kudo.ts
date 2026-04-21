@@ -20,7 +20,10 @@ export type KudoUser = Pick<
   honour_title: string | null;
 };
 
-export type Hashtag = Pick<HashtagRow, "slug" | "label">;
+// Hashtags carry a locale-resolved `label` alongside the canonical
+// `slug`. `getKudoHashtags()` picks `label_vi` vs `label_en` based on
+// the active locale (migration 0010) — the UI consumes `{ slug, label }`.
+export type Hashtag = Pick<HashtagRow, "slug"> & { label: string };
 
 // Departments carry a locale-resolved `label` alongside the canonical
 // `code`. The Server Action picks name_vi vs name_en based on active

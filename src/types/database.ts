@@ -105,19 +105,22 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
-          label: string
+          label_en: string
+          label_vi: string
           slug: string
         }
         Insert: {
           created_at?: string | null
           id?: string
-          label: string
+          label_en: string
+          label_vi: string
           slug: string
         }
         Update: {
           created_at?: string | null
           id?: string
-          label?: string
+          label_en?: string
+          label_vi?: string
           slug?: string
         }
         Relationships: []

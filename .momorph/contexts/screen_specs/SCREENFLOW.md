@@ -6,7 +6,7 @@
 - **Figma URL**: https://www.figma.com/design/9ypp4enmFmdK3YAFJLIu6C
 - **MoMorph URL**: https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C
 - **Created**: 2026-04-17
-- **Last Updated**: 2026-04-19 (scope review v2: reconciled against Figma "With design" group — 16 frames)
+- **Last Updated**: 2026-04-20 (added `Dropdown Hashtag filter` `JWpsISMAaM` as a Live-board popover — 17 frames)
 
 ---
 
@@ -17,8 +17,8 @@ whose design has been finalised and whose spec has been prepared on
 MoMorph**. Source of truth: the Figma sidebar's `Screens > With design`
 group (verified 2026-04-19 against a user screenshot — 16 frames).
 
-- **In scope**: 16 spec-ready frames (5 shipped screens + 2 next-up
-  screens + 1 compose-editor overlay + 6 dropdown overlays + 2 FAB
+- **In scope**: 17 spec-ready frames (5 shipped screens + 2 next-up
+  screens + 1 compose-editor overlay + 7 dropdown overlays + 2 FAB
   overlays + 1 secret-box animation overlay).
 - **Out of scope / not tracked here**: iOS native app (37 `[iOS]` frames),
   design-system atoms (~45 frames), Admin full screens (Phase 2, 8
@@ -55,11 +55,11 @@ for Figma-side work.
 
 | Metric                              | Count |
 |-------------------------------------|-------|
-| Spec-ready web frames (in scope)    | 16    |
+| Spec-ready web frames (in scope)    | 17    |
 | Shipped                             | 8     |
 | Locally spec'd, impl pending        | 0     |
 | Next up (implementation pending)    | 1     |
-| Overlays pending implementation     | 7     |
+| Overlays pending implementation     | 8     |
 | Error-page stubs (awaiting spec)    | 2     |
 | Actionable completion               | 50%   |
 
@@ -67,7 +67,7 @@ for Figma-side work.
 
 ## Screens
 
-All 16 web frames from the Figma `Screens > With design` group. Primary
+All 17 web frames from the Figma `Screens > With design` group. Primary
 key is `screen_id`; `node_id` is the Figma-native identifier, provided
 as a convenience for deep-linking into Figma
 (`?node-id=<node_id>` in the file URL).
@@ -84,23 +84,23 @@ spec has not been reconciled against it).
 | 3 | Countdown – Prelaunch page | `8PJQswPZmU` | `2268:35127` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/8PJQswPZmU) | 🟢 shipped | [countdown.md](countdown.md) · [spec](../../specs/8PJQswPZmU-countdown/spec.md) · [page](../../../src/app/countdown/page.tsx) | `GET /events/current` (env-var sourced for MVP) | Login (at T-0 auto-redirect) |
 | 4 | Hệ thống giải | `zFYDgyj_pD` | `313:8436` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/zFYDgyj_pD) | 🟢 shipped | [spec](../../specs/zFYDgyj_pD-awards-system/spec.md) · [design-style](../../specs/zFYDgyj_pD-awards-system/design-style.md) · [page](../../../src/app/awards/page.tsx) | `GET /awards`, `GET /notifications/unread`, `GET /users/me` | Homepage SAA, Sun* Kudos Live board, Dropdown-ngôn ngữ, Dropdown-profile |
 | 5 | Thể lệ UPDATE | `b1Filzi9i6` | _(fetch via MoMorph)_ | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/b1Filzi9i6) | 🟢 shipped | [the-le.md](the-le.md) · [spec](../../specs/b1Filzi9i6-the-le/spec.md) · [page](../../../src/app/the-le/page.tsx) | None (static content, MVP) | Homepage SAA (Đóng), Viết Kudo (CTA) |
-| 6 | Sun* Kudos – Live board | `MaZUn5xHXZ` | `2940:13431` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/MaZUn5xHXZ) | 🟢 shipped | [spec](../../specs/MaZUn5xHXZ-kudos-live-board/spec.md) · [design-style](../../specs/MaZUn5xHXZ-kudos-live-board/design-style.md) · [plan](../../specs/MaZUn5xHXZ-kudos-live-board/plan.md) · [tasks](../../specs/MaZUn5xHXZ-kudos-live-board/tasks.md) · [DEPLOY](../../specs/MaZUn5xHXZ-kudos-live-board/DEPLOY.md) · [page](../../../src/app/kudos/page.tsx) | `GET /kudos`, `GET /kudos?hashtag=…`, `GET /kudos?department=…`, `POST /kudos/:id/hearts` | Viết Kudo, Dropdown Phòng ban, View Kudo (parked) |
+| 6 | Sun* Kudos – Live board | `MaZUn5xHXZ` | `2940:13431` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/MaZUn5xHXZ) | 🟢 shipped | [spec](../../specs/MaZUn5xHXZ-kudos-live-board/spec.md) · [design-style](../../specs/MaZUn5xHXZ-kudos-live-board/design-style.md) · [plan](../../specs/MaZUn5xHXZ-kudos-live-board/plan.md) · [tasks](../../specs/MaZUn5xHXZ-kudos-live-board/tasks.md) · [DEPLOY](../../specs/MaZUn5xHXZ-kudos-live-board/DEPLOY.md) · [page](../../../src/app/kudos/page.tsx) | `GET /kudos`, `GET /kudos?hashtag=…`, `GET /kudos?department=…`, `POST /kudos/:id/hearts` | Viết Kudo, Dropdown Phòng ban, Dropdown Hashtag filter, View Kudo (parked) |
 | 7 | Viết Kudo | `ihQ26W78P2` | `520:11602` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/ihQ26W78P2) | 🟡 next up | — | `POST /kudos`, `GET /users?search=…`, `GET /hashtags` | Live board, Dropdown list hashtag, Addlink Box, Viết Kudo error state (fold into same spec) |
 | 8 | Dropdown-ngôn ngữ | `hUyaaugye2` | `721:4942` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/hUyaaugye2) | 🔵 prototype | [src/components/login/LanguageDropdown.tsx](../../../src/components/login/LanguageDropdown.tsx) | `setLocale` Server Action | Parent: Login, Homepage header, every authenticated screen |
 | 9 | Dropdown-profile | `z4sCl3_Qtk` | `721:5223` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/z4sCl3_Qtk) | 🔵 prototype | [src/components/homepage/ProfileMenu.tsx](../../../src/components/homepage/ProfileMenu.tsx) | `signOut` Server Action | Parent: Authenticated header |
 | 10 | Dropdown-profile Admin | `54rekaCHG1` | `721:5277` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/54rekaCHG1) | ⚪ pending (admin) | — | `signOut` Server Action | Parent: Admin header (Phase 2) |
 | 11 | Dropdown Phòng ban | `WXK5AYB_rG` | `721:5684` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/WXK5AYB_rG) | ⚪ pending | — | `GET /departments` | Parent: Live board |
-| 12 | Dropdown list hashtag | `p9zO-c4a4x` | `1002:13013` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/p9zO-c4a4x) | ⚪ pending | — | `GET /hashtags` | Parent: Viết Kudo |
-| 13 | Addlink Box | `OyDLDuSGEa` | `1002:12917` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/OyDLDuSGEa) | ⚪ pending | — | None (client-side link-insert dialog) | Parent: Viết Kudo editor |
-| 14 | Floating Action Button – phím nổi chức năng (collapsed) | `_hphd32jN2` | `313:9137` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/_hphd32jN2) | 🟢 shipped | [spec](../../specs/_hphd32jN2-fab-collapsed/spec.md) · [design-style](../../specs/_hphd32jN2-fab-collapsed/design-style.md) · [plan](../../specs/_hphd32jN2-fab-collapsed/plan.md) · [page](../../../src/components/shell/QuickActionsFab.tsx) | None | Toggles to `Sv7DFwBw1h` expanded |
-| 15 | Floating Action Button – phím nổi chức năng 2 (expanded menu) | `Sv7DFwBw1h` | `313:9139` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/Sv7DFwBw1h) | 🟢 shipped | [spec](../../specs/Sv7DFwBw1h-fab-quick-actions/spec.md) · [design-style](../../specs/Sv7DFwBw1h-fab-quick-actions/design-style.md) · [page](../../../src/components/shell/QuickActionsFab.tsx) | None (pure navigation) | Thể lệ UPDATE, Viết Kudo |
-| 16 | Open secret box – chưa mở | `J3-4YFIpMM` | `1466:7676` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/J3-4YFIpMM) | ⚪ pending (animation, Phase 2-ish) | — | `POST /secret-boxes/:id/open` (predicted) | Parent: Profile bản thân (parked) |
+| 12 | Dropdown Hashtag filter | `JWpsISMAaM` | _(fetch via MoMorph)_ | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/JWpsISMAaM) | ⚪ pending | — | `GET /hashtags` | Parent: Live board (FilterBar) |
+| 13 | Dropdown list hashtag | `p9zO-c4a4x` | `1002:13013` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/p9zO-c4a4x) | ⚪ pending | — | `GET /hashtags` | Parent: Viết Kudo |
+| 14 | Addlink Box | `OyDLDuSGEa` | `1002:12917` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/OyDLDuSGEa) | ⚪ pending | — | None (client-side link-insert dialog) | Parent: Viết Kudo editor |
+| 15 | Floating Action Button – phím nổi chức năng (collapsed) | `_hphd32jN2` | `313:9137` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/_hphd32jN2) | 🟢 shipped | [spec](../../specs/_hphd32jN2-fab-collapsed/spec.md) · [design-style](../../specs/_hphd32jN2-fab-collapsed/design-style.md) · [plan](../../specs/_hphd32jN2-fab-collapsed/plan.md) · [page](../../../src/components/shell/QuickActionsFab.tsx) | None | Toggles to `Sv7DFwBw1h` expanded |
+| 16 | Floating Action Button – phím nổi chức năng 2 (expanded menu) | `Sv7DFwBw1h` | `313:9139` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/Sv7DFwBw1h) | 🟢 shipped | [spec](../../specs/Sv7DFwBw1h-fab-quick-actions/spec.md) · [design-style](../../specs/Sv7DFwBw1h-fab-quick-actions/design-style.md) · [page](../../../src/components/shell/QuickActionsFab.tsx) | None (pure navigation) | Thể lệ UPDATE, Viết Kudo |
+| 17 | Open secret box – chưa mở | `J3-4YFIpMM` | `1466:7676` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/J3-4YFIpMM) | ⚪ pending (animation, Phase 2-ish) | — | `POST /secret-boxes/:id/open` (predicted) | Parent: Profile bản thân (parked) |
 
-**Discrepancy flagged**: `Dropdown Hashtag filter` (`JWpsISMAaM`) was
-tagged `"Spec Created"` on MoMorph earlier but is **not** in the Figma
-`With design` group. Remove the tag on MoMorph, or add the frame to the
-group — either fix will reconcile the two sources. Treat the component
-as blocked on Design confirmation until then.
+**Discrepancy resolved (2026-04-20)**: `Dropdown Hashtag filter`
+(`JWpsISMAaM`) is now tracked as a Live-board popover (row #12). It
+opens from the Kudos Live board (`/kudos`) when the user clicks the
+"Hashtag" chip in the `FilterBar`; it is not a route.
 
 Error-page stubs (code live, but awaiting a real MoMorph spec before we
 call them finished):
@@ -138,6 +138,7 @@ flowchart TD
 
     subgraph FilterOverlays["Feed / compose overlays"]
         DeptFilter["Dropdown Phòng ban ⚪\nWXK5AYB_rG"]
+        HashFilter["Dropdown Hashtag filter ⚪\nJWpsISMAaM"]
         HashList["Dropdown list hashtag ⚪\np9zO-c4a4x"]
         AddLink["Addlink Box ⚪\nOyDLDuSGEa"]
     end
@@ -170,6 +171,8 @@ flowchart TD
 
     Liveboard -- FAB --> FAB
     Liveboard --> DeptFilter
+    Liveboard -- click Hashtag chip --> HashFilter
+    HashFilter -- select / clear --> Liveboard
     Liveboard --> Compose
     FAB -- quick action --> Compose
 
@@ -251,6 +254,7 @@ flowchart LR
 | Dropdown-profile | `z4sCl3_Qtk` | 🔵 prototype | User menu + sign out | Authenticated header |
 | Dropdown-profile Admin | `54rekaCHG1` | ⚪ pending (admin) | Admin user menu | Admin header (Phase 2) |
 | Dropdown Phòng ban | `WXK5AYB_rG` | ⚪ pending | Filter feed by department | Live board |
+| Dropdown Hashtag filter | `JWpsISMAaM` | ⚪ pending | Filter Live board feed by hashtag (popover from FilterBar); select → apply + close, click outside → close, clear → reset | Live board FilterBar |
 | Dropdown list hashtag | `p9zO-c4a4x` | ⚪ pending | Hashtag picker while composing | Viết Kudo |
 | Addlink Box | `OyDLDuSGEa` | ⚪ pending | Link-insert dialog for editor | Viết Kudo |
 
@@ -382,6 +386,7 @@ constitution §II:
 | 2026-04-19 | FAB expanded (variant 2) specs drafted | `Sv7DFwBw1h` | Created [spec.md](../../specs/Sv7DFwBw1h-fab-quick-actions/spec.md) + [design-style.md](../../specs/Sv7DFwBw1h-fab-quick-actions/design-style.md). 6 user stories (3 × P1, 2 × P2, 1 × P3 reduced-motion), 11 FRs, 6 TRs, 4 SCs. Zero APIs (pure navigation). 3 tiles — A (Thể lệ → `/the-le`), B (Viết KUDOS → `/kudos/new`), C (red circular Cancel). Reuses `saa`/`pencil`/`close` icons from `Icon.tsx`; reuses `--color-accent-cream*` + `--color-nav-dot` tokens (no new tokens). Implementation will **replace** the current single-item dark-dropdown `QuickActionsFab` in `src/components/homepage/` — design diverges significantly. Open questions: EN translations, whether Thể lệ tile's icon should be `saa` or a generic info/book icon. |
 | 2026-04-20 | Sun\* Kudos – Live board shipped | `MaZUn5xHXZ` | Full 11-phase delivery (US1..US9, 114 tasks). Ships feed + hashtag/department filters + optimistic heart (300 ms debounce) + copy-link + highlight carousel (5-slide pan/zoom) + spotlight word-cloud (pan/zoom, search, reduced-motion) + personal stats sidebar. Supabase-from-day-one (7 tables + RLS + 4 migrations + generated types), 11 new design tokens, ~70 i18n leaves × 2 locales, 8 typed analytics events. Test count 256 → 275 after Phase 10 motion + focus-visible sweep; axe-core + responsive E2E files added (gated on `SUPABASE_TEST_SESSION_TOKEN`). See [DEPLOY.md](../../specs/MaZUn5xHXZ-kudos-live-board/DEPLOY.md) for prod runbook. |
 | 2026-04-20 | FAB collapsed (variant 1) specs drafted | `_hphd32jN2` | Created [spec.md](../../specs/_hphd32jN2-fab-collapsed/spec.md) + [design-style.md](../../specs/_hphd32jN2-fab-collapsed/design-style.md). 6 user stories (3 × P1, 2 × P2, 1 × P3 reduced-motion), 11 FRs, 7 TRs, 5 SCs. Zero APIs. Pill 106×64 `rounded-full`, three glyphs inside: pen + "/" + saa. Composite `box-shadow` (black drop + warm cream `#FAE287` glow) — new token `--shadow-fab-trigger`. Current `QuickActionsFab.tsx` prototype matches visually but missing glow layer and hover lift. Now that both FAB frames are spec'd, implementation bundles them as a single `<QuickActionsFab>` relocated to `src/components/shell/`. |
+| 2026-04-20 | Dropdown Hashtag filter added to tracker | `JWpsISMAaM` | Reconciled the earlier discrepancy by formally adding the popover as row #12 under Dropdowns & Overlays. Sub-screen of Live board (`MaZUn5xHXZ`, `/kudos`): opens from `FilterBar` "Hashtag" chip; exit transitions are select-hashtag (filters feed + closes), click-outside (closes), clear-selection (resets filter). Predicted API: `GET /hashtags`. Still ⚪ pending — spec to be drafted via `/momorph.specify`. |
 
 ---
 
@@ -395,9 +400,11 @@ constitution §II:
       so compose → post → see-on-board lands in one coherent sprint. Fold
       the `Viết KUDO – Lỗi chưa điền đủ` (`5c7PkAibyD`) error variant into
       this spec.
-- [ ] **Feed + compose overlays** (`WXK5AYB_rG`, `p9zO-c4a4x`,
-      `OyDLDuSGEa`) — spec them together with their parent screens, not
-      as separate routes.
+- [ ] **Feed + compose overlays** (`WXK5AYB_rG`, `JWpsISMAaM`,
+      `p9zO-c4a4x`, `OyDLDuSGEa`) — spec them together with their parent
+      screens, not as separate routes. `JWpsISMAaM` is the Live-board
+      hashtag filter popover; pair it with `WXK5AYB_rG` so the Live
+      board FilterBar gets both filter dropdowns in one pass.
 - [ ] **Header dropdowns** (`hUyaaugye2`, `z4sCl3_Qtk`) — reconcile existing
       prototypes against their specs via `/momorph.specify`.
 - [ ] **FAB — both states as one component** (`_hphd32jN2` + `Sv7DFwBw1h`) —
@@ -407,9 +414,8 @@ constitution §II:
       Replaces the existing single-item dark dropdown prototype in
       [src/components/homepage/QuickActionsFab.tsx](../../../src/components/homepage/QuickActionsFab.tsx);
       relocates the component to `src/components/shell/`.
-- [ ] **Reconcile `Dropdown Hashtag filter`** (`JWpsISMAaM`) — ask Design
-      to either add the frame to the Figma `With design` group or remove
-      the MoMorph `"Spec Created"` tag. Blocks Live board filter UX.
+- [x] **Reconcile `Dropdown Hashtag filter`** (`JWpsISMAaM`) — resolved
+      2026-04-20 by adding the frame as a Live-board popover (row #12).
 - [ ] **Chase Design for the parked list** — especially Profile own/other
       (`3FoIx6ALVb`, `w4WUvsJ9KI`) and Notifications (`6-1LRz3vqr`,
       `gWBVcaSVIf`). These are MVP-level but blocked on a MoMorph spec.
