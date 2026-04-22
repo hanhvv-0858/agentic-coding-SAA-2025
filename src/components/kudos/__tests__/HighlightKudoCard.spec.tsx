@@ -34,6 +34,8 @@ const baseKudo = (overrides: Partial<Kudo> = {}): Kudo => ({
   created_at: new Date(2025, 9, 30, 10, 0, 0).toISOString(),
   sender_id: "u-sender",
   hearts_count: 42,
+  is_anonymous: false,
+  anonymous_alias: null,
   sender: user("u-sender", "Alice Sender"),
   recipients: [user("u-rec", "Bob Recipient")],
   hashtags: [tag("dedicated", "Dedicated")],

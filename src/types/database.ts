@@ -241,23 +241,29 @@ export type Database = {
       }
       kudos: {
         Row: {
+          anonymous_alias: string | null
           body: string
           created_at: string | null
           id: string
+          is_anonymous: boolean
           sender_id: string
           title: string | null
         }
         Insert: {
+          anonymous_alias?: string | null
           body: string
           created_at?: string | null
           id?: string
+          is_anonymous?: boolean
           sender_id: string
           title?: string | null
         }
         Update: {
+          anonymous_alias?: string | null
           body?: string
           created_at?: string | null
           id?: string
+          is_anonymous?: boolean
           sender_id?: string
           title?: string | null
         }
@@ -389,10 +395,12 @@ export type Database = {
     Views: {
       kudos_with_stats: {
         Row: {
+          anonymous_alias: string | null
           body: string | null
           created_at: string | null
           hearts_count: number | null
           id: string | null
+          is_anonymous: boolean | null
           sender_id: string | null
           title: string | null
         }
@@ -408,7 +416,18 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      create_kudo: {
+        Args: {
+          p_title: string
+          p_body: string
+          p_is_anonymous: boolean
+          p_recipient_id: string
+          p_hashtag_slugs: string[]
+          p_image_paths: string[]
+          p_anonymous_alias?: string | null
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

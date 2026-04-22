@@ -396,9 +396,24 @@ hashtags, C.7 has both, etc.).
 | layout | `flex flex-col items-center justify-center` |
 | children | avatar 64×64 + name (Montserrat 16/24/700/navy) + honourific (Montserrat 14/20/700/grey `#999`) + optional hoa-thị row |
 
+**Anonymous-sender variant (Figma node `2099:9148`, round 4 2026-04-22)**
+
+Applied when `kudo.is_anonymous === true`. Rendered by the same `KudoParticipant` component with `isAnonymous={true}`:
+
+| Property | Value | Rationale |
+|---|---|---|
+| Avatar background | `var(--color-border-secondary)/30` (olive at 30% alpha → light beige) | Matches the muted "mask" aesthetic of incognito mode |
+| Avatar icon | `<Icon name="incognito" size={36} />` — detective hat + round spectacles, currentColor = `--color-brand-900` | Sprite atom in `src/components/ui/Icon.tsx` (new) |
+| Avatar border | none (inherit 64×64 round) | Differentiates from the cream ring reserved for active/highlight cards |
+| Name | same typography as 17a but value is `anonymous_alias` (e.g. "Anh Hùng Xạ Điêu") | Server-side swap in `getKudoFeed` / `getHighlightKudos` replaces `sender.display_name` with alias before reaching the UI |
+| Subline (replaces CECV + Hero pill) | Text "Người gửi ẩn danh" — Montserrat 12/16/700 `tracking-wide` muted `#999` | i18n key `kudos.card.anonymousSenderLabel` (vi + en) |
+| Hides | `department_code`, `honour_title` pill, avatar Next.js image fetch | Protects sender identity — department + tier + avatar would leak through |
+
+**Rationale**: defence-in-depth anonymity. The swap lives in the server action (not the client component) so real identity never reaches the browser for anonymous kudos. See [MaZUn5xHXZ/spec.md §"Anonymous sender rendering"](spec.md) for the data contract.
+
 #### 17b. `KudoCardRecipient` — C.3.3 (`I3127:21871;256:4860`)
 
-Identical shape to 17a.
+Identical shape to 17a. The anonymous variant does NOT apply here — recipients are always real identities.
 
 #### 17c. `KudoCardSentIcon` — C.3.2 (`I3127:21871;256:5161`)
 

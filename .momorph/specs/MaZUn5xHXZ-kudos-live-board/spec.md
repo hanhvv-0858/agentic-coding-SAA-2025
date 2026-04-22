@@ -415,6 +415,91 @@ Proposed additions to `src/app/globals.css` (flagged explicitly because no exist
   - `weight: number` (drives font size; hearts or kudos-count based)
   - `recent_kudo: { time: ISO, preview: string }`
 
+### Honour tier auto-computation (resolved 2026-04-22)
+
+The Thể lệ screen (`b1Filzi9i6-the-le/spec.md` line 16) states recipient Hero tier badges by counts: *"New 1–4 / Rising 5–9 / Super 10–20 / Legend 20+ senders"*. This spec **owns** the computation contract because the kudo write-path and `profiles.honour_title` read-path both belong to the Kudos Live board domain.
+
+**Resolved decisions** (from reviewspecify round 2026-04-22):
+
+- **Q1 — What to count**: **distinct senders** per recipient (`count(distinct sender_id)` over `kudos` joined with `kudo_recipients` where `recipient_id = $1`). The spec's wording "senders" is load-bearing — a single sender giving 5 kudos to the same recipient counts as 1 sender, not 5 kudos.
+- **Q2 — Anonymous kudos**: **include** them in the count. Tier is a property of the recipient's social capital; sender privacy (the `is_anonymous` flag) does not affect whether the kudo-event happened.
+- **Q3 — Threshold boundaries** (resolving the "10–20" ambiguity in spec copy):
+  - `null` when distinct-sender count = 0 (user renders plain name row)
+  - `New Hero` when 1 ≤ count ≤ 4
+  - `Rising Hero` when 5 ≤ count ≤ 9
+  - `Super Hero` when 10 ≤ count ≤ 19
+  - `Legend Hero` when count ≥ 20
+- **Q4 — Where to compute**: **DB trigger** on `INSERT` to `kudo_recipients`. Runs `AFTER INSERT FOR EACH ROW` → recomputes the recipient's tier via `compute_honour_tier()` helper → updates `profiles.honour_title` only if the new tier differs (avoid write churn). Chosen over inline in `create_kudo` for isolation + correctness if multi-recipient lands later.
+- **Q5 — Backfill**: one-time `UPDATE profiles` at end of migration applies the tier to every existing recipient based on current `kudo_recipients` state, so legacy data is not blind.
+- **Q6 — Migration file**: `supabase/migrations/0018_honour_tier_autocompute.sql` — contains: (a) `compute_honour_tier(uuid)` function, (b) `sync_recipient_honour()` trigger function, (c) trigger on `kudo_recipients`, (d) backfill UPDATE.
+
+**Tier function contract**:
+
+```sql
+create or replace function compute_honour_tier(p_user_id uuid)
+  returns honour_title language sql stable as $$
+  select case
+    when distinct_senders = 0 then null
+    when distinct_senders <= 4 then 'New Hero'::honour_title
+    when distinct_senders <= 9 then 'Rising Hero'::honour_title
+    when distinct_senders <= 19 then 'Super Hero'::honour_title
+    else 'Legend Hero'::honour_title
+  end
+  from (
+    select count(distinct k.sender_id) as distinct_senders
+    from kudo_recipients kr
+    join kudos k on k.id = kr.kudo_id
+    where kr.recipient_id = p_user_id
+  ) t;
+$$;
+```
+
+**Acceptance scenarios** (observable):
+
+1. **Given** recipient Alice has 0 kudo_recipients rows, **When** sender Bob sends her his 1st kudo, **Then** post-commit `SELECT honour_title FROM profiles WHERE id = alice.id` returns `'New Hero'`.
+2. **Given** Alice has kudos from 4 distinct senders (honour = `'New Hero'`), **When** a 5th distinct sender sends a kudo, **Then** her `honour_title` flips to `'Rising Hero'`.
+3. **Given** Alice has kudos from sender Bob only (honour = `'New Hero'`), **When** Bob sends her another kudo (2nd from same sender), **Then** `distinct_senders` stays at 1 and her `honour_title` stays at `'New Hero'`.
+4. **Given** a recipient has `is_anonymous=true` kudos from 3 distinct senders + `is_anonymous=false` from 2 more, **Then** distinct-sender count = 5 → `'Rising Hero'`.
+5. **Given** the backfill UPDATE runs on an existing DB with mixed prior state, **When** the migration finishes, **Then** every recipient with ≥1 distinct sender has the correct `honour_title`; every recipient with 0 senders has `honour_title = null`.
+
+**Edge cases**:
+
+- **Self-kudo** (sender_id = recipient_id): still counted — no business rule excludes it. Flagged here for review; add filter if product team decides otherwise.
+- **Soft-delete / hard-delete of a kudo** (not in current scope): if `kudo_recipients` rows are ever removed, the trigger should also be on `DELETE`. For MVP, kudos are insert-only; if delete arrives, add an `AFTER DELETE` branch to the trigger.
+- **Concurrent inserts to same recipient**: Postgres `AFTER INSERT FOR EACH ROW` trigger serialises per row; recomputation is idempotent (`UPDATE ... WHERE honour_title IS DISTINCT FROM $new`), so race conditions converge.
+
+### Anonymous sender rendering (resolved 2026-04-22 round 4)
+
+When `kudo.is_anonymous === true`, the Live board card MUST hide the sender's real identity and render the dedicated anonymous variant. The spec source is Figma node `2099:9148` (design-style §17a "Anonymous-sender variant").
+
+**Data contract** — the feed server actions (`getKudoFeed` + `getHighlightKudos`) perform the identity swap **server-side** before returning the payload to the client. The client component (`KudoParticipant`) is stateless with respect to anonymity and reads a single boolean prop.
+
+| Returned field | Anonymous kudo                                              | Non-anonymous              |
+| -------------- | ----------------------------------------------------------- | -------------------------- |
+| `sender.id`    | `anon-{kudoId}` — stable seed for `pickMonogramColor` (n/a, monogram is replaced by incognito icon anyway) | real `profiles.id`        |
+| `sender.display_name` | `anonymous_alias` (fallback "Ẩn danh" when null)      | real `display_name`         |
+| `sender.avatar_url`   | `null`                                                 | real URL                    |
+| `sender.department_id` / `department_code` | `null` / `null`                   | real values                 |
+| `sender.honour_title` | `null`                                                 | real tier                   |
+| Top-level `sender_id` | `null` (viewers can't correlate)                       | real `sender_id`            |
+| Top-level `is_anonymous` | `true`                                              | `false`                     |
+| Top-level `anonymous_alias` | alias string (for Live-board label) | `null`                      |
+
+**Rendering contract** — when `is_anonymous={true}` is passed to `KudoParticipant`:
+
+- Avatar: 64×64 circle with `bg-[var(--color-border-secondary)]/30` + `<Icon name="incognito" size={36} />` (hat + spectacles glyph, colour `--color-brand-900`).
+- Name: displays `user.display_name` (= alias, already swapped server-side) in the same Montserrat 16/24/700 style as real names.
+- Subline: literal text "Người gửi ẩn danh" via i18n key `kudos.card.anonymousSenderLabel` (vi) / "Anonymous sender" (en). Replaces the CECV code + Hero-tier pill.
+
+**Edit-pencil behaviour** (intentional): anonymous kudos render with `sender_id = null`, so the `viewerId === kudo.sender_id` check in `KudoPostCard` is always false → the pencil button does NOT show for anyone on an anonymous kudo in the public feed. If a "Sent by me" tab/filter is built later, it must use a dedicated query (`sender_id = auth.uid()`) to show the sender's own sent kudos there without breaking anonymity on the public feed.
+
+**Acceptance scenarios**:
+
+1. **Given** a kudo with `is_anonymous=true, anonymous_alias='Anh Hùng Xạ Điêu'`, **When** any viewer loads `/kudos`, **Then** the card renders the incognito avatar + "Anh Hùng Xạ Điêu" + "Người gửi ẩn danh" subline; no CECV code, no Hero pill, no real name appears.
+2. **Given** the same kudo, **When** the sender themselves loads `/kudos`, **Then** they ALSO see the anonymous variant (no special-case reveal) and the edit pencil does NOT appear on this card on the public feed.
+3. **Given** a kudo with `is_anonymous=false`, **When** the card renders, **Then** the existing sender variant (real name + CECV + Hero pill) is unchanged.
+4. **Given** a kudo where `anonymous_alias` is unexpectedly null despite `is_anonymous=true` (data integrity issue — CHECK constraint should prevent but defence-in-depth), **Then** the label falls back to "Ẩn danh" so nothing renders blank.
+
 ---
 
 ## State Management
@@ -697,7 +782,9 @@ New optional fields on the TS domain types (backend migration TBD):
   small grey label beneath the participant's name.
 - `KudoUser.honour_title?: string` — one of `"Legend Hero"`,
   `"Rising Hero"`, `"Super Hero"`, `"New Hero"`. Maps to a pre-rendered
-  image pill under `public/images/the-le/pill-*.png`.
+  image pill under `public/images/the-le/pill-*.png`. **Auto-computed**
+  from received-kudo activity — see §"Honour tier auto-computation"
+  below.
 - `Kudo.title?: string` — e.g. `"IDOL GIỚI TRẺ"`. Centered navy line
   above the body copy.
 

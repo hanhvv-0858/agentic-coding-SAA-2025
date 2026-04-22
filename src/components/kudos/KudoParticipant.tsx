@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Icon } from "@/components/ui/Icon";
 import { getInitials, pickMonogramColor } from "@/libs/kudos/monogram";
 import type { KudoUser } from "@/types/kudo";
 
@@ -6,6 +7,18 @@ type KudoParticipantProps = {
   user: KudoUser;
   /** Aria-only label (design-style §17a/17b names are `<button>`s in later phases). */
   monogramAlt: string;
+  /** When true, render the anonymous-sender variant per design round 4:
+   *  grey circle + incognito icon instead of monogram, and a neutral
+   *  "Người gửi ẩn danh" subline instead of CECV + honour pill. The
+   *  caller supplies `user.display_name` = alias (already swapped
+   *  server-side in `getKudoFeed`). */
+  isAnonymous?: boolean;
+  /** Localised "Người gửi ẩn danh" subline — only used when
+   *  `isAnonymous=true`. Injected from messages so consumers can keep
+   *  this component locale-agnostic. */
+  anonymousLabel?: string;
+  /** Localised alt text for the incognito avatar. */
+  anonymousAvatarAlt?: string;
 };
 
 // Maps the `honour_title` string onto the pre-rendered pill PNGs shared
@@ -43,7 +56,13 @@ const HONOUR_PILL_MAP: Record<
  * title pill (dark navy with cream/red accent). Falls back to a monogram
  * circle (FR-016) when `avatar_url` is null.
  */
-export function KudoParticipant({ user, monogramAlt }: KudoParticipantProps) {
+export function KudoParticipant({
+  user,
+  monogramAlt,
+  isAnonymous = false,
+  anonymousLabel,
+  anonymousAvatarAlt,
+}: KudoParticipantProps) {
   const name = user.display_name ?? "";
   const initials = getInitials(name);
   const bg = pickMonogramColor(user.id);
@@ -57,7 +76,16 @@ export function KudoParticipant({ user, monogramAlt }: KudoParticipantProps) {
         className="relative h-16 w-16 overflow-hidden rounded-full"
         data-testid="kudo-participant-avatar"
       >
-        {hasAvatar ? (
+        {isAnonymous ? (
+          <div
+            role="img"
+            aria-label={anonymousAvatarAlt ?? monogramAlt}
+            className="flex h-full w-full items-center justify-center bg-[var(--color-border-secondary)]/30 text-[var(--color-brand-900)]"
+            data-testid="kudo-participant-anonymous-avatar"
+          >
+            <Icon name="incognito" size={36} />
+          </div>
+        ) : hasAvatar ? (
           <Image
             src={user.avatar_url as string}
             alt={name || monogramAlt}
@@ -80,7 +108,14 @@ export function KudoParticipant({ user, monogramAlt }: KudoParticipantProps) {
       <span className="text-center font-[family-name:var(--font-montserrat)] text-base font-bold leading-6 text-[var(--color-brand-900)]">
         {name || monogramAlt}
       </span>
-      {honourCode || honourTitle ? (
+      {isAnonymous ? (
+        <span
+          className="font-[family-name:var(--font-montserrat)] text-xs font-bold leading-4 tracking-wide text-[var(--color-muted-grey)]"
+          data-testid="kudo-participant-anonymous-label"
+        >
+          {anonymousLabel ?? "Người gửi ẩn danh"}
+        </span>
+      ) : honourCode || honourTitle ? (
         <div className="flex items-center gap-2">
           {honourCode ? (
             <span
@@ -99,7 +134,6 @@ export function KudoParticipant({ user, monogramAlt }: KudoParticipantProps) {
                     alt={honourTitle}
                     width={pill.width}
                     height={pill.height}
-                    style={{ width: "auto" }}
                     className="h-5 w-auto select-none"
                     data-testid="kudo-participant-honour"
                   />

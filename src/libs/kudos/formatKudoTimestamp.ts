@@ -1,10 +1,23 @@
 import type { Locale } from "@/types/auth";
 
 // Formats a timestamp as `HH:mm - MM/DD/YYYY` (design-style.md §17d).
-// Locale only affects numeral rendering (VI and EN both use the same
-// pattern per design). We keep this zero-dep — the spec's date-fns
-// mention (tasks.md T032) is an implementation hint, not a hard
-// requirement, and the project has no existing date-fns dependency.
+// ALWAYS renders in `Asia/Ho_Chi_Minh` time so SSR (UTC runtime on
+// Cloudflare Workers) and CSR (user's local timezone) produce the
+// identical string — otherwise the `d.getHours()` / `d.getMonth()` etc.
+// local-time methods cause hydration mismatches for any kudo shown
+// between 17:00 UTC and 00:00 UTC (see hydration-failed regression
+// 2026-04-22). Locale only affects numeral rendering; vi + en both use
+// the same pattern per design.
+const VN_FORMATTER = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Asia/Ho_Chi_Minh",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+
 export function formatKudoTimestamp(
   value: string | Date | null | undefined,
   _locale: Locale = "vi",
@@ -13,10 +26,15 @@ export function formatKudoTimestamp(
   const d = typeof value === "string" ? new Date(value) : value;
   if (Number.isNaN(d.getTime())) return "";
 
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const year = d.getFullYear();
+  // `formatToParts` keeps the spec-required `HH:mm - MM/DD/YYYY` shape
+  // without being at the mercy of Intl's default "en-GB" glue text.
+  const parts = VN_FORMATTER.formatToParts(d);
+  const pick = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((p) => p.type === type)?.value ?? "";
+  const hh = pick("hour");
+  const mm = pick("minute");
+  const month = pick("month");
+  const day = pick("day");
+  const year = pick("year");
   return `${hh}:${mm} - ${month}/${day}/${year}`;
 }

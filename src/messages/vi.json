@@ -276,7 +276,9 @@
       "imageAlt": "Ảnh đính kèm kudo",
       "seeDetailLabel": "Xem chi tiết",
       "editAria": "Chỉnh sửa Kudo này",
-      "monogramAlt": "Ảnh đại diện mặc định"
+      "monogramAlt": "Ảnh đại diện mặc định",
+      "anonymousSenderLabel": "Người gửi ẩn danh",
+      "anonymousAvatarAlt": "Avatar ẩn danh"
     },
     "spotlight": {
       "sectionCaption": "NGƯỜI ĐƯỢC VINH DANH",
@@ -324,6 +326,97 @@
       "offlineWarning": "Bạn đang offline — thao tác sẽ được đồng bộ khi có mạng.",
       "filterOfflineToast": "Không tải được bộ lọc khi offline.",
       "parkedToast": "Đang xây dựng — tính năng sẽ sớm ra mắt."
+    }
+  },
+  "compose": {
+    "title": "Gửi lời cám ơn và ghi nhận đến đồng đội",
+    "fields": {
+      "recipient": {
+        "label": "Người nhận",
+        "placeholder": "Tìm kiếm"
+      },
+      "honor": {
+        "label": "Danh hiệu",
+        "placeholder": "Dành tặng một danh hiệu cho đồng đội.",
+        "helper": "Ví dụ: Người truyền động lực cho tôi. Danh hiệu sẽ hiển thị làm tiêu đề của Kudos của bạn."
+      },
+      "body": {
+        "placeholder": "Hãy gửi gắm lời cám ơn và ghi nhận đến đồng đội tại đây nhé!",
+        "mentionHelper": "Bạn có thể \"@ + tên\" để nhắc tới đồng nghiệp khác"
+      },
+      "hashtag": {
+        "label": "Hashtag",
+        "trigger": "Hashtag",
+        "max": "Tối đa 5",
+        "pickerLabel": "Chọn hashtag",
+        "emptyState": "Chưa có hashtag",
+        "errorState": "Không tải được hashtag.",
+        "retryLabel": "Thử lại"
+      },
+      "image": {
+        "label": "Image",
+        "trigger": "Image",
+        "max": "Tối đa 5"
+      },
+      "anonymous": {
+        "label": "Gửi lời cám ơn và ghi nhận ẩn danh"
+      },
+      "anonymousAlias": {
+        "label": "Nickname ẩn danh",
+        "placeholder": "Nhập nickname",
+        "validation": {
+          "required": "Vui lòng nhập nickname (2–40 ký tự)",
+          "tooLong": "Nickname tối đa 40 ký tự"
+        }
+      }
+    },
+    "toolbar": {
+      "standardsLink": "Tiêu chuẩn cộng đồng",
+      "bold": "In đậm",
+      "italic": "In nghiêng",
+      "strikethrough": "Gạch ngang",
+      "bulletList": "Danh sách",
+      "link": "Chèn liên kết",
+      "quote": "Trích dẫn"
+    },
+    "mention": {
+      "empty": "Không tìm thấy đồng nghiệp",
+      "error": "Lỗi kết nối. Thử lại."
+    },
+    "validation": {
+      "recipientRequired": "Vui lòng chọn người nhận.",
+      "titleRequired": "Vui lòng nhập danh hiệu.",
+      "titleTooLong": "Danh hiệu quá dài (tối đa 120 ký tự).",
+      "bodyRequired": "Vui lòng nhập nội dung.",
+      "bodyTooLong": "Nội dung quá dài (tối đa 5000 ký tự).",
+      "hashtagRequired": "Vui lòng chọn ít nhất 1 hashtag.",
+      "hashtagTooMany": "Tối đa 5 hashtag.",
+      "imageTooLarge": "Ảnh phải nhỏ hơn 5 MB.",
+      "imageMimeInvalid": "Chỉ hỗ trợ JPG, PNG, WebP."
+    },
+    "actions": {
+      "cancel": "Hủy",
+      "submit": "Gửi",
+      "cancelDirtyConfirm": "Bỏ bản nháp? Nội dung chưa gửi sẽ mất."
+    },
+    "toasts": {
+      "success": "Đã gửi kudo",
+      "error": "Không gửi được. Thử lại sau.",
+      "imageUploadError": "Tải ảnh lỗi. Kiểm tra lại quyền."
+    },
+    "addlink": {
+      "title": "Thêm đường dẫn",
+      "textLabel": "Nội dung",
+      "urlLabel": "URL",
+      "cancel": "Hủy",
+      "save": "Lưu",
+      "validation": {
+        "textRequired": "Vui lòng nhập nội dung.",
+        "textTooLong": "Nội dung quá dài (tối đa 100 ký tự).",
+        "urlRequired": "Vui lòng nhập URL.",
+        "urlInvalid": "URL không hợp lệ.",
+        "urlTooLong": "URL quá dài (tối đa 2048 ký tự)."
+      }
     }
   }
 }

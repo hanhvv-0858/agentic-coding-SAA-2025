@@ -57,12 +57,22 @@ export function HighlightKudoCard({
       data-kudo-id={kudo.id}
       data-active={isActive ? "true" : "false"}
     >
-      {/* Sender + sent-arrow + primary recipient row. */}
-      <div className="flex w-full flex-row items-start justify-center gap-4">
-        <KudoParticipant user={kudo.sender} monogramAlt={card.monogramAlt} />
+      {/* Sender + sent-arrow + primary recipient row. 3-col grid with
+          each participant centred in its half gives the wide breathing
+          room shown in design; the icon sits dead-centre of the card. */}
+      <div className="grid w-full grid-cols-[1fr_auto_1fr] items-start">
+        <div className="flex justify-center">
+          <KudoParticipant
+            user={kudo.sender}
+            monogramAlt={card.monogramAlt}
+            isAnonymous={kudo.is_anonymous ?? false}
+            anonymousLabel={card.anonymousSenderLabel}
+            anonymousAvatarAlt={card.anonymousAvatarAlt}
+          />
+        </div>
         <div
           aria-hidden="true"
-          className="flex h-16 w-8 items-center justify-center"
+          className="flex h-16 w-16 items-center justify-center"
         >
           <Image
             src="/icons/ic_kudo_send@2x.png"
@@ -72,12 +82,14 @@ export function HighlightKudoCard({
             className="h-7 w-7 select-none"
           />
         </div>
-        {primaryRecipient ? (
-          <KudoParticipant
-            user={primaryRecipient}
-            monogramAlt={card.monogramAlt}
-          />
-        ) : null}
+        <div className="flex justify-center">
+          {primaryRecipient ? (
+            <KudoParticipant
+              user={primaryRecipient}
+              monogramAlt={card.monogramAlt}
+            />
+          ) : null}
+        </div>
       </div>
 
       {/* Cream hairline between participants and meta row (design §B.3). */}
@@ -102,17 +114,17 @@ export function HighlightKudoCard({
       ) : null}
 
       {/* Amber body panel (design §B.3 — thank-you message in warmer
-          tint with cream outline). 4-line clamp. */}
+          tint with cream outline). 4-line clamp. Body is TipTap-
+          serialised HTML (see Viết Kudo FR-007 for schema safety). */}
       <div
         className="w-full rounded-2xl border border-[var(--color-accent-cream)] bg-[var(--color-accent-cream)]/40 p-5"
         data-testid="kudo-highlight-content-panel"
       >
-        <p
-          className="line-clamp-4 w-full whitespace-pre-line text-center font-[family-name:var(--font-montserrat)] text-[18px] font-bold leading-7 text-[var(--color-brand-900)]"
+        <div
+          className="line-clamp-4 w-full text-center font-[family-name:var(--font-montserrat)] text-[18px] font-bold leading-7 text-[var(--color-brand-900)] [&_p]:m-0 [&_a]:underline [&_a]:text-[var(--color-error)]"
           data-testid="kudo-highlight-body"
-        >
-          {body}
-        </p>
+          dangerouslySetInnerHTML={{ __html: body }}
+        />
       </div>
 
       {/* Images — renders when `kudo.images` is non-empty. */}

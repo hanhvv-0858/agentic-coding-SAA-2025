@@ -61,6 +61,12 @@
   --shadow-fab-pill-hover: 0 6px 10px 0 rgba(0, 0, 0, 0.3), 0 0 10px 0 #fae287;
   --shadow-fab-tile: 0 8px 24px rgba(0, 0, 0, 0.35);
 
+  /* Viết Kudo (spec ihQ26W78P2) — compose modal additions.
+     3 new tokens per plan.md §New Design Tokens. */
+  --color-modal-paper: #fff8e1;
+  --color-error: #cf1322;
+  --color-close-red: #d4271d;
+
   /* Kudos Live board (spec MaZUn5xHXZ) — design-style §TR-008.
      11 NEW tokens lifted from plan.md §Token & i18n plan. */
   --color-kudo-card: #fff8e1;

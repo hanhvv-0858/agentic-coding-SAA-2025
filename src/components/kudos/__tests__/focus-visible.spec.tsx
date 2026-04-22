@@ -69,6 +69,8 @@ const makeKudo = (id: string, hearts = 0): Kudo => ({
   created_at: new Date(2025, 9, 30, 10, 0, 0).toISOString(),
   sender_id: `sender-${id}`,
   hearts_count: hearts,
+  is_anonymous: false,
+  anonymous_alias: null,
   sender: user(`sender-${id}`, `Sender ${id}`),
   recipients: [user(`rec-${id}`, `Recipient ${id}`)],
   hashtags: [tag("dedicated", "Dedicated")],

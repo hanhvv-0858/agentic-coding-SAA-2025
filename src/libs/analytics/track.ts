@@ -47,7 +47,10 @@ export type AnalyticsEvent =
       from_index: number;
       to_index: number;
     }
-  | { type: "kudos_compose_open"; source: "liveboard_pill" | "fab" };
+  | { type: "kudos_compose_open"; source: "liveboard_pill" | "fab" }
+  // Viết Kudo compose flow (spec ihQ26W78P2) — added in PR 2.
+  | { type: "kudos_compose_submit"; kudo_id: string }
+  | { type: "kudos_compose_cancel"; reason: "hủy_button" | "esc" | "backdrop" };
 
 declare global {
   interface Window {

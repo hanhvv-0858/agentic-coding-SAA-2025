@@ -14,6 +14,8 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/libs/supabase/server";
 import { getLocale } from "@/libs/i18n/getMessages";
 import type {
+  CreateKudoInput,
+  CreateKudoResult,
   Department,
   FeedPage,
   FilterState,
@@ -110,7 +112,7 @@ export async function getKudoFeed(
   let query = supabase
     .from("kudos_with_stats")
     .select(
-      `id, body, title, created_at, sender_id, hearts_count,
+      `id, body, title, created_at, sender_id, hearts_count, is_anonymous, anonymous_alias,
        sender:profiles!sender_id ( id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code ) ),
        kudo_recipients ( recipient:profiles!recipient_id ( id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code ) ) ),
        kudo_hashtags ( hashtags ( id, slug, label_vi, label_en ) ),
@@ -169,6 +171,8 @@ export async function getKudoFeed(
     created_at: string | null;
     sender_id: string | null;
     hearts_count: number | null;
+    is_anonymous: boolean | null;
+    anonymous_alias: string | null;
     sender: MaybeRelated<RelatedProfile>;
     kudo_recipients:
       | { recipient: MaybeRelated<RelatedProfile> }[]
@@ -185,21 +189,59 @@ export async function getKudoFeed(
 
   const typedRows = rows as unknown as RawRow[];
 
+  // Batch-sign all image paths in one round-trip. kudo_images.url stores
+  // the Storage PATH (spec Q4 2026-04-21); `next/image` needs an absolute
+  // URL, so we convert path → signed URL here. Private `kudo-images`
+  // bucket requires signed URLs with TTL 1 h.
+  const allImagePaths = Array.from(
+    new Set(
+      typedRows
+        .flatMap((r) => r.kudo_images ?? [])
+        .map((img) => img.url)
+        .filter((p): p is string => typeof p === "string" && p.length > 0),
+    ),
+  );
+  const signedUrlByPath = new Map<string, string>();
+  if (allImagePaths.length > 0) {
+    const { data: signed, error: signErr } = await supabase.storage
+      .from("kudo-images")
+      .createSignedUrls(allImagePaths, 3600);
+    if (signErr) {
+      console.error("[kudos] batch signedUrl failed:", signErr);
+    } else {
+      for (const entry of signed ?? []) {
+        if (entry.path && entry.signedUrl) {
+          signedUrlByPath.set(entry.path, entry.signedUrl);
+        }
+      }
+    }
+  }
+
   // Hashtag + department filters are now applied server-side (see
   // pre-query `.in()` narrowing above); rows here are already final.
   const items = typedRows.map((r) => {
     const senderProfile = pickOne(r.sender);
     const orderedImages = [...(r.kudo_images ?? [])]
       .sort((a, b) => a.position - b.position)
-      .map((img) => img.url);
-    return {
-      id: r.id ?? "",
-      body: r.body,
-      title: r.title,
-      created_at: r.created_at,
-      sender_id: r.sender_id,
-      hearts_count: r.hearts_count,
-      sender: senderProfile
+      .map((img) => signedUrlByPath.get(img.url) ?? "")
+      .filter((u) => u.length > 0);
+    const isAnonymous = r.is_anonymous ?? false;
+    const aliasName = r.anonymous_alias ?? "Ẩn danh";
+    // Anonymous kudos hide the sender's real identity on the public
+    // feed (FR-011 round 3). Alias replaces display_name; avatar falls
+    // back to monogram; department_code + honour_title cleared; and
+    // sender_id is stripped so viewers cannot correlate.
+    const kudoIdSeed = r.id ?? r.sender_id ?? "anon";
+    const senderView = isAnonymous
+      ? {
+          id: `anon-${kudoIdSeed}`,
+          display_name: aliasName,
+          avatar_url: null,
+          department_id: null,
+          department_code: null,
+          honour_title: null,
+        }
+      : senderProfile
         ? {
             id: senderProfile.id,
             display_name: senderProfile.display_name,
@@ -215,7 +257,17 @@ export async function getKudoFeed(
             department_id: null,
             department_code: null,
             honour_title: null,
-          },
+          };
+    return {
+      id: r.id ?? "",
+      body: r.body,
+      title: r.title,
+      created_at: r.created_at,
+      sender_id: isAnonymous ? null : r.sender_id,
+      hearts_count: r.hearts_count,
+      is_anonymous: isAnonymous,
+      anonymous_alias: r.anonymous_alias ?? null,
+      sender: senderView,
       recipients: (r.kudo_recipients ?? [])
         .map((kr) => pickOne(kr.recipient))
         .filter((p): p is RelatedProfile => !!p)
@@ -309,7 +361,7 @@ export async function getHighlightKudos(
   let query = supabase
     .from("kudos_with_stats")
     .select(
-      `id, body, title, created_at, sender_id, hearts_count,
+      `id, body, title, created_at, sender_id, hearts_count, is_anonymous, anonymous_alias,
        sender:profiles!sender_id ( id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code ) ),
        kudo_recipients ( recipient:profiles!recipient_id ( id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code ) ) ),
        kudo_hashtags ( hashtags ( id, slug, label_vi, label_en ) ),
@@ -362,6 +414,8 @@ export async function getHighlightKudos(
     created_at: string | null;
     sender_id: string | null;
     hearts_count: number | null;
+    is_anonymous: boolean | null;
+    anonymous_alias: string | null;
     sender: MaybeRelated<RelatedProfile>;
     kudo_recipients:
       | { recipient: MaybeRelated<RelatedProfile> }[]
@@ -378,19 +432,54 @@ export async function getHighlightKudos(
 
   const typedRows = rows as unknown as RawRow[];
 
+  // Batch-sign all image paths (see getKudoFeed for rationale).
+  const allImagePaths = Array.from(
+    new Set(
+      typedRows
+        .flatMap((r) => r.kudo_images ?? [])
+        .map((img) => img.url)
+        .filter((p): p is string => typeof p === "string" && p.length > 0),
+    ),
+  );
+  const signedUrlByPath = new Map<string, string>();
+  if (allImagePaths.length > 0) {
+    const { data: signed, error: signErr } = await supabase.storage
+      .from("kudo-images")
+      .createSignedUrls(allImagePaths, 3600);
+    if (signErr) {
+      console.error("[kudos] batch signedUrl failed:", signErr);
+    } else {
+      for (const entry of signed ?? []) {
+        if (entry.path && entry.signedUrl) {
+          signedUrlByPath.set(entry.path, entry.signedUrl);
+        }
+      }
+    }
+  }
+
   return typedRows.map((r) => {
     const senderProfile = pickOne(r.sender);
     const orderedImages = [...(r.kudo_images ?? [])]
       .sort((a, b) => a.position - b.position)
-      .map((img) => img.url);
-    return {
-      id: r.id ?? "",
-      body: r.body,
-      title: r.title,
-      created_at: r.created_at,
-      sender_id: r.sender_id,
-      hearts_count: r.hearts_count,
-      sender: senderProfile
+      .map((img) => signedUrlByPath.get(img.url) ?? "")
+      .filter((u) => u.length > 0);
+    const isAnonymous = r.is_anonymous ?? false;
+    const aliasName = r.anonymous_alias ?? "Ẩn danh";
+    // Anonymous kudos hide the sender's real identity on the public
+    // feed (FR-011 round 3). Alias replaces display_name; avatar falls
+    // back to monogram; department_code + honour_title cleared; and
+    // sender_id is stripped so viewers cannot correlate.
+    const kudoIdSeed = r.id ?? r.sender_id ?? "anon";
+    const senderView = isAnonymous
+      ? {
+          id: `anon-${kudoIdSeed}`,
+          display_name: aliasName,
+          avatar_url: null,
+          department_id: null,
+          department_code: null,
+          honour_title: null,
+        }
+      : senderProfile
         ? {
             id: senderProfile.id,
             display_name: senderProfile.display_name,
@@ -406,7 +495,17 @@ export async function getHighlightKudos(
             department_id: null,
             department_code: null,
             honour_title: null,
-          },
+          };
+    return {
+      id: r.id ?? "",
+      body: r.body,
+      title: r.title,
+      created_at: r.created_at,
+      sender_id: isAnonymous ? null : r.sender_id,
+      hearts_count: r.hearts_count,
+      is_anonymous: isAnonymous,
+      anonymous_alias: r.anonymous_alias ?? null,
+      sender: senderView,
       recipients: (r.kudo_recipients ?? [])
         .map((kr) => pickOne(kr.recipient))
         .filter((p): p is RelatedProfile => !!p)
@@ -862,4 +961,79 @@ export async function getLatestGiftees(
     });
   }
   return out;
+}
+
+// --------------------------------------------------------------------
+// Viết Kudo compose flow (spec ihQ26W78P2) — Server Action stub.
+// PR 1 Foundation (plan T011): signature pinned + returns
+// not-implemented. Real atomic insert via the `create_kudo` stored
+// function (migration 0016) lands in PR 2 T020 per plan Phase 3 / US1.
+// --------------------------------------------------------------------
+
+export async function createKudo(
+  input: CreateKudoInput,
+): Promise<CreateKudoResult> {
+  // Basic client-side-equivalent validation. The stored function also
+  // validates (migration 0016) — this is defence-in-depth.
+  const title = input.title.trim();
+  if (title.length === 0 || title.length > 120) {
+    return { ok: false, error: "invalid_title" };
+  }
+  const body = input.body;
+  if (!body || body.replace(/<[^>]+>/g, "").trim().length === 0) {
+    return { ok: false, error: "invalid_body" };
+  }
+  if (!input.recipientId) {
+    return { ok: false, error: "invalid_recipient" };
+  }
+  if (input.hashtagSlugs.length < 1 || input.hashtagSlugs.length > 5) {
+    return { ok: false, error: "invalid_hashtag_count" };
+  }
+  if (input.imagePaths.length > 5) {
+    return { ok: false, error: "too_many_images" };
+  }
+
+  // Anonymous/alias pairing (spec round 3, FR-011): alias required
+  // when anonymous, null otherwise. DB CHECK enforces the same rule.
+  const trimmedAlias = (input.anonymousAlias ?? "").trim();
+  let finalAlias: string | null;
+  if (input.isAnonymous) {
+    if (trimmedAlias.length < 2 || trimmedAlias.length > 40) {
+      return { ok: false, error: "invalid_anonymous_alias" };
+    }
+    finalAlias = trimmedAlias;
+  } else {
+    finalAlias = null;
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { ok: false, error: "unauthenticated" };
+  }
+
+  // Call the atomic stored function (migration 0016, updated by 0017).
+  // SECURITY DEFINER + hard-coded auth.uid() inside the function body —
+  // plan Risk Assessment.
+  const { data, error } = await supabase.rpc("create_kudo", {
+    p_title: title,
+    p_body: body,
+    p_is_anonymous: input.isAnonymous,
+    p_recipient_id: input.recipientId,
+    p_hashtag_slugs: input.hashtagSlugs,
+    p_image_paths: input.imagePaths,
+    p_anonymous_alias: finalAlias,
+  });
+
+  if (error) {
+    console.error("[kudos] createKudo rpc failed:", error);
+    return { ok: false, error: error.message };
+  }
+
+  // Revalidate the Live board feed so the new kudo shows up.
+  revalidatePath("/kudos");
+
+  return { ok: true, kudoId: data as string };
 }

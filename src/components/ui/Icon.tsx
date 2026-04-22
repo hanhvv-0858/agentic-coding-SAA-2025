@@ -29,7 +29,18 @@ export type IconName =
   | "copy-link"
   | "check"
   | "eye"
-  | "gift";
+  | "gift"
+  // Viết Kudo compose flow (spec ihQ26W78P2) — 8 new glyphs per plan T003.
+  | "bold"
+  | "italic"
+  | "strikethrough"
+  | "list-bullet"
+  | "link"
+  | "quote"
+  | "send"
+  | "plus"
+  // Anonymous-sender mask (spec MaZUn5xHXZ round 4 — hat + glasses).
+  | "incognito";
 
 type IconProps = Omit<SVGProps<SVGSVGElement>, "xmlns" | "viewBox"> & {
   name: IconName;
@@ -338,6 +349,90 @@ export function Icon({ name, size = DEFAULT_SIZE, title, className, ...rest }: I
           <path d="M19 12v9H5v-9" />
           <path d="M7.5 8a2.5 2.5 0 0 1 0-5c2 0 4.5 3 4.5 5" />
           <path d="M16.5 8a2.5 2.5 0 0 0 0-5c-2 0-4.5 3-4.5 5" />
+        </svg>
+      );
+    case "bold":
+      // Viết Kudo editor toolbar — Bold format toggle.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 4h7a4 4 0 0 1 0 8H6z" />
+          <path d="M6 12h8a4 4 0 0 1 0 8H6z" />
+        </svg>
+      );
+    case "italic":
+      // Viết Kudo editor toolbar — Italic format toggle.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <line x1="19" y1="4" x2="10" y2="4" />
+          <line x1="14" y1="20" x2="5" y2="20" />
+          <line x1="15" y1="4" x2="9" y2="20" />
+        </svg>
+      );
+    case "strikethrough":
+      // Viết Kudo editor toolbar — Strike format toggle.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 12h16" />
+          <path d="M17.5 7a4 4 0 0 0-4-3h-3a3.5 3.5 0 0 0-3.5 3.5" />
+          <path d="M6.5 17a3.5 3.5 0 0 0 3.5 3.5h3a4 4 0 0 0 4-3.5" />
+        </svg>
+      );
+    case "list-bullet":
+      // Viết Kudo editor toolbar — Bullet list toggle.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <line x1="9" y1="6" x2="20" y2="6" />
+          <line x1="9" y1="12" x2="20" y2="12" />
+          <line x1="9" y1="18" x2="20" y2="18" />
+          <circle cx="5" cy="6" r="1.5" fill="currentColor" />
+          <circle cx="5" cy="12" r="1.5" fill="currentColor" />
+          <circle cx="5" cy="18" r="1.5" fill="currentColor" />
+        </svg>
+      );
+    case "link":
+      // Viết Kudo editor toolbar — Link insert (opens Addlink Box) +
+      // Lưu button icon on Addlink dialog.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1 1" />
+          <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1-1" />
+        </svg>
+      );
+    case "quote":
+      // Viết Kudo editor toolbar — Blockquote toggle.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 17h3l2-4V7H5v6h3z" />
+          <path d="M14 17h3l2-4V7h-6v6h3z" />
+        </svg>
+      );
+    case "send":
+      // Viết Kudo Gửi button — paper-plane icon.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 2L11 13" />
+          <path d="M22 2l-7 20-4-9-9-4 20-7z" />
+        </svg>
+      );
+    case "plus":
+      // Viết Kudo — "+ Hashtag" and "+ Image" trigger buttons.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      );
+    case "incognito":
+      // Anonymous sender avatar mask — detective hat + spectacles.
+      return (
+        <svg {...common} fill="currentColor">
+          {/* Hat brim + crown */}
+          <path d="M5 10.5h14l-1.2-3.2a2 2 0 0 0-1.87-1.3H8.07a2 2 0 0 0-1.87 1.3L5 10.5Z" />
+          <rect x="3.5" y="10.5" width="17" height="1.8" rx="0.9" />
+          {/* Spectacles: two lenses + bridge */}
+          <circle cx="8.25" cy="16" r="2.75" fill="none" stroke="currentColor" strokeWidth={1.6} />
+          <circle cx="15.75" cy="16" r="2.75" fill="none" stroke="currentColor" strokeWidth={1.6} />
+          <path d="M11 16 Q12 15.2 13 16" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" />
         </svg>
       );
   }

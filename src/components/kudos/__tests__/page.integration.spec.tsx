@@ -26,6 +26,8 @@ const sampleKudo: Kudo = {
   created_at: new Date(2025, 9, 30, 10, 0, 0).toISOString(),
   sender_id: "u1",
   hearts_count: 2,
+  is_anonymous: false,
+  anonymous_alias: null,
   sender: {
     id: "u1",
     display_name: "Alice",

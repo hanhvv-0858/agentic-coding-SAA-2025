@@ -21,47 +21,47 @@ export function LatestGiftRecipients({
   return (
     <section
       aria-labelledby="kudos-latest-giftees-title"
-      className="flex w-full flex-col items-start gap-2.5 rounded-[17px] border border-[var(--color-border-secondary)] bg-[var(--color-panel-surface)] pb-6 pl-6 pr-4 pt-6"
+      className="flex w-full flex-col items-stretch gap-6 rounded-[17px] border border-[var(--color-border-secondary)] bg-[var(--color-panel-surface)] px-6 py-8"
       data-testid="kudos-latest-giftees"
     >
       <h3
         id="kudos-latest-giftees-title"
-        className="font-[family-name:var(--font-montserrat)] text-[22px] font-bold leading-8 text-[var(--color-accent-cream)]"
+        className="text-center font-[family-name:var(--font-montserrat)] text-lg font-bold uppercase leading-7 tracking-wide text-[var(--color-accent-cream)]"
       >
         {messages.kudos.sidebar.latestGifteesTitle}
       </h3>
       {giftees.length === 0 ? (
         <EmptyState messages={messages} variant="gifteesEmpty" />
       ) : (
-        <ul role="list" className="mt-2 flex w-full flex-col gap-3">
+        <ul role="list" className="flex w-full flex-col gap-4">
           {giftees.map((g) => (
             <li
               key={g.id}
-              className="flex items-center gap-3 rounded px-2 py-1 transition hover:bg-[var(--color-accent-cream)]/[0.08]"
+              className="flex items-center gap-4 rounded-lg px-1 transition hover:bg-[var(--color-accent-cream)]/[0.08]"
               data-testid="kudos-latest-giftee-row"
             >
               {g.avatarUrl ? (
                 <Image
                   src={g.avatarUrl}
                   alt=""
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 flex-shrink-0 rounded-full object-cover"
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 flex-shrink-0 rounded-full border-2 border-white object-cover"
                 />
               ) : (
                 <span
                   aria-hidden="true"
-                  className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold text-white"
+                  className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border-2 border-white bg-white/10 text-sm font-bold text-white"
                 >
                   {(g.displayName[0] ?? "?").toUpperCase()}
                 </span>
               )}
               <div className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-bold text-white">
+                <span className="truncate text-base font-bold leading-6 text-[var(--color-accent-cream)] font-[family-name:var(--font-montserrat)]">
                   {g.displayName}
                 </span>
                 {g.giftDescription ? (
-                  <span className="truncate text-xs text-white/70">
+                  <span className="truncate text-sm font-bold leading-5 text-white font-[family-name:var(--font-montserrat)]">
                     {g.giftDescription}
                   </span>
                 ) : null}

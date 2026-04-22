@@ -84,3 +84,28 @@ export type HeartToggleResult = {
   multiplier: 1 | 2;
   reason?: string;
 };
+
+// Viết Kudo compose flow (spec ihQ26W78P2) — added in plan T008.
+
+/** Alias of `Hashtag` — the hashtag picker's option prop name per
+ * spec `p9zO-c4a4x`. Both refer to `{ slug, label }` locale-resolved. */
+export type HashtagOption = Hashtag;
+
+/** Payload accepted by the `createKudo` Server Action. Single-recipient
+ * per spec Q1; image paths are Storage paths (not signed URLs) per Q4.
+ * `anonymousAlias` is required (2–40 trimmed Unicode chars) when
+ * `isAnonymous=true`, and null otherwise — round 3 spec 2026-04-21. */
+export type CreateKudoInput = {
+  recipientId: string;
+  title: string;
+  body: string; // TipTap-serialised HTML
+  hashtagSlugs: string[]; // 1..5
+  imagePaths: string[]; // 0..5, Supabase Storage paths under kudo-images/{userId}/
+  isAnonymous: boolean;
+  anonymousAlias: string | null;
+};
+
+/** Tagged-union result from `createKudo`. */
+export type CreateKudoResult =
+  | { ok: true; kudoId: string }
+  | { ok: false; error: string };

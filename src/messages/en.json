@@ -276,7 +276,9 @@
       "imageAlt": "Kudo attachment",
       "seeDetailLabel": "See detail",
       "editAria": "Edit this Kudo",
-      "monogramAlt": "Default avatar"
+      "monogramAlt": "Default avatar",
+      "anonymousSenderLabel": "Anonymous sender",
+      "anonymousAvatarAlt": "Anonymous avatar"
     },
     "spotlight": {
       "sectionCaption": "HONOUREES",
@@ -324,6 +326,97 @@
       "offlineWarning": "You're offline — changes will sync when you're back online.",
       "filterOfflineToast": "Can't load filters while offline.",
       "parkedToast": "Coming soon — this feature is still in the works."
+    }
+  },
+  "compose": {
+    "title": "Send thanks and recognition to a teammate",
+    "fields": {
+      "recipient": {
+        "label": "Recipient",
+        "placeholder": "Search"
+      },
+      "honor": {
+        "label": "Title",
+        "placeholder": "Give your teammate a title.",
+        "helper": "Example: My source of motivation. The title will be shown as the Kudos heading."
+      },
+      "body": {
+        "placeholder": "Share your thanks and recognition with your teammate here!",
+        "mentionHelper": "Type \"@ + name\" to mention another colleague"
+      },
+      "hashtag": {
+        "label": "Hashtag",
+        "trigger": "Hashtag",
+        "max": "Up to 5",
+        "pickerLabel": "Pick hashtags",
+        "emptyState": "No hashtags available",
+        "errorState": "Couldn't load hashtags.",
+        "retryLabel": "Try again"
+      },
+      "image": {
+        "label": "Image",
+        "trigger": "Image",
+        "max": "Up to 5"
+      },
+      "anonymous": {
+        "label": "Send thanks and recognition anonymously"
+      },
+      "anonymousAlias": {
+        "label": "Anonymous nickname",
+        "placeholder": "Enter nickname",
+        "validation": {
+          "required": "Please enter a nickname (2–40 chars)",
+          "tooLong": "Nickname is at most 40 chars"
+        }
+      }
+    },
+    "toolbar": {
+      "standardsLink": "Community standards",
+      "bold": "Bold",
+      "italic": "Italic",
+      "strikethrough": "Strikethrough",
+      "bulletList": "Bullet list",
+      "link": "Insert link",
+      "quote": "Quote"
+    },
+    "mention": {
+      "empty": "No colleague found",
+      "error": "Connection error. Try again."
+    },
+    "validation": {
+      "recipientRequired": "Please select a recipient.",
+      "titleRequired": "Please enter a title.",
+      "titleTooLong": "Title is too long (max 120 characters).",
+      "bodyRequired": "Please enter the body.",
+      "bodyTooLong": "Body is too long (max 5000 characters).",
+      "hashtagRequired": "Please select at least one hashtag.",
+      "hashtagTooMany": "Maximum 5 hashtags.",
+      "imageTooLarge": "Image must be smaller than 5 MB.",
+      "imageMimeInvalid": "Only JPG, PNG, and WebP are supported."
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "submit": "Send",
+      "cancelDirtyConfirm": "Discard draft? Unsent content will be lost."
+    },
+    "toasts": {
+      "success": "Kudo sent",
+      "error": "Couldn't send. Please try again.",
+      "imageUploadError": "Image upload failed. Please check permissions."
+    },
+    "addlink": {
+      "title": "Add link",
+      "textLabel": "Text",
+      "urlLabel": "URL",
+      "cancel": "Cancel",
+      "save": "Save",
+      "validation": {
+        "textRequired": "Please enter the link text.",
+        "textTooLong": "Text is too long (max 100 characters).",
+        "urlRequired": "Please enter the URL.",
+        "urlInvalid": "Invalid URL.",
+        "urlTooLong": "URL is too long (max 2048 characters)."
+      }
     }
   }
 }

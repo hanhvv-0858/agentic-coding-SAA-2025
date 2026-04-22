@@ -14,7 +14,15 @@ Static, read-only "Thể lệ" (Rules) panel explaining how the SAA 2025 Kudos
 programme works. Presented as a right-anchored side panel / modal with:
 
 1. **NGƯỜI NHẬN KUDOS** — four Hero tier badges (New 1–4 / Rising 5–9 / Super
-   10–20 / Legend 20+ senders) shown on the receiver's profile.
+   10–20 / Legend 20+ senders) shown on the receiver's profile. **Threshold
+   boundary clarification** (round 2026-04-22): ranges are inclusive at the
+   low end, exclusive at the high end — Super is 10–19 (not 10–20) and
+   Legend is ≥ 20; "10–20" in the UI copy is a typography shortcut. The
+   computation (distinct senders, anonymous kudos included) lives in the
+   Kudos Live board spec
+   ([MaZUn5xHXZ/spec.md §"Honour tier auto-computation"](../MaZUn5xHXZ-kudos-live-board/spec.md#honour-tier-auto-computation-resolved-2026-04-22))
+   and is implemented via migration 0018 (`honour_tier_autocompute.sql`) —
+   this screen only *renders* the rule, it does not own the computation.
 2. **NGƯỜI GỬI KUDOS** — every 5 ❤ on a sent Kudo opens a Secret Box with a
    chance at one of six collectible badges (REVIVAL, TOUCH OF LIGHT, STAY GOLD,
    FLOW TO HORIZON, BEYOND THE BOUNDARY, ROOT FURTHER). Full set → mystery gift.
