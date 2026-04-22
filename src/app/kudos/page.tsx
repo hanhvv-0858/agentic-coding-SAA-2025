@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/libs/supabase/server";
 import { getMessages } from "@/libs/i18n/getMessages";
 import { track } from "@/libs/analytics/track";
+import { requireOnboardingComplete } from "@/libs/auth/requireOnboardingComplete";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { LanguageToggle } from "@/components/layout/LanguageToggle";
@@ -78,6 +79,7 @@ export default async function KudosPage({
     user = null;
   }
   if (!user) redirect("/login?next=/kudos");
+  await requireOnboardingComplete(user.id);
 
   const { locale, messages } = await getMessages();
   const resolvedSearchParams = (await searchParams) ?? {};

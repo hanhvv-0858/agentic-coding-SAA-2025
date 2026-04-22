@@ -25,22 +25,25 @@ export async function generateMetadata(): Promise<Metadata> {
 // / FAB per plan Q8). Server-side gate redirects to `/login` once the event
 // has started so new visits post-launch never see a frozen `00:00:00`.
 export default async function CountdownPage() {
-  const eventStartAt = clientEnv.NEXT_PUBLIC_EVENT_START_AT;
+  // Prelaunch counts down to mốc A — NEXT_PUBLIC_SITE_LAUNCH_AT. This is
+  // independent of NEXT_PUBLIC_CEREMONY_AT (mốc B) which powers the
+  // Homepage hero countdown.
+  const siteLaunchAt = clientEnv.NEXT_PUBLIC_SITE_LAUNCH_AT;
   const { messages } = await getMessages();
 
   // Server-side post-launch gate (FR-008). `Date.now()` is intentional in a
   // Server Component — this path runs once per request on the edge, not on
   // the React client re-render lifecycle the purity rule targets.
   const now = serverNow();
-  if (eventStartAt) {
-    const target = Date.parse(eventStartAt);
+  if (siteLaunchAt) {
+    const target = Date.parse(siteLaunchAt);
     if (!Number.isNaN(target) && now >= target) {
       redirect("/login");
     }
   }
 
-  const remainingMinutes = eventStartAt
-    ? Math.max(0, Math.floor((Date.parse(eventStartAt) - now) / 60_000))
+  const remainingMinutes = siteLaunchAt
+    ? Math.max(0, Math.floor((Date.parse(siteLaunchAt) - now) / 60_000))
     : 0;
 
   try {
@@ -76,7 +79,7 @@ export default async function CountdownPage() {
           {messages.countdown.prelaunch.headline}
         </h1>
         <PrelaunchCountdown
-          eventStartAt={eventStartAt}
+          eventStartAt={siteLaunchAt}
           labels={{ days: cd.days, hours: cd.hours, minutes: cd.minutes }}
         />
       </section>

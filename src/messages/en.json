@@ -15,6 +15,48 @@
       "cookie_blocked": "Your browser is blocking cookies — enable cookies for saa.sun-asterisk.com."
     }
   },
+  "onboarding": {
+    "title": "Complete your profile",
+    "description": "So that every kudo you send and receive shows the right department, please complete the information below. You only need to do this once.",
+    "fields": {
+      "displayName": {
+        "label": "Display name",
+        "placeholder": "e.g. John Doe"
+      },
+      "department": {
+        "label": "Department",
+        "placeholder": "Select your department"
+      }
+    },
+    "errors": {
+      "displayName": {
+        "required": "Please enter your display name.",
+        "tooShort": "Display name must be at least 2 characters.",
+        "tooLong": "Display name must be at most 80 characters.",
+        "invalidChars": "Display name can only contain letters, spaces, hyphens, apostrophes, and periods."
+      },
+      "department": {
+        "required": "Please select your department.",
+        "invalid": "Invalid department. Please pick one from the list."
+      },
+      "submit": {
+        "generic": "Couldn't save. Please try again.",
+        "sessionExpired": "Your session expired. Redirecting to sign-in…"
+      },
+      "departmentList": {
+        "loadFailed": "Couldn't load departments. Please try again.",
+        "retry": "Retry",
+        "empty": "No departments available. Please contact an administrator."
+      }
+    },
+    "submit": {
+      "default": "Complete",
+      "loading": "Saving…"
+    },
+    "signOut": {
+      "cta": "Not you? Sign out and try again"
+    }
+  },
   "homepage": {
     "hero": {
       "comingSoon": "Coming soon"
@@ -246,7 +288,7 @@
       "h1": "A system to recognize and thank",
       "decorative": "KUDOS",
       "composerPlaceholder": "Today, who would you like to send a shout-out to?",
-      "searchPlaceholder": "Search Sunner profile"
+      "searchPlaceholder": "Tìm kiếm profile Sunner"
     },
     "feed": {
       "sectionCaption": "FEED",

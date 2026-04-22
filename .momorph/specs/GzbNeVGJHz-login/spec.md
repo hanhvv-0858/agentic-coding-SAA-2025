@@ -12,6 +12,14 @@
 > **[design-style.md](design-style.md)**. This spec focuses on behavior, data, and
 > acceptance criteria.
 
+> **Post-login routing patch (2026-04-22)** — After a successful Google OAuth
+> exchange, the authenticated layout checks `profiles.department_id`. If it is
+> `NULL` (new Google users; legacy users pre-onboarding), the layout redirects
+> to `/onboarding` (see [ObrdH9pKx7-onboarding-department](../ObrdH9pKx7-onboarding-department/spec.md))
+> **before** rendering any other authenticated route. Users with `department_id`
+> already set skip the gate and land on `/`. Updates to FR-004 below reflect
+> this branch.
+
 ---
 
 ## Overview
@@ -250,7 +258,13 @@ All dimensions, colors, typography, spacing, and per-node CSS live in
 - **FR-004**: The system MUST expose an `/auth/callback` Route Handler on the server
   that calls `supabase.auth.exchangeCodeForSession(code)`, sets the session cookie using
   `@supabase/ssr`, and responds with `302` to either a validated `next` param (same
-  origin only) or `/`.
+  origin only) or `/`. The authenticated layout downstream then enforces the
+  **onboarding gate** — if `profiles.department_id IS NULL`, the layout issues a
+  server `redirect("/onboarding")` before rendering the requested route. See
+  [ObrdH9pKx7-onboarding-department/spec.md](../ObrdH9pKx7-onboarding-department/spec.md)
+  for the full contract. This branch is transparent to the callback handler —
+  the callback always redirects to the `next` / `/` target, and the gate fires
+  on the next Server Component render.
 - **FR-005**: The system MUST reject any Google identity whose email domain is not on the
   Sun\* allow-list (enforced at Supabase Auth plus a defense-in-depth check in the
   callback), redirecting to `Error page - 403` with no session cookie set.
@@ -498,7 +512,10 @@ No client-side global store (Zustand, Redux, Context) is introduced by this scre
   `public.user_profiles` row — a Supabase DB trigger, the callback handler, or the
   Homepage on first hit? Affects FR-004.
 - Q3. Should a brand-new (first-ever-login) user be redirected to Homepage `/` or to an
-  onboarding flow (if one exists)?
+  onboarding flow (if one exists)? **Resolved 2026-04-22** → redirect to
+  `/onboarding` when `profiles.department_id IS NULL` (applies to both brand-new
+  and legacy users). Gate lives in the authenticated layout, not in the callback
+  handler. See [ObrdH9pKx7-onboarding-department](../ObrdH9pKx7-onboarding-department/spec.md).
 
 **Design / Visual**
 

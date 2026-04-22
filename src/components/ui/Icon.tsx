@@ -40,7 +40,11 @@ export type IconName =
   | "send"
   | "plus"
   // Anonymous-sender mask (spec MaZUn5xHXZ round 4 — hat + glasses).
-  | "incognito";
+  | "incognito"
+  // Account dropdown (spec z4sCl3_Qtk Dropdown-profile) — outlined user.
+  | "user"
+  // Admin dropdown row (spec 54rekaCHG1 Dropdown-profile Admin) — 2×2 grid.
+  | "dashboard";
 
 type IconProps = Omit<SVGProps<SVGSVGElement>, "xmlns" | "viewBox"> & {
   name: IconName;
@@ -420,6 +424,24 @@ export function Icon({ name, size = DEFAULT_SIZE, title, className, ...rest }: I
         <svg {...common} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      );
+    case "user":
+      // Dropdown-profile (z4sCl3_Qtk) — outlined head + shoulders.
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" />
+        </svg>
+      );
+    case "dashboard":
+      // Admin dashboard row (54rekaCHG1) — 2×2 grid of rounded rectangles.
+      return (
+        <svg {...common} fill="currentColor">
+          <rect x="3" y="3" width="8" height="8" rx="1.5" />
+          <rect x="13" y="3" width="8" height="8" rx="1.5" />
+          <rect x="3" y="13" width="8" height="8" rx="1.5" />
+          <rect x="13" y="13" width="8" height="8" rx="1.5" />
         </svg>
       );
     case "incognito":

@@ -22,7 +22,7 @@
 
 **Purpose**: Verify pre-existing dependencies and spec folder scaffolding. No new assets required.
 
-- [x] T001 [P] Verify `NEXT_PUBLIC_EVENT_START_AT` is set in `.env.local` (real value or a future ISO-8601 timestamp for dev/test). If missing, add per README guidance | `.env.local` (verify only — do not commit)
+- [x] T001 [P] Verify `NEXT_PUBLIC_SITE_LAUNCH_AT` is set in `.env.local` (real value or a future ISO-8601 timestamp for dev/test). If missing, add per README guidance | `.env.local` (verify only — do not commit)
 - [x] T002 [P] Verify `public/images/homepage-hero.png` exists (reused as the Prelaunch background per plan Q7). Note its 4.4 MB size for R2 follow-up | `public/images/homepage-hero.png` (verify only)
 - [x] T003 [P] Verify `--font-digital-numbers` token is declared in `globals.css` (fallback `"Courier New", monospace`) — reused for the LED digits | `src/app/globals.css` (verify only)
 
@@ -52,7 +52,7 @@
 
 **Goal**: A public visitor hits `/countdown` (or `/` pre-launch via middleware rewrite) and sees the key-visual background + headline + live D/H/M counter in the active locale. Also covers **US3 (localised headline)** and **US4 (responsive)** inline — both are primarily content + styling work that is complete when Phase 3 ships.
 
-**Independent Test**: With `NEXT_PUBLIC_EVENT_START_AT` set to a future ISO-8601 timestamp, visit `/countdown` anonymously. Assert: title page is `"Countdown | SAA 2025"`; exactly one H1 with the headline; three H2-free unit labels (DAYS/HOURS/MINUTES); each unit has two LED tiles (77×123 at `lg:`, scaled at `sm:` and mobile) with Digital Numbers digits. Resize 375 / 800 / 1440 px — no horizontal overflow.
+**Independent Test**: With `NEXT_PUBLIC_SITE_LAUNCH_AT` set to a future ISO-8601 timestamp, visit `/countdown` anonymously. Assert: title page is `"Countdown | SAA 2025"`; exactly one H1 with the headline; three H2-free unit labels (DAYS/HOURS/MINUTES); each unit has two LED tiles (77×123 at `lg:`, scaled at `sm:` and mobile) with Digital Numbers digits. Resize 375 / 800 / 1440 px — no horizontal overflow.
 
 ### Presentation atoms (US1)
 
@@ -67,7 +67,7 @@
 
 ### Route + server composition (US1)
 
-- [x] T016 [US1] Create `src/app/countdown/page.tsx` — Server Component. Flow: (a) read `clientEnv.NEXT_PUBLIC_EVENT_START_AT`; (b) if already launched → `redirect("/login")` (FR-008); (c) call `getMessages()`; (d) compute `remainingMinutes` server-side → fire `track({ type: "prelaunch_view", remaining_minutes })`; (e) render the page — `<main relative w-full min-h-dvh bg-[var(--color-brand-900)] overflow-hidden>` with `<Image src="/images/homepage-hero.png" fill priority sizes="100vw" className="object-cover object-center" alt="" aria-hidden="true" unoptimized>` + cover-gradient `<div absolute inset-0 z-10 pointer-events-none style={{ background: "linear-gradient(18deg, #00101A 15.48%, rgba(0,18,29,0.46) 52.13%, rgba(0,19,32,0) 63.41%)" }}>` + `<section relative z-20 flex flex-col items-center justify-center gap-16 sm:gap-24 lg:gap-[120px] px-6 py-16 sm:px-12 sm:py-20 lg:px-36 lg:py-24>` containing `<h1 text-[24px] leading-[32px] sm:text-[32px] sm:leading-[44px] lg:text-[36px] lg:leading-[48px] font-bold text-white text-center>` + `<PrelaunchCountdown>` | `src/app/countdown/page.tsx`
+- [x] T016 [US1] Create `src/app/countdown/page.tsx` — Server Component. Flow: (a) read `clientEnv.NEXT_PUBLIC_SITE_LAUNCH_AT`; (b) if already launched → `redirect("/login")` (FR-008); (c) call `getMessages()`; (d) compute `remainingMinutes` server-side → fire `track({ type: "prelaunch_view", remaining_minutes })`; (e) render the page — `<main relative w-full min-h-dvh bg-[var(--color-brand-900)] overflow-hidden>` with `<Image src="/images/homepage-hero.png" fill priority sizes="100vw" className="object-cover object-center" alt="" aria-hidden="true" unoptimized>` + cover-gradient `<div absolute inset-0 z-10 pointer-events-none style={{ background: "linear-gradient(18deg, #00101A 15.48%, rgba(0,18,29,0.46) 52.13%, rgba(0,19,32,0) 63.41%)" }}>` + `<section relative z-20 flex flex-col items-center justify-center gap-16 sm:gap-24 lg:gap-[120px] px-6 py-16 sm:px-12 sm:py-20 lg:px-36 lg:py-24>` containing `<h1 text-[24px] leading-[32px] sm:text-[32px] sm:leading-[44px] lg:text-[36px] lg:leading-[48px] font-bold text-white text-center>` + `<PrelaunchCountdown>` | `src/app/countdown/page.tsx`
 - [x] T017 [US1] Implement `generateMetadata()` in `page.tsx` reading `messages.countdown.prelaunch.meta.{title,description}` — mirrors the pattern in [`src/app/awards/page.tsx:34`](../../../src/app/awards/page.tsx#L34) | `src/app/countdown/page.tsx` (same file as T016)
 - [x] T018 [US1] Manual responsive smoke — `yarn dev` + visit `/countdown` at 375 / 800 / 1440 px. Verify: no horizontal overflow, tiles scale per design-style §Responsive, headline clamps on mobile, BG image fills viewport without dark gaps | (no file — QA artefact; capture screenshots for PR)
 
@@ -79,7 +79,7 @@
 
 **Goal**: At T-0, visitors seamlessly transition from the Prelaunch page to the authenticated site. Covered by two mechanisms: (a) **middleware** rewrites `/ → /countdown` only while `now < target`; (b) **client tick** inside `<PrelaunchCountdown>` pushes to `/login` when the minute boundary crosses T-0; (c) **server gate** in `page.tsx` (shipped in T016) redirects new visits to `/login` once launched.
 
-**Independent Test**: Set `NEXT_PUBLIC_EVENT_START_AT` to a time ~70 seconds in the future. Visit `/` anonymously → middleware rewrites to `/countdown`, page renders. Wait ~80 seconds → countdown tick flips, page `router.push("/login")`. Hard-refresh `/countdown` post-launch → `redirect("/login")` fires at the server. Hard-refresh `/` post-launch → middleware does NOT rewrite, existing Homepage shell runs → `redirect("/login")` per existing auth gate.
+**Independent Test**: Set `NEXT_PUBLIC_SITE_LAUNCH_AT` to a time ~70 seconds in the future. Visit `/` anonymously → middleware rewrites to `/countdown`, page renders. Wait ~80 seconds → countdown tick flips, page `router.push("/login")`. Hard-refresh `/countdown` post-launch → `redirect("/login")` fires at the server. Hard-refresh `/` post-launch → middleware does NOT rewrite, existing Homepage shell runs → `redirect("/login")` per existing auth gate.
 
 - [x] T019 [US2] Extend `middleware.ts` — add pre-launch dispatch **before** the `updateSession(request)` call. Logic: if `target` env set + parseable + `Date.now() < targetMs` + `pathname === "/"`, return `NextResponse.rewrite(url)` with `url.pathname = "/countdown"`. Otherwise fall through to `updateSession(request)`. Keep matcher unchanged. Include the tradeoff note from plan.md §Notes as a comment above the dispatch block. Import `NextResponse` from `next/server` | `middleware.ts`
 - [x] T020 [P] [US2] Add Playwright test in the happy-path spec: (a) with env in the future → visit `/` → assert URL stays as `/` but page rendered is the Prelaunch (heading matches `countdown.prelaunch.headline`); (b) with env in the past → visit `/countdown` → assert redirect to `/login` — see T023 below | `tests/e2e/countdown.spec.ts`

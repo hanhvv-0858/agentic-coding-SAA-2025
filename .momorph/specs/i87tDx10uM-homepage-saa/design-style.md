@@ -551,7 +551,7 @@ own asset under a different render context.
   description). Use `scrollIntoView({ behavior: 'smooth', block: 'start' })`
   on the page wrapper.
 - **Countdown target time**: driven by an env var (per B1 description). Add
-  `NEXT_PUBLIC_EVENT_START_AT` (ISO 8601) to the env schema. When countdown
+  `NEXT_PUBLIC_CEREMONY_AT` (ISO 8601) to the env schema. When countdown
   reaches 0, hide "Coming soon" subtitle + hold digits at "00".
 - **Navigation to awards detail**: each award card links to `/awards#<slug>`
   so the browser scrolls to the matching section once the Awards page exists.

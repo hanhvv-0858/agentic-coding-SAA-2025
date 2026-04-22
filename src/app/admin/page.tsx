@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/libs/supabase/server";
+import { requireOnboardingComplete } from "@/libs/auth/requireOnboardingComplete";
 
 // Admin-only dashboard — server-side role gate per constitution Principle IV.
 export default async function AdminPage() {
@@ -9,6 +10,7 @@ export default async function AdminPage() {
   if (!data.user) redirect("/login");
   const role = (data.user.app_metadata as { role?: string } | null)?.role;
   if (role !== "admin") redirect("/error/403");
+  await requireOnboardingComplete(data.user.id);
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-6 bg-[var(--color-brand-900)] px-6 py-24 text-white">

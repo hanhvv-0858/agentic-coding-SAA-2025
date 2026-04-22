@@ -43,7 +43,7 @@ bootstrap work.
 | Supabase clients | [src/libs/supabase/{server,client,middleware}.ts](../../../src/libs/supabase/) | `createClient()` on Homepage for session check; `signOut()` for profile menu logout |
 | i18n infra | [src/libs/i18n/](../../../src/libs/i18n/) | `getMessages()` server-side; `setLocale` Server Action stays the same |
 | Analytics | [src/libs/analytics/track.ts](../../../src/libs/analytics/track.ts) | Extend with `screen_view` + homepage-specific events (none urgent) |
-| Env schema | [src/libs/env/server.ts](../../../src/libs/env/server.ts) | Extend with `NEXT_PUBLIC_EVENT_START_AT` (client-safe value) |
+| Env schema | [src/libs/env/server.ts](../../../src/libs/env/server.ts) | Extend with `NEXT_PUBLIC_CEREMONY_AT` (client-safe value) |
 
 ---
 
@@ -55,7 +55,7 @@ bootstrap work.
 | `<SiteFooter />` | Server comp; copyright only, justify-center | Accept optional `navItems` + optional `logoAlign` prop. When `navItems` provided, layout switches to `logo ↔ nav ↔ copyright` (Homepage uses this) |
 | `<PrimaryButton />` | Cream filled CTA with `variant="default"` implied | Add `variant="outline"` for the "ABOUT KUDOS" outlined cream button (border + transparent bg + cream text) |
 | `src/messages/{vi,en}.json` | Login keys only | Extend with ~30 `homepage.*` + `common.nav.*` + `common.notification.*` + `common.profile.*` + `common.widget.*` keys |
-| `src/libs/env/server.ts` schema | 5 vars | Add `NEXT_PUBLIC_EVENT_START_AT` (ISO 8601 string, `.datetime()`), client-safe so also in [client.ts](../../../src/libs/env/client.ts) |
+| `src/libs/env/server.ts` schema | 5 vars | Add `NEXT_PUBLIC_CEREMONY_AT` (ISO 8601 string, `.datetime()`), client-safe so also in [client.ts](../../../src/libs/env/client.ts) |
 | `src/app/globals.css` `@theme` | Login tokens | Add `--color-brand-700: #101417` (Homepage header variant) + `--color-card: #0B1419` + `--font-digital-numbers` variable |
 | `src/app/layout.tsx` | Loads Montserrat + Montserrat Alternates | Add `next/font/local` load for **Digital Numbers** (gate on license — if unavailable, drop the line and fallback will kick in) |
 | Tailwind config (if present) | (implicit via `@theme inline`) | Already absorbed into globals.css — no separate config file edit needed |
@@ -110,7 +110,7 @@ bootstrap work.
 | `supabase.auth.signOut()` Server Action | `<ProfileMenu />` | **New** — `src/libs/auth/signOut.ts` Server Action |
 | Notification unread count | `<NotificationBell />` | **Fake for MVP** — prop `initialUnreadCount={0}` passed from page. Real query deferred |
 | User profile (avatar + displayName) | `<ProfileMenu />` | **Fake for MVP** — read from `user.user_metadata.avatar_url` + `full_name` (Google profile) |
-| Event start datetime | `<Countdown />` | From `NEXT_PUBLIC_EVENT_START_AT` env — no API |
+| Event start datetime | `<Countdown />` | From `NEXT_PUBLIC_CEREMONY_AT` env — no API |
 
 ### Database entities
 

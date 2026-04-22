@@ -15,6 +15,48 @@
       "cookie_blocked": "Trình duyệt của bạn đang chặn cookie — hãy bật cookie cho saa.sun-asterisk.com."
     }
   },
+  "onboarding": {
+    "title": "Hoàn tất hồ sơ của bạn",
+    "description": "Để mỗi lời cảm ơn bạn gửi và nhận được hiển thị đúng phòng ban, vui lòng hoàn tất thông tin dưới đây. Bước này chỉ thực hiện một lần.",
+    "fields": {
+      "displayName": {
+        "label": "Họ và tên hiển thị",
+        "placeholder": "Ví dụ: Nguyễn Văn A"
+      },
+      "department": {
+        "label": "Phòng ban",
+        "placeholder": "Chọn phòng ban của bạn"
+      }
+    },
+    "errors": {
+      "displayName": {
+        "required": "Vui lòng nhập họ tên hiển thị.",
+        "tooShort": "Họ tên cần tối thiểu 2 ký tự.",
+        "tooLong": "Họ tên tối đa 80 ký tự.",
+        "invalidChars": "Họ tên chỉ được chứa chữ cái, khoảng trắng, dấu gạch ngang, dấu nháy đơn và dấu chấm."
+      },
+      "department": {
+        "required": "Vui lòng chọn phòng ban của bạn.",
+        "invalid": "Phòng ban không hợp lệ. Vui lòng chọn lại."
+      },
+      "submit": {
+        "generic": "Không thể lưu thông tin. Vui lòng thử lại.",
+        "sessionExpired": "Phiên đăng nhập đã hết hạn. Đang chuyển về trang đăng nhập…"
+      },
+      "departmentList": {
+        "loadFailed": "Không tải được danh sách phòng ban. Vui lòng thử lại.",
+        "retry": "Thử lại",
+        "empty": "Không tìm thấy danh sách phòng ban. Vui lòng liên hệ quản trị viên."
+      }
+    },
+    "submit": {
+      "default": "Hoàn tất",
+      "loading": "Đang lưu…"
+    },
+    "signOut": {
+      "cta": "Không phải bạn? Đăng xuất và thử lại"
+    }
+  },
   "homepage": {
     "hero": {
       "comingSoon": "Comming soon"

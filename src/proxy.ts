@@ -1,7 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/libs/supabase/middleware";
 
-export async function middleware(request: NextRequest) {
+// Next.js 16 renamed the `middleware` file convention to `proxy`. The
+// exported function + `config.matcher` contract is unchanged; only the
+// filename and the exported symbol name are different.
+// See: https://nextjs.org/docs/messages/middleware-to-proxy
+export async function proxy(request: NextRequest) {
   // Prelaunch dispatch — rewrite `/` → `/countdown` while the event hasn't
   // started yet. This branch intentionally SKIPS `updateSession(request)`:
   // prelaunch visitors are typically anonymous, and signed-in users who
@@ -9,9 +13,11 @@ export async function middleware(request: NextRequest) {
   // navigation (the session lifetime comfortably exceeds the prelaunch
   // window). Merging rewrite + cookie-carry would add complexity for
   // negligible benefit — see plan.md §Notes on middleware session-refresh
-  // tradeoff. Resolution Q5 (spec b1Filzi9i6-the-le counterpart for rules
-  // was similar).
-  const target = process.env.NEXT_PUBLIC_EVENT_START_AT;
+  // tradeoff.
+  // Prelaunch gate is driven by NEXT_PUBLIC_SITE_LAUNCH_AT (mốc A — site
+  // opens). Independent of NEXT_PUBLIC_CEREMONY_AT (mốc B — gala night)
+  // which powers the Homepage About-SAA countdown only.
+  const target = process.env.NEXT_PUBLIC_SITE_LAUNCH_AT;
   if (target && request.nextUrl.pathname === "/") {
     const targetMs = Date.parse(target);
     if (!Number.isNaN(targetMs) && Date.now() < targetMs) {
@@ -25,7 +31,12 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match everything except static assets and Next.js internals.
+    // Root path explicit — the negative-lookahead pattern below requires
+    // at least one character after the leading slash, so `/` needs its
+    // own entry. Without this, prelaunch rewrite on `/` would silently
+    // skip the proxy and the homepage would render through.
+    "/",
+    // Everything else except static assets and Next.js internals.
     "/((?!_next/static|_next/image|favicon.ico|images/|icons/).*)",
   ],
 };

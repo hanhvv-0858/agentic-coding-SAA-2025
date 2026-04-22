@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/libs/supabase/server";
 import { getMessages } from "@/libs/i18n/getMessages";
+import { requireOnboardingComplete } from "@/libs/auth/requireOnboardingComplete";
 import { getKudoHashtags } from "@/app/kudos/actions";
 import { KudoComposer } from "@/components/kudos/KudoComposer";
 
@@ -19,6 +20,7 @@ export default async function NewKudoPage() {
   if (!user) {
     redirect("/login?next=/kudos/new");
   }
+  await requireOnboardingComplete(user.id);
 
   const [{ messages }, hashtags] = await Promise.all([
     getMessages(),

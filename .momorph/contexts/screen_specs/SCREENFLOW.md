@@ -6,7 +6,7 @@
 - **Figma URL**: https://www.figma.com/design/9ypp4enmFmdK3YAFJLIu6C
 - **MoMorph URL**: https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C
 - **Created**: 2026-04-17
-- **Last Updated**: 2026-04-21 (formally added `Dropdown Phòng ban` `WXK5AYB_rG` as a Live-board popover sibling of the Hashtag filter at row #13 — 18 frames tracked)
+- **Last Updated**: 2026-04-22 (Onboarding `ObrdH9pKx7` shipped — 29 new tests green, 6 authenticated pages gated via `requireOnboardingComplete` helper; frame count unchanged at 19)
 
 ---
 
@@ -55,13 +55,13 @@ for Figma-side work.
 
 | Metric                              | Count |
 |-------------------------------------|-------|
-| Spec-ready web frames (in scope)    | 18    |
-| Shipped                             | 8     |
+| Spec-ready web frames (in scope)    | 19    |
+| Shipped                             | 9     |
 | Locally spec'd, impl pending        | 0     |
 | Next up (implementation pending)    | 1     |
 | Overlays pending implementation     | 9     |
 | Error-page stubs (awaiting spec)    | 2     |
-| Actionable completion               | 50%   |
+| Actionable completion               | 53%   |
 
 ---
 
@@ -96,6 +96,7 @@ spec has not been reconciled against it).
 | 15 | Floating Action Button – phím nổi chức năng (collapsed) | `_hphd32jN2` | `313:9137` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/_hphd32jN2) | 🟢 shipped | [spec](../../specs/_hphd32jN2-fab-collapsed/spec.md) · [design-style](../../specs/_hphd32jN2-fab-collapsed/design-style.md) · [plan](../../specs/_hphd32jN2-fab-collapsed/plan.md) · [page](../../../src/components/shell/QuickActionsFab.tsx) | None | Toggles to `Sv7DFwBw1h` expanded |
 | 16 | Floating Action Button – phím nổi chức năng 2 (expanded menu) | `Sv7DFwBw1h` | `313:9139` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/Sv7DFwBw1h) | 🟢 shipped | [spec](../../specs/Sv7DFwBw1h-fab-quick-actions/spec.md) · [design-style](../../specs/Sv7DFwBw1h-fab-quick-actions/design-style.md) · [page](../../../src/components/shell/QuickActionsFab.tsx) | None (pure navigation) | Thể lệ UPDATE, Viết Kudo |
 | 17 | Open secret box – chưa mở | `J3-4YFIpMM` | `1466:7676` | [Link](https://momorph.ai/files/9ypp4enmFmdK3YAFJLIu6C/screens/J3-4YFIpMM) | ⚪ pending (animation, Phase 2-ish) | — | `POST /secret-boxes/:id/open` (predicted) | Parent: Profile bản thân (parked) |
+| 18 | Onboarding – Complete profile | `ObrdH9pKx7` | _(no Figma — synthetic)_ | — | 🟢 shipped | [spec](../../specs/ObrdH9pKx7-onboarding-department/spec.md) · [design-style](../../specs/ObrdH9pKx7-onboarding-department/design-style.md) · [plan](../../specs/ObrdH9pKx7-onboarding-department/plan.md) · [tasks](../../specs/ObrdH9pKx7-onboarding-department/tasks.md) · [page](../../../src/app/onboarding/page.tsx) | `getKudoDepartments` (exists), `completeOnboarding` Server Action (NEW) | Homepage SAA (after submit), Dropdown-ngôn ngữ |
 
 **Discrepancy resolved (2026-04-20)**: `Dropdown Hashtag filter`
 (`JWpsISMAaM`) is now tracked as a Live-board popover (row #12). It
@@ -125,6 +126,7 @@ call them finished):
 flowchart TD
     subgraph Auth["Authentication (web)"]
         Login["Login 🟢\nGzbNeVGJHz"]
+        Onboarding["Onboarding 📋\nObrdH9pKx7"]
         Err403["Error 403 (stub)\nT3e_iS9PCL"]
         Err404["Error 404 (stub)\np0yJ89B-9_"]
     end
@@ -159,7 +161,10 @@ flowchart TD
         SecretBox["Open secret box – chưa mở ⚪\nJ3-4YFIpMM"]
     end
 
-    Login -- Google OAuth success --> Home
+    Login -- "OAuth success + dept set" --> Home
+    Login -- "OAuth success + dept NULL" --> Onboarding
+    Onboarding -- "submit" --> Home
+    Onboarding -- click locale --> LangDrop
     Login -- click locale --> LangDrop
     Login -- denied domain --> Err403
 
@@ -242,6 +247,7 @@ flowchart LR
 | Screen | Frame ID | Status | Purpose | Entry Points |
 |--------|----------|--------|---------|--------------|
 | Login | `GzbNeVGJHz` | 🟢 shipped | Google OAuth entry | App launch, logout, Error 403 |
+| Onboarding – Complete profile | `ObrdH9pKx7` | 📋 spec'd | Post-OAuth gate — collect `display_name` + `department_id` when `profiles.department_id IS NULL` (new + legacy users) | Authenticated layout redirects when `dept_id IS NULL` |
 | Error page – 403 | `T3e_iS9PCL` | stub | Denied domain / unauthorized | Auth failure |
 | Error page – 404 | `p0yJ89B-9_` | stub | Not found | Invalid routes |
 
@@ -345,11 +351,16 @@ flowchart LR
   `middleware.ts` → `updateSession`.
 
 ### Pre-launch routing
-- `middleware.ts` rewrites `/` → `/countdown` while
-  `Date.now() < NEXT_PUBLIC_EVENT_START_AT`. Documented trade-off: the
-  rewrite branch skips session refresh (accepted risk for MVP).
+- `src/proxy.ts` (Next.js 16 renamed `middleware` → `proxy`) rewrites `/` →
+  `/countdown` while `Date.now() < NEXT_PUBLIC_SITE_LAUNCH_AT` (mốc A —
+  site open). Independent of `NEXT_PUBLIC_CEREMONY_AT` (mốc B — gala).
+  Documented trade-off: the rewrite branch skips session refresh (accepted
+  risk for MVP).
 - `/countdown` itself is chromeless + public; a server-side
-  `redirect("/login")` fires if someone opens it after T-0.
+  `redirect("/login")` fires if someone opens it after T-0 of SITE_LAUNCH.
+- Homepage hero (`/`) shows a second countdown driven by
+  `NEXT_PUBLIC_CEREMONY_AT`; hides the "Coming soon" subtitle and freezes
+  at 00/00/00 after T-0 of the ceremony.
 
 ### State Management
 - Server state = Server Components + Server Actions. No client data
@@ -399,6 +410,8 @@ constitution §II:
 | 2026-04-21 | Addlink Box specs drafted | `OyDLDuSGEa` | Ran `/momorph.specify` for the TipTap link-insert dialog (child overlay of Viết Kudo). Created [spec.md](../../specs/OyDLDuSGEa-addlink-box/spec.md) + [design-style.md](../../specs/OyDLDuSGEa-addlink-box/design-style.md). 5 user stories (2 × P1 insert + validation, 2 × P2 edit + keyboard, 1 × P3 dirty-state confirm deferred to Phase 2), 11 FRs, 6 TRs, 5 SCs. Zero new APIs (pure client-side TipTap wrapper). Zero new icons — reuses `link` (added by Viết Kudo) + `close`. Zero new design tokens — reuses Viết Kudo's `--color-modal-paper`, `--color-error`, `--color-secondary-btn-fill`. New deliverable: `src/components/kudos/AddlinkDialog.tsx`. Key decisions: nested-modal over Viết Kudo (z-50 above parent's z-30); insertion-mode + wrap-selection + edit-mode via TipTap `setLink` command variants; URL regex `^https?:\/\/.+$` (rejects bare domains, `javascript:`, non-http schemes); right-side decorative icon on URL input rendered as `aria-hidden` placeholder since Figma doesn't annotate its purpose. Row #14 flipped from ⚪ pending to 📋 spec'd. All 3 compose-flow specs (Viết Kudo + Hashtag picker + Addlink) now complete — ready for `/momorph.plan` covering the bundled compose feature. |
 | 2026-04-21 | Dropdown list hashtag specs drafted | `p9zO-c4a4x` | Ran `/momorph.specify` for the compose-time hashtag picker (child overlay of Viết Kudo). Created [spec.md](../../specs/p9zO-c4a4x-dropdown-list-hashtag/spec.md) + [design-style.md](../../specs/p9zO-c4a4x-dropdown-list-hashtag/design-style.md). 4 user stories (2 × P1 multi-select + 5-cap, 1 × P2 keyboard, 1 × P3 loading/empty states), 10 FRs, 5 TRs, 5 SCs. Zero new design tokens, zero new APIs — reuses `getKudoHashtags()` + dark-navy panel family tokens (`--color-panel-surface`, `--color-border-secondary`, `--color-accent-cream`). Zero new icons — reuses `check`. Divergence from sibling `FilterDropdown` (Hashtag filter): multi-select (`role="listbox" aria-multiselectable="true"`) vs single-select (`role="combobox"`); click on row toggles WITHOUT closing picker. New deliverable: `src/components/kudos/HashtagPicker.tsx`. Row #11 flipped from ⚪ pending to 📋 spec'd. |
 | 2026-04-21 | Viết Kudo specs drafted | `ihQ26W78P2` | Ran `/momorph.specify` for the compose modal. Created [spec.md](../../specs/ihQ26W78P2-viet-kudo/spec.md) + [design-style.md](../../specs/ihQ26W78P2-viet-kudo/design-style.md). 6 user stories (2 × P1, 3 × P2, 1 × P3), 15 FRs, 8 TRs, 6 SCs. Key decisions folded in from the plan-prep discussion: **TipTap** as editor (StarterKit + Link + Mention + Suggestion), **Supabase Storage bucket `kudo-images`** private with authenticated-read RLS (5 MB, jpeg/png/webp). Error variant `5c7PkAibyD` folded as UI state "validation error" — no separate spec (5c7PkAibyD has no annotations in MoMorph). Flag noted: Figma `list_design_items` is MISSING the "Danh hiệu" field even though it's visible in the rendered frame + styles tree as `Frame 552` / node `1688:10448` — spec treats it as required text input (uses existing `kudos.title` column from migration 0007). Two sibling overlays await their own specs: `p9zO-c4a4x` Dropdown list hashtag + `OyDLDuSGEa` Addlink Box. New deliverables during implementation: `createKudo` Server Action, migration `0014_kudo_images_storage.sql` for bucket + RLS, 6 new icons in `Icon.tsx` (bold/italic/strikethrough/list-bullet/link/quote/send), TipTap deps (~60 KB gz). Row #7 flipped from 🟡 next up to 📋 spec'd. |
+| 2026-04-22 | Onboarding (Complete profile) **shipped** | `ObrdH9pKx7` | MVP landed in one pass. New files: `src/libs/onboarding/validation.ts` (Unicode `/^[\p{L}\p{M}\s\-'.]+$/u` charset per spec Q1), `src/libs/auth/requireOnboardingComplete.ts` (gate helper — replaces the plan's route-group refactor after Phase-0 audit T001 found no `(authed)` group existed), `src/app/onboarding/page.tsx` + `actions.ts`, `src/components/onboarding/{OnboardingForm,AccountRow,SignOutLink}.tsx`. Modified: `src/libs/analytics/track.ts` (new `onboarding_complete` event, PII-clean payload per Q3), `src/messages/{vi,en}.json` (19 new keys in `onboarding.*` namespace), 6 authenticated pages (`/`, `/awards`, `/kudos`, `/kudos/new`, `/the-le`, `/admin`) each call `requireOnboardingComplete(user.id)` right after the login redirect. 29 new tests (11 validation + 5 AccountRow + 9 OnboardingForm + T-U9 fake-timer 1.5 s assertion for Q8 session-expired redirect). Phase-0 findings: RLS policy `profiles_update_self` already permits UPDATE on all own-row columns (no migration needed); `signOut` already lives standalone at `src/libs/auth/signOut.ts` (no extraction needed); `<Icon name="spinner" />` already exists. Zero new npm deps. Four pre-existing unrelated test failures (honorific / EmptyState / line-clamp) untouched. Row #18 flipped 📋 → 🟢. |
+| 2026-04-22 | Onboarding (Complete profile) specs drafted | `ObrdH9pKx7` | Ran `/momorph.specify` equivalent for the post-Google-OAuth gate. Created [spec.md](../../specs/ObrdH9pKx7-onboarding-department/spec.md) + [design-style.md](../../specs/ObrdH9pKx7-onboarding-department/design-style.md) + [plan.md](../../specs/ObrdH9pKx7-onboarding-department/plan.md) + [tasks.md](../../specs/ObrdH9pKx7-onboarding-department/tasks.md). 3 user stories (all P1 — new Google user, legacy NULL-dept user, dept-already-set bypass), 13 FRs, 7 TRs, 4 SCs. Zero new design tokens (extends Login + Thể lệ visual families). Zero new deps. Synthetic screenId (no Figma frame) — problem surfaced after user noted Google OAuth only returns email + full_name, leaving `profiles.department_id` NULL. Decision (2026-04-22): onboarding gate in authenticated layout, form collects `display_name` (editable, pre-filled from Google) + `department_id` (from existing `getKudoDepartments()`), no skip button, applies to new AND legacy NULL-dept users. Login spec patched with a "Post-login routing" cross-reference; Q3 resolved. Phase 0 audit (authenticated layout presence, RLS policy) kicks off before code lands. |
 | 2026-04-21 | Dropdown-ngôn ngữ specs drafted | `hUyaaugye2` | Reconciled the existing prototype ([src/components/login/LanguageDropdown.tsx](../../../src/components/login/LanguageDropdown.tsx)) against Figma via `/momorph.specify`. Created [spec.md](../../specs/hUyaaugye2-dropdown-ngon-ngu/spec.md) + [design-style.md](../../specs/hUyaaugye2-dropdown-ngon-ngu/design-style.md). 4 user stories (2 × P1 — switch locale + dismiss-without-select; 2 × P2 — keyboard nav + prototype reconciliation), 12 FRs, 5 TRs, 4 SCs. Zero APIs (reuses existing `setLocale` Server Action). Zero new design tokens — reuses `--color-panel-surface` / `--color-border-secondary` / `--color-accent-cream` already landed for Thể lệ + Kudos. Key divergences from the current prototype: (a) visible labels MUST be 2-letter codes `"VN"` / `"EN"` not full names (full name moves to `aria-label`), (b) panel surface switches from `--color-brand-800` to `--color-panel-surface` with the gold `--color-border-secondary` border, (c) EN row needs a new `flag-gb-nir` Icon (currently falls back to `globe`), (d) re-selecting the active locale MUST be a no-op (FR-006). Row #8 flipped from 🔵 prototype to 📋 spec'd (prototype). Paired with `z4sCl3_Qtk` Dropdown-profile as the two header-dropdown reconciliations still pending. |
 
 ---

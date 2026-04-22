@@ -50,7 +50,14 @@ export type AnalyticsEvent =
   | { type: "kudos_compose_open"; source: "liveboard_pill" | "fab" }
   // Viết Kudo compose flow (spec ihQ26W78P2) — added in PR 2.
   | { type: "kudos_compose_submit"; kudo_id: string }
-  | { type: "kudos_compose_cancel"; reason: "hủy_button" | "esc" | "backdrop" };
+  | { type: "kudos_compose_cancel"; reason: "hủy_button" | "esc" | "backdrop" }
+  // Onboarding — complete profile (spec ObrdH9pKx7). Payload is PII-free by
+  // design (no user id, no department_code, no name fragment) — see spec Q3.
+  | {
+      type: "onboarding_complete";
+      has_display_name_changed: boolean;
+      has_department_changed: boolean;
+    };
 
 declare global {
   interface Window {

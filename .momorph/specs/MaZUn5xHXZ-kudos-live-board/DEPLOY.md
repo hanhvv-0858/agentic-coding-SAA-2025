@@ -13,7 +13,8 @@
 | `NEXT_PUBLIC_SUPABASE_URL` | Client + Server | ✅ yes | Supabase project settings → API → Project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client + Server | ✅ yes | Supabase project settings → API → anon `public` key |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Server-only** / CI-only | ⚠️ yes, but NEVER expose client-side | Supabase project settings → API → `service_role` key |
-| `NEXT_PUBLIC_EVENT_START_AT` | Client + Server | ✅ yes | Launch timestamp ISO-8601 string |
+| `NEXT_PUBLIC_SITE_LAUNCH_AT` | Client + Server | optional | Site-open timestamp ISO-8601 string (mốc A). Powers the `/` → `/countdown` proxy gate. When unset, site is always open. |
+| `NEXT_PUBLIC_CEREMONY_AT` | Client + Server | optional | Awards-ceremony timestamp ISO-8601 string (mốc B). Powers the Homepage About-SAA countdown + "Coming soon" subtitle. Must be `>= NEXT_PUBLIC_SITE_LAUNCH_AT` when both set — Zod cross-field check in `src/libs/env/client.ts` fails the build if violated. |
 
 **Hard rule**: only `NEXT_PUBLIC_*` variables ship into the Cloudflare
 Workers client bundle. `SUPABASE_SERVICE_ROLE_KEY` is injected at build

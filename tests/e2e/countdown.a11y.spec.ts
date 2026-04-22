@@ -9,7 +9,7 @@ test.describe("Countdown a11y", () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     const response = await page.goto("/countdown");
     if (response && response.status() >= 300 && response.status() < 400) {
-      test.skip(true, "Env NEXT_PUBLIC_EVENT_START_AT is in the past — prelaunch redirects to /login");
+      test.skip(true, "Env NEXT_PUBLIC_SITE_LAUNCH_AT is in the past — prelaunch redirects to /login");
     }
 
     const results = await new AxeBuilder({ page })
@@ -37,7 +37,7 @@ test.describe("Countdown a11y", () => {
     await page.setViewportSize({ width: 375, height: 812 });
     const response = await page.goto("/countdown");
     if (response && response.status() >= 300 && response.status() < 400) {
-      test.skip(true, "Env NEXT_PUBLIC_EVENT_START_AT is in the past");
+      test.skip(true, "Env NEXT_PUBLIC_SITE_LAUNCH_AT is in the past");
     }
 
     const results = await new AxeBuilder({ page })

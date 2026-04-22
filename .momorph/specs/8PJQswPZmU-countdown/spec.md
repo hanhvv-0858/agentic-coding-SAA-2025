@@ -8,17 +8,26 @@
 
 ---
 
+> **Env-var split note** (resolved 2026-04-22): the SAA has **two** distinct
+> moments, each driving its own countdown — **mốc A** `NEXT_PUBLIC_SITE_LAUNCH_AT`
+> (site opens, registration + kudo compose enabled) and **mốc B**
+> `NEXT_PUBLIC_CEREMONY_AT` (awards ceremony gala). This spec owns mốc A;
+> the Homepage About-SAA hero countdown
+> ([i87tDx10uM-homepage-saa](../i87tDx10uM-homepage-saa/spec.md)) owns mốc B.
+> Invariant: `SITE_LAUNCH_AT <= CEREMONY_AT` — enforced at boot by Zod
+> `.refine()` in `src/libs/env/client.ts`.
+
 ## Overview
 
 Full-bleed pre-launch landing page that displays a live countdown to the
-SAA 2025 ceremony opening (`NEXT_PUBLIC_EVENT_START_AT`). The screen is the
+SAA 2025 **site launch** (`NEXT_PUBLIC_SITE_LAUNCH_AT` — mốc A). The screen is the
 public "holding page" users land on before the site officially opens —
 dramatic key-visual background on the right side of the viewport + dark
 gradient overlay on the left + centered headline ("Sự kiện sẽ bắt đầu sau")
 above a large glass-style LED display showing remaining **Days / Hours /
 Minutes** (no Seconds, no navigation, no auth).
 
-Once the event starts (`now >= NEXT_PUBLIC_EVENT_START_AT`), the screen
+Once the event starts (`now >= NEXT_PUBLIC_SITE_LAUNCH_AT`), the screen
 transitions to a "We're live" state that either auto-redirects to `/login`
 or swaps the countdown for a "Go to site" CTA — exact behaviour driven by
 open question Q5 below.
@@ -37,12 +46,12 @@ event hasn't started yet and know exactly how long until it does.
 it, visitors hit a blank holding page or the login screen without context.
 
 **Independent Test**: Open the site at a fixed `Date.now()` earlier than
-`NEXT_PUBLIC_EVENT_START_AT`. Verify the headline + 3 LED counters (D/H/M)
+`NEXT_PUBLIC_SITE_LAUNCH_AT`. Verify the headline + 3 LED counters (D/H/M)
 render with correct remaining time and tick at least once per minute.
 
 **Acceptance Scenarios**:
 
-1. **Given** `NEXT_PUBLIC_EVENT_START_AT` is set to a future timestamp,
+1. **Given** `NEXT_PUBLIC_SITE_LAUNCH_AT` is set to a future timestamp,
    **When** a visitor loads the prelaunch route, **Then** the page renders
    the key-visual background + headline + 3 countdown units (D / H / M) in
    the active locale.
@@ -51,7 +60,7 @@ render with correct remaining time and tick at least once per minute.
 3. **Given** the user toggles between tabs for several minutes, **When**
    they return, **Then** the countdown shows the accurate current remaining
    time (no drift) — recompute on focus/visibilitychange.
-4. **Given** `NEXT_PUBLIC_EVENT_START_AT` is unset or invalid, **When** the
+4. **Given** `NEXT_PUBLIC_SITE_LAUNCH_AT` is unset or invalid, **When** the
    page renders, **Then** all three tiles show `00` and a fallback message
    is used instead of the default headline.
 
@@ -67,7 +76,7 @@ refresh manually.
 `00 / 00 / 00` countdown. UX also calls out launch-time as a critical
 moment.
 
-**Independent Test**: Set `NEXT_PUBLIC_EVENT_START_AT` to a timestamp ~1
+**Independent Test**: Set `NEXT_PUBLIC_SITE_LAUNCH_AT` to a timestamp ~1
 minute in the future, wait for the tick, and verify the page redirects to
 `/login` (or shows the "Go to site" CTA per Q5 resolution).
 
@@ -133,7 +142,7 @@ on mobile `< 640 px`, and the background image never leaves a dark gap.
 
 ### Edge Cases
 
-- **Env var missing**: `NEXT_PUBLIC_EVENT_START_AT` not set → show `00:00:00`
+- **Env var missing**: `NEXT_PUBLIC_SITE_LAUNCH_AT` not set → show `00:00:00`
   + locale-aware fallback (reuse existing `homepage.countdown.fallback` key).
 - **Env var in the past**: treat as "event has started" → apply T-0 transition
   logic (Q5).
@@ -193,7 +202,7 @@ Full visual specs live in [design-style.md](./design-style.md).
 ### Functional Requirements
 
 - **FR-001**: Countdown MUST compute remaining time from
-  `NEXT_PUBLIC_EVENT_START_AT` (ISO 8601 string). Same env var as Homepage
+  `NEXT_PUBLIC_SITE_LAUNCH_AT` (ISO 8601 string). Same env var as Homepage
   hero countdown — no new configuration surface. The variable is already
   declared in the Zod schema at
   [`src/libs/env/client.ts:12`](../../../src/libs/env/client.ts#L12)
@@ -272,7 +281,7 @@ No user input fields (read-only page). Display data is derived from:
 
 | Source | Type | Purpose |
 |--------|------|---------|
-| `NEXT_PUBLIC_EVENT_START_AT` env var | ISO-8601 string | Launch timestamp — single source of truth for countdown target |
+| `NEXT_PUBLIC_SITE_LAUNCH_AT` env var | ISO-8601 string | Launch timestamp — single source of truth for countdown target |
 | `NEXT_LOCALE` cookie | `"vi" \| "en"` | Drives which message catalog `getMessages()` returns |
 | `src/messages/{vi,en}.json → homepage.countdown.{days,hours,minutes,fallback}` | i18n | Unit labels + missing-env fallback — **reused from Homepage hero** (already shipped) |
 | `src/messages/{vi,en}.json → countdown.prelaunch.headline` | i18n | Prelaunch headline ("Sự kiện sẽ bắt đầu sau" / "Event starts in") — **new key per locale** |
@@ -292,7 +301,7 @@ Derived display fields:
 
 - **Server state**: None — page is a Server Component that pre-resolves
   locale copy via `getMessages()`. At request time the server reads
-  `NEXT_PUBLIC_EVENT_START_AT` and can short-circuit to a redirect when
+  `NEXT_PUBLIC_SITE_LAUNCH_AT` and can short-circuit to a redirect when
   `hasLaunched` is already true (FR-008).
 - **Client state** (lives in `<PrelaunchCountdown>` only):
   - `remaining: { days: string; hours: string; minutes: string }` — derived
@@ -322,7 +331,7 @@ None — no DB model involved.
 |----------|--------|---------|--------|
 | (none) | — | No server API calls | — |
 
-Countdown is driven entirely by `NEXT_PUBLIC_EVENT_START_AT`. No fetch
+Countdown is driven entirely by `NEXT_PUBLIC_SITE_LAUNCH_AT`. No fetch
 calls; no future API calls anticipated.
 
 ---
@@ -338,7 +347,7 @@ calls; no future API calls anticipated.
   desktop.
 - **SC-004**: Grep of the compiled bundle for "Sự kiện sẽ bắt đầu sau"
   returns only `src/messages/vi.json` (no hard-coded VI in `.tsx`).
-- **SC-005**: Setting `NEXT_PUBLIC_EVENT_START_AT` to 1 minute in the
+- **SC-005**: Setting `NEXT_PUBLIC_SITE_LAUNCH_AT` to 1 minute in the
   future and waiting through T-0 transitions the page to the post-launch
   destination within 60 seconds (one tick).
 - **SC-006**: On a warm cache, the HTML response arrives in ≤ 200 ms from
@@ -399,8 +408,8 @@ calls; no future API calls anticipated.
     mental model.
 
 - **Q3** *(Tech)*: **Launch timestamp source** — reuse
-  `NEXT_PUBLIC_EVENT_START_AT` or add a new `NEXT_PUBLIC_PRELAUNCH_END_AT`?
-  - **Recommendation**: Reuse `NEXT_PUBLIC_EVENT_START_AT`. One source of
+  `NEXT_PUBLIC_SITE_LAUNCH_AT` or add a new `NEXT_PUBLIC_PRELAUNCH_END_AT`?
+  - **Recommendation**: Reuse `NEXT_PUBLIC_SITE_LAUNCH_AT`. One source of
     truth prevents drift between Homepage hero countdown and this screen.
 
 - **Q4** *(Design)*: **Seconds** — Figma shows D/H/M; Homepage hero also
@@ -456,7 +465,7 @@ calls; no future API calls anticipated.
 ### Assumptions (until Q1–Q7 resolved)
 
 - The screen ships as a **public root replacement** at `/` when
-  `now < NEXT_PUBLIC_EVENT_START_AT` (Q1 + Q2).
+  `now < NEXT_PUBLIC_SITE_LAUNCH_AT` (Q1 + Q2).
 - Reuses existing env var (Q3) and existing background asset (Q7).
 - T-0 behaviour is "same URL swap to authenticated Homepage" (Q5 Option C).
 - Copy: `"Sự kiện sẽ bắt đầu sau"` for VI, `"Event starts in"` for EN

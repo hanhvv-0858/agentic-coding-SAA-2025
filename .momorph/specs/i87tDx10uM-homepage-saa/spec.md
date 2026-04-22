@@ -12,14 +12,22 @@
 > document: **[design-style.md](design-style.md)**. This spec focuses on
 > behavior, data, and acceptance criteria.
 
+> **Env-var split note** (resolved 2026-04-22): the SAA has **two** distinct
+> moments — **mốc A** `NEXT_PUBLIC_SITE_LAUNCH_AT` (site opens, registration +
+> kudo compose enabled) and **mốc B** `NEXT_PUBLIC_CEREMONY_AT` (awards
+> ceremony gala). This spec's hero countdown tracks **mốc B**; the Prelaunch
+> page ([8PJQswPZmU-countdown](../8PJQswPZmU-countdown/spec.md)) tracks mốc A.
+> Invariant: `SITE_LAUNCH_AT <= CEREMONY_AT` — enforced at boot by Zod
+> `.refine()` in `src/libs/env/client.ts`.
+
 ---
 
 ## Overview
 
 The **Homepage SAA** is the landing page every authenticated Sun\* employee
 sees after signing in. It introduces the "Root Further" theme of SAA 2025,
-counts down to the event start, showcases the six award categories, and
-promotes the Sun\* Kudos campaign.
+counts down to the awards **ceremony** (`NEXT_PUBLIC_CEREMONY_AT` — mốc B),
+showcases the six award categories, and promotes the Sun\* Kudos campaign.
 
 **Target users**
 
@@ -86,13 +94,13 @@ rendered. Header shows the user's avatar.
 **Why this priority**: Countdown is the most visually prominent element; if
 it's wrong or missing, credibility of the whole page drops.
 
-**Independent Test**: Set `NEXT_PUBLIC_EVENT_START_AT=<future-ISO-date>`; load
+**Independent Test**: Set `NEXT_PUBLIC_CEREMONY_AT=<future-ISO-date>`; load
 page; countdown shows correct DD/HH/MM values; wait 1 minute; minute digit
 decrements.
 
 **Acceptance Scenarios**
 
-1. **Given** `NEXT_PUBLIC_EVENT_START_AT` is a future date, **when** the page
+1. **Given** `NEXT_PUBLIC_CEREMONY_AT` is a future date, **when** the page
    mounts, **then** the 3 tiles display remaining `days`, `hours`,
    `minutes` — each a 2-digit zero-padded number (e.g. `02 · 18 · 45`).
 
@@ -104,7 +112,7 @@ decrements.
    page renders, **then** all three tiles show `00`, the "Coming soon"
    subtitle is hidden, and no negative countdown is shown (stays at zero).
 
-4. **Given** `NEXT_PUBLIC_EVENT_START_AT` is missing or malformed, **when**
+4. **Given** `NEXT_PUBLIC_CEREMONY_AT` is missing or malformed, **when**
    the page loads, **then** the Countdown component renders a graceful
    fallback (e.g. "Event details coming soon") and logs the error
    server-side — does not crash the page.
@@ -362,10 +370,10 @@ All dimensions, colors, typography, spacing, and per-node CSS live in
   `createServerClient().auth.getUser()`; if no session, redirect to
   `/login`.
 - **FR-002**: The page MUST read the event start time from
-  `NEXT_PUBLIC_EVENT_START_AT` (ISO 8601 UTC) and pass it to the Countdown
+  `NEXT_PUBLIC_CEREMONY_AT` (ISO 8601 UTC) and pass it to the Countdown
   client component. Figma indicates the event date is **2025-12-26** (value
   `26/12/2025` in the event info block) — so a sensible default is
-  `NEXT_PUBLIC_EVENT_START_AT=2025-12-26T11:30:00Z` (confirm actual kick-off
+  `NEXT_PUBLIC_CEREMONY_AT=2025-12-26T11:30:00Z` (confirm actual kick-off
   time with Product — the Figma doesn't specify a time-of-day). When the env
   var is missing or malformed, render a graceful fallback.
 - **FR-003**: The Countdown component MUST compute remaining time using
@@ -585,7 +593,7 @@ No client-side store introduced. All server state via Server Components.
 - [x] [design-style.md](design-style.md) (sibling).
 - [x] SCREENFLOW lists Homepage
       ([SCREENFLOW.md](../../contexts/screen_specs/SCREENFLOW.md)).
-- [ ] `NEXT_PUBLIC_EVENT_START_AT` env var added to `.env.example` +
+- [ ] `NEXT_PUBLIC_CEREMONY_AT` env var added to `.env.example` +
       `.env.local`.
 - [ ] `src/data/awards.ts` — frozen list of 6 award categories with id, slug,
       title key, description key, image path.

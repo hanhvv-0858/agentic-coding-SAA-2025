@@ -10,7 +10,7 @@
 ## Summary
 
 Ship a **public, chromeless** Prelaunch landing page that shows a live
-Days / Hours / Minutes countdown to `NEXT_PUBLIC_EVENT_START_AT` on top of
+Days / Hours / Minutes countdown to `NEXT_PUBLIC_SITE_LAUNCH_AT` on top of
 the shared SAA key-visual background. Transitions to the authenticated
 Homepage at T-0.
 
@@ -20,7 +20,7 @@ Homepage at T-0.
 |---|----------|
 | **Q1 — Public or auth-gated?** | **Public**. No `redirect("/login")`, no `SiteHeader`. |
 | **Q2 — Route placement?** | **Dedicated `/countdown` route** (Option B). Avoids the risky refactor of `src/app/page.tsx` and keeps the authenticated Homepage untouched. A small `middleware.ts` tweak handles the "redirect `/` → `/countdown` while `now < target`" dispatch. |
-| **Q3 — Launch timestamp source?** | **Reuse `NEXT_PUBLIC_EVENT_START_AT`** (already in `src/libs/env/client.ts`). |
+| **Q3 — Launch timestamp source?** | **Reuse `NEXT_PUBLIC_SITE_LAUNCH_AT`** (already in `src/libs/env/client.ts`). |
 | **Q4 — Seconds?** | **D/H/M only** on Prelaunch. Keep Homepage hero's D/H/M/S asymmetry (the minute-resolution tick is cheaper + matches the quiet "holding page" mood). |
 | **Q5 — T-0 behaviour?** | **Auto-rewrite** via `middleware.ts`: once `Date.now() >= target`, the middleware stops rewriting `/` → `/countdown`. Client-side detects T-0 locally and calls `router.push("/login")` so users already on the page don't sit on `00:00:00`. |
 | **Q6 — EN headline?** | **"Event starts in"** — direct mirror of VI, consistent with Homepage `hero.comingSoon` tone. Can be swapped via i18n key `countdown.prelaunch.headline` if Marketing revises. |
@@ -41,7 +41,7 @@ Core technical moves:
    chromeless, renders `<BackgroundImage>` + `<CoverGradient>` +
    `<PrelaunchCountdown>`.
 4. **Middleware dispatch** — extend [`middleware.ts`](../../../middleware.ts)
-   to rewrite `/` → `/countdown` when `now < NEXT_PUBLIC_EVENT_START_AT`.
+   to rewrite `/` → `/countdown` when `now < NEXT_PUBLIC_SITE_LAUNCH_AT`.
    Session refresh behaviour stays intact.
 
 No DB, no API, no new npm deps.
@@ -61,7 +61,7 @@ No DB, no API, no new npm deps.
 | API Style | N/A |
 | i18n | Existing `getMessages()` — reuse `homepage.countdown.*` labels + add one new `countdown.prelaunch.headline` key per locale |
 | Analytics | Extend `AnalyticsEvent` union in [`src/libs/analytics/track.ts`](../../../src/libs/analytics/track.ts) with `prelaunch_view` + `prelaunch_launch_transition` |
-| Env | `NEXT_PUBLIC_EVENT_START_AT` — already declared in [`src/libs/env/client.ts:12`](../../../src/libs/env/client.ts#L12) |
+| Env | `NEXT_PUBLIC_SITE_LAUNCH_AT` — already declared in [`src/libs/env/client.ts:12`](../../../src/libs/env/client.ts#L12) |
 
 ---
 
@@ -92,7 +92,7 @@ No DB, no API, no new npm deps.
 <CountdownPage>  Server Component (src/app/countdown/page.tsx)
   — no SiteHeader / SiteFooter / FAB (chromeless per Q8)
   — calls generateMetadata() from countdown.prelaunch.meta.*
-  — reads NEXT_PUBLIC_EVENT_START_AT server-side
+  — reads NEXT_PUBLIC_SITE_LAUNCH_AT server-side
   — if hasLaunched already (now >= target) → redirect("/login")
   — fires track({ type: "prelaunch_view", remaining_minutes })
     directly (precedent: Homepage `page.tsx:60` + Awards `page.tsx:81`
@@ -134,7 +134,7 @@ Extend [`middleware.ts`](../../../middleware.ts):
 ```ts
 export async function middleware(request: NextRequest) {
   // Pre-launch gate: rewrite / → /countdown when event hasn't started.
-  const target = process.env.NEXT_PUBLIC_EVENT_START_AT;
+  const target = process.env.NEXT_PUBLIC_SITE_LAUNCH_AT;
   if (target && request.nextUrl.pathname === "/") {
     const targetMs = Date.parse(target);
     if (!Number.isNaN(targetMs) && Date.now() < targetMs) {
@@ -157,7 +157,7 @@ None. No DB, no API endpoints. Supabase Auth is untouched.
 
 | Existing Service / Component | How used |
 |------------------------------|----------|
-| `@/libs/env/client#clientEnv.NEXT_PUBLIC_EVENT_START_AT` | Source of launch timestamp (both server + client) |
+| `@/libs/env/client#clientEnv.NEXT_PUBLIC_SITE_LAUNCH_AT` | Source of launch timestamp (both server + client) |
 | `@/libs/i18n/getMessages` | Load `countdown.prelaunch.headline` + reused `homepage.countdown.*` labels |
 | `@/libs/analytics/track` | Fire `prelaunch_view` + `prelaunch_launch_transition` — union extension required |
 | `@/components/homepage/Countdown` | **Refactored** to consume new `useCountdown()` hook; public API unchanged |
@@ -199,7 +199,7 @@ None. No DB, no API endpoints. Supabase Auth is untouched.
 | File | Changes |
 |------|---------|
 | `src/components/homepage/Countdown.tsx` | Strip inline tick logic → call `useCountdown()` hook. Keep `{ eventStartAt, labels }` prop shape. Retain flip-clock tile rendering. Verified: no `__tests__/Countdown.spec.tsx` exists today (no homepage-level test folder), so no test edits required — regression coverage is via the Playwright `awards.spec.ts`/`countdown.spec.ts` flows that indirectly hit the Homepage Countdown on route visits. |
-| `middleware.ts` | Add pre-launch dispatch: `/` → `/countdown` rewrite while `now < NEXT_PUBLIC_EVENT_START_AT` |
+| `middleware.ts` | Add pre-launch dispatch: `/` → `/countdown` rewrite while `now < NEXT_PUBLIC_SITE_LAUNCH_AT` |
 | `src/libs/analytics/track.ts` | Extend `AnalyticsEvent` union with `prelaunch_view` + `prelaunch_launch_transition` (mirror how `rules_*` events were added) |
 | `src/messages/en.json` | Add `countdown.prelaunch.headline: "Event starts in"` + `countdown.prelaunch.meta.title: "Countdown \| SAA 2025"` + `countdown.prelaunch.meta.description: "SAA 2025 prelaunch countdown"`. Unit labels (DAYS/HOURS/MINUTES) + env-missing fallback reused from existing `homepage.countdown.*`. |
 | `src/messages/vi.json` | Add `countdown.prelaunch.headline: "Sự kiện sẽ bắt đầu sau"` + `countdown.prelaunch.meta.title: "Đếm ngược \| SAA 2025"` + `countdown.prelaunch.meta.description: "Đếm ngược khai mạc SAA 2025"`. |
@@ -305,7 +305,7 @@ exists. An AVIF/WebP derivative is a Phase-4 polish item (risk R2).
 | `useRouter` (`next/navigation`) | `vi.mock` | Assert `router.push("/login")` at T-0 |
 | `track` | `vi.fn()` | Assert event payloads |
 | `Date.now()` | `vi.useFakeTimers()` | Deterministic tick + T-0 simulation |
-| `NEXT_PUBLIC_EVENT_START_AT` | Per-test env override | Cover future/past/missing cases |
+| `NEXT_PUBLIC_SITE_LAUNCH_AT` | Per-test env override | Cover future/past/missing cases |
 
 ### Test Scenarios Outline
 
@@ -339,7 +339,7 @@ exists. An AVIF/WebP derivative is a Phase-4 polish item (risk R2).
 | **R1** — Extracting `useCountdown` breaks Homepage hero | Low | High | TDD: write hook tests first, run existing Homepage tests after refactor, keep `<Countdown>` prop API identical |
 | **R2** — 4.4 MB hero image tanks Lighthouse LCP on prelaunch (public page, cold cache) | Medium | Medium | Accept for MVP; ship AVIF/WebP derivative as Phase-4 polish. `unoptimized` Next.js Image still benefits from browser cache on repeat visit. |
 | **R3** — Middleware rewrite collides with existing `updateSession` cookie pass-through | Low | High | Rewrite returns a distinct `NextResponse.rewrite`; session-refresh path untouched when `now >= target` or pathname ≠ `/`. Covered by manual smoke + e2e. |
-| **R4** — `NEXT_PUBLIC_EVENT_START_AT` unset in production | Low | Medium | Zod schema marks env optional; hook + server gate both handle undefined gracefully (show `00:00:00` + fallback). Add a PR-time check in README. |
+| **R4** — `NEXT_PUBLIC_SITE_LAUNCH_AT` unset in production | Low | Medium | Zod schema marks env optional; hook + server gate both handle undefined gracefully (show `00:00:00` + fallback). Add a PR-time check in README. |
 | **R5** — Clock skew between client and server surfaces inconsistent state at T-0 | Low | Low | Client checks every minute; any drift ≤ 60 s is invisible at minute resolution. |
 | **R6** — `prefers-reduced-motion` users see tick animation flicker | Low | Low | No animations in MVP — risk is zero until Phase-5 polish adds flip/fade. |
 | **R7** — i18n key missing breaks render | Low | Low | Only one new key (`countdown.prelaunch.headline`); everything else reused. `getMessages()` graceful-degrades to key name per existing pattern. |
@@ -362,7 +362,7 @@ exists. An AVIF/WebP derivative is a Phase-4 polish item (risk R2).
 - [x] `design-style.md` approved (tokens + layout + implementation mapping)
 - [x] `SCREENFLOW.md` updated (row #11 `discovered`)
 - [x] Homepage hero `<Countdown>` already shipped (source of the tick engine)
-- [x] `NEXT_PUBLIC_EVENT_START_AT` declared in Zod env schema
+- [x] `NEXT_PUBLIC_SITE_LAUNCH_AT` declared in Zod env schema
 - [ ] Stakeholder ack of Q2/Q5/Q6 decisions captured in this plan
 
 ### External Dependencies

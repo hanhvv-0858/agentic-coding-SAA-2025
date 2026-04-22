@@ -50,10 +50,10 @@ depends on the env file change.
 - [x] T006 [P] Decide on Digital Numbers font (plan Q-P1): license + download,
       or ship fallback. If licensed, drop `.woff2` file | `public/fonts/digital-numbers.woff2`
       (or "DECISION: fallback only" noted in spec Q14)
-- [x] T007 Add `NEXT_PUBLIC_EVENT_START_AT=2025-12-26T11:30:00Z` (placeholder
+- [x] T007 Add `NEXT_PUBLIC_CEREMONY_AT=2025-12-26T11:30:00Z` (placeholder
       — confirm exact time with Product per spec Q3) | `.env.example`
 - [x] T008 Mirror the env var in local dev | `.env.local`
-- [x] T009 Extend env schema: add `NEXT_PUBLIC_EVENT_START_AT:
+- [x] T009 Extend env schema: add `NEXT_PUBLIC_CEREMONY_AT:
       z.string().datetime().optional()` | `src/libs/env/client.ts`,
       `src/libs/env/__tests__/client.spec.ts` (new if not exists)
 - [x] T010 Verify Phase 1 exit: `yarn typecheck` passes; all 8 assets present
@@ -210,7 +210,7 @@ correct content; countdown ticks; clicking "Top Talent" card navigates to
       recomputes on foreground, renders fallback when `eventStartAt` missing
       (FR-002/FR-003 + edge cases) | `src/components/homepage/Countdown.tsx`,
       `src/components/homepage/__tests__/Countdown.spec.tsx`
-- [x] T036 [US2] Wire `<Countdown eventStartAt={env.NEXT_PUBLIC_EVENT_START_AT} />`
+- [x] T036 [US2] Wire `<Countdown eventStartAt={env.NEXT_PUBLIC_CEREMONY_AT} />`
       into `<HeroSection />`. Pass an `onSubtitleVisible` callback (or just
       conditionally render subtitle server-side based on whether event time is
       in the future) so "Comming soon" hides correctly | `src/components/homepage/HeroSection.tsx`

@@ -23,8 +23,9 @@
  *   SUPABASE_SERVICE_ROLE_KEY
  *
  * Idempotency: re-running the script is a no-op on second run — users
- * are matched by email, kudos by a deterministic `external_ref` prefix
- * encoded in the body (`[fixture#N]`) so duplicates are skipped.
+ * are matched by email, kudos by `(sender_id, body)` uniqueness (the
+ * 30-row seed plan never reuses the same pair, so an exact body match
+ * on the same sender means the row is already present).
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -233,7 +234,7 @@ async function seedKudos(
 
   for (let i = 0; i < 30; i++) {
     const sender = profiles[i % profiles.length];
-    const body = `[fixture#${i}] ${SAMPLE_BODIES[i % SAMPLE_BODIES.length]}`;
+    const body = SAMPLE_BODIES[i % SAMPLE_BODIES.length];
     if (await kudoExists(sender.id, body)) {
       skipped++;
       continue;

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/libs/supabase/server";
 import { getMessages } from "@/libs/i18n/getMessages";
 import { track } from "@/libs/analytics/track";
+import { requireOnboardingComplete } from "@/libs/auth/requireOnboardingComplete";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { LanguageToggle } from "@/components/layout/LanguageToggle";
@@ -43,6 +44,7 @@ export default async function TheLePage({ searchParams }: PageProps) {
     user = null;
   }
   if (!user) redirect("/login");
+  await requireOnboardingComplete(user.id);
 
   const { locale, messages } = await getMessages();
   const languageLabel = messages.common.language.label[locale];

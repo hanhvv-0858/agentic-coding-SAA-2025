@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 // E2E for /countdown — public route, no auth required. Behaviour depends on
-// NEXT_PUBLIC_EVENT_START_AT being set to a future timestamp at build/dev
+// NEXT_PUBLIC_SITE_LAUNCH_AT being set to a future timestamp at build/dev
 // time. These tests assume the dev server has a future value (which is the
 // default in .env.local per README guidance).
 
@@ -11,7 +11,7 @@ test.describe("Countdown — public render", () => {
     if (response && response.status() >= 300 && response.status() < 400) {
       // If the env is already in the past on the dev machine, the server
       // redirects to /login — skip the happy-path assertions and flag it.
-      test.skip(true, "Env NEXT_PUBLIC_EVENT_START_AT is in the past — cannot test prelaunch render");
+      test.skip(true, "Env NEXT_PUBLIC_SITE_LAUNCH_AT is in the past — cannot test prelaunch render");
     }
 
     // Headline — checked by role=heading level 1.
@@ -30,7 +30,7 @@ test.describe("Countdown — public render", () => {
   test("middleware rewrites `/` to the prelaunch content without changing URL", async ({ page }) => {
     const response = await page.goto("/");
     if (response && response.status() >= 300 && response.status() < 400) {
-      test.skip(true, "Env NEXT_PUBLIC_EVENT_START_AT is in the past");
+      test.skip(true, "Env NEXT_PUBLIC_SITE_LAUNCH_AT is in the past");
     }
 
     // NextResponse.rewrite keeps the URL as /, but the body is the prelaunch page.

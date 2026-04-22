@@ -49,7 +49,7 @@ export function SunnerSearchPill({ placeholder }: SunnerSearchPillProps) {
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className="min-w-0 flex-1 bg-transparent font-[family-name:var(--font-montserrat)] text-base text-white placeholder-white/60 focus:outline-none"
+          className="min-w-0 flex-1 bg-transparent font-[family-name:var(--font-montserrat)] text-base text-white placeholder:text-white focus:outline-none"
         />
       </label>
       {results.length > 0 ? (

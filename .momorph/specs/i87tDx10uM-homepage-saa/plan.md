@@ -102,7 +102,7 @@ satisfy by re-using patterns established in the Login ship.
 - **Data access**: via Supabase client only (no raw SQL). No DB tables
   touched in this feature; `auth.users` metadata is read as a side effect
   of `getUser()`.
-- **Validation**: `NEXT_PUBLIC_EVENT_START_AT` validated via Zod's
+- **Validation**: `NEXT_PUBLIC_CEREMONY_AT` validated via Zod's
   `.datetime()` in `src/libs/env/client.ts` (client-safe because
   `NEXT_PUBLIC_*` prefix).
 
@@ -194,11 +194,11 @@ src/
 | [src/components/ui/Icon.tsx](../../../src/components/ui/Icon.tsx) | Add cases: `bell`, `pencil`, `arrow-right` |
 | [src/messages/vi.json](../../../src/messages/vi.json) | Add ~30 `homepage.*` + `common.nav.*` keys per [spec § i18n](spec.md) |
 | [src/messages/en.json](../../../src/messages/en.json) | Mirror VI additions |
-| [src/libs/env/client.ts](../../../src/libs/env/client.ts) | Add `NEXT_PUBLIC_EVENT_START_AT: z.string().datetime().optional()` |
+| [src/libs/env/client.ts](../../../src/libs/env/client.ts) | Add `NEXT_PUBLIC_CEREMONY_AT: z.string().datetime().optional()` |
 | [src/libs/analytics/track.ts](../../../src/libs/analytics/track.ts) | Extend `AnalyticsEvent` union with `{ type: "screen_view"; screen: "homepage" }` (already covered by generic `screen_view` — just call site-wide) |
 | [src/app/layout.tsx](../../../src/app/layout.tsx) | Load **Digital Numbers** font via `next/font/local` + add `font-digital-numbers` CSS variable |
 | [src/app/globals.css](../../../src/app/globals.css) | Add `@theme` tokens: `--color-brand-700: #101417;`, `--color-card: #0B1419;`, `--font-digital-numbers: ...;` |
-| [.env.example](../../../.env.example) | Add `NEXT_PUBLIC_EVENT_START_AT=2025-12-26T11:30:00Z` |
+| [.env.example](../../../.env.example) | Add `NEXT_PUBLIC_CEREMONY_AT=2025-12-26T11:30:00Z` |
 | [.env.local](../../../.env.local) | Add same (real value) |
 
 ### Dependencies
@@ -240,7 +240,7 @@ whether Digital Numbers font is licenseable or we fall back.
    drops PNG/JPG files into `public/images/`.
 3. **Digital Numbers font decision** (Q-P1): licensed / self-hosted /
    fallback? If fallback, skip font install.
-4. Add `NEXT_PUBLIC_EVENT_START_AT=2025-12-26T11:30:00Z` (placeholder —
+4. Add `NEXT_PUBLIC_CEREMONY_AT=2025-12-26T11:30:00Z` (placeholder —
    confirm exact time with Product) to `.env.example` + `.env.local`.
 5. Update `src/libs/env/client.ts` schema.
 
@@ -250,7 +250,7 @@ whether Digital Numbers font is licenseable or we fall back.
       TODO)
 - [ ] `public/images/awards/` has 6 PNGs (or 6 coloured placeholders)
 - [ ] `public/images/sunkudos-promo.png` exists
-- [ ] `NEXT_PUBLIC_EVENT_START_AT` available in dev + schema-validated
+- [ ] `NEXT_PUBLIC_CEREMONY_AT` available in dev + schema-validated
 - [ ] Digital Numbers font decision made + documented
 
 ---
@@ -593,7 +593,7 @@ cast for all US1–US7 logged-in sessions.)
    - [ ] Language toggle flips entire page
 2. **Error handling**
    - [ ] `getUser` throws → error shell renders (FR-016)
-   - [ ] `NEXT_PUBLIC_EVENT_START_AT` missing → fallback copy in countdown
+   - [ ] `NEXT_PUBLIC_CEREMONY_AT` missing → fallback copy in countdown
    - [ ] Event in the past → tiles hold at `00`, subtitle hidden
 3. **Edge cases**
    - [ ] Unread count 0, 5, 150 → badge rendering 3 variants
