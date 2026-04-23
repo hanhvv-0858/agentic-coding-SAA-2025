@@ -26,7 +26,6 @@ export type ProfilePreviewTooltipProps = {
 
 // Card dimensions from design-style §27.1 (inferred — flagged in §29).
 const TOOLTIP_WIDTH = 380;
-const TOOLTIP_HEIGHT = 360; // approximate; surface auto-grows with content
 
 // Session-scoped cache with 60 s TTL (Q17 — lazy fetch + memoise).
 const CACHE_TTL_MS = 60_000;
@@ -83,37 +82,47 @@ export function ProfilePreviewTooltip({
   const tooltipId = useId();
   const router = useRouter();
 
-  // Seed `data` from cache synchronously so repeat hovers are instant.
-  const [data, setData] = useState<ProfilePreview | null>(() => getCached(userId));
-  const [loading, setLoading] = useState(false);
+  // Read the cache synchronously on every render. Cache hits are stable
+  // across renders (same Map entry → same object reference) until the
+  // TTL expires, so this avoids the "setState in effect" cascade that
+  // React's new `react-hooks/set-state-in-effect` rule flags.
+  const cached = getCached(userId);
+
+  // Track the async fetched payload separately; `data` is derived on
+  // render (cache wins when hot, otherwise the async fetch for this
+  // exact userId fills in). The userId guard avoids showing stale
+  // payloads when the parent rapidly hovers different names.
+  const [fetched, setFetched] = useState<
+    { userId: string; payload: ProfilePreview } | null
+  >(null);
+  const data: ProfilePreview | null =
+    cached ?? (fetched?.userId === userId ? fetched.payload : null);
+  // Loading = tooltip open but nothing to show yet. Derived from state
+  // instead of a separate `useState(false)` so we don't need a
+  // synchronous `setLoading(true)` inside the effect (which the
+  // `react-hooks/set-state-in-effect` rule flags).
+  const loading = open && data == null;
 
   useEffect(() => {
     if (!open) return;
-    const cached = getCached(userId);
-    if (cached) {
-      setData(cached);
-      return;
-    }
+    if (cached) return;
+    if (fetched?.userId === userId) return;
     let cancelled = false;
-    setLoading(true);
     getProfilePreview(userId)
       .then((payload) => {
         if (cancelled) return;
         if (payload) {
           setCached(userId, payload);
-          setData(payload);
+          setFetched({ userId, payload });
         }
       })
       .catch((err) => {
         if (!cancelled) console.error("[kudos] ProfilePreview fetch failed:", err);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
       });
     return () => {
       cancelled = true;
     };
-  }, [open, userId]);
+  }, [open, userId, cached, fetched?.userId]);
 
   if (!open) return null;
   // SSR guard — portal target only exists on the client. During server

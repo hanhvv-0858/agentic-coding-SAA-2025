@@ -6,6 +6,22 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  // Exempt `_`-prefixed identifiers from no-unused-vars — the common
+  // "intentionally unused" convention for parameters we're keeping for
+  // API compatibility (e.g. `_locale` on locale-free formatters).
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+        },
+      ],
+    },
+  },
   globalIgnores([
     ".next/**",
     "out/**",

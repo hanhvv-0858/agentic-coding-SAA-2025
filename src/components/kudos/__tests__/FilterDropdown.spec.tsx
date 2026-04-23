@@ -1,7 +1,7 @@
 // `FilterDropdown` combobox unit tests covering the dark-navy redesign
 // per spec JWpsISMAaM. Scenarios align with tasks.md T011-T034.
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { FilterDropdown, type FilterDropdownOption } from "../FilterDropdown";
 import type { Messages } from "@/libs/i18n/getMessages";

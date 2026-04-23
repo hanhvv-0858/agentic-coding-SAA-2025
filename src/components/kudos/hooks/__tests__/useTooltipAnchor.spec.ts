@@ -8,8 +8,6 @@ import { renderHook, act } from "@testing-library/react";
 import { useRef } from "react";
 import { useTooltipAnchor } from "../useTooltipAnchor";
 
-type Renderer = ReturnType<typeof renderUnderTest>;
-
 // Utility — wires a fresh `<div>` in jsdom as the trigger element so
 // `triggerRef.current.getBoundingClientRect()` works inside the hook's
 // layout effect.
