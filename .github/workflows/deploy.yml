@@ -38,8 +38,14 @@ jobs:
 
       # Reconstruct `.env.production.local` from GitHub Actions config so
       # NEXT_PUBLIC_* values are inlined into the client bundle at build
-      # time. The file is gitignored; GitHub repo vars + secrets are the
-      # source of truth for CI deploys.
+      # time, AND the server env schema (src/libs/env/server.ts) can
+      # validate at build time. The file is gitignored; GitHub repo vars
+      # + secrets are the source of truth for CI deploys.
+      #
+      # Note: ALLOWED_EMAIL_DOMAINS also lives in wrangler.toml [vars]
+      # for runtime, but it's duplicated here because build-time Zod
+      # validation runs before Wrangler applies [vars] — without this
+      # line the build fails with "Invalid server environment variables".
       - name: Create .env.production.local
         run: |
           cat > .env.production.local <<'EOF'
@@ -48,6 +54,7 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_LAUNCH_AT=${{ vars.NEXT_PUBLIC_SITE_LAUNCH_AT }}
           NEXT_PUBLIC_CEREMONY_AT=${{ vars.NEXT_PUBLIC_CEREMONY_AT }}
+          ALLOWED_EMAIL_DOMAINS=${{ vars.ALLOWED_EMAIL_DOMAINS }}
           EOF
 
       - name: Build Worker bundle
