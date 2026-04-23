@@ -1,9 +1,10 @@
 name: Deploy to Cloudflare Workers
 
 on:
-  push:
-    branches: [main]
-  # Allow manual "Run workflow" button from the Actions tab.
+  # Auto-deploy on push to main is intentionally disabled — deploys are
+  # manual-only. Re-enable by uncommenting the `push` block below.
+  # push:
+  #   branches: [main]
   workflow_dispatch:
 
 # Queue concurrent runs so two pushes in quick succession don't fight over
