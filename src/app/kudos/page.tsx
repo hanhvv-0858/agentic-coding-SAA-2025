@@ -18,6 +18,7 @@ import type {
   Hashtag,
   KudosStats,
   LatestGiftee,
+  SpotlightLatestKudo,
   SpotlightRecipient,
 } from "@/types/kudo";
 import {
@@ -107,8 +108,11 @@ export default async function KudosPage({
   let departments: Department[] = [];
   let highlights: Kudo[] = [];
   let highlightsErrored = false;
-  let spotlight: { total: number; recipients: SpotlightRecipient[] } | null =
-    null;
+  let spotlight: {
+    total: number;
+    recipients: SpotlightRecipient[];
+    latestKudos: SpotlightLatestKudo[];
+  } | null = null;
   let spotlightErrored = false;
   let stats: KudosStats | null = null;
   let statsErrored = false;

@@ -25,6 +25,7 @@ import type {
   KudoUser,
   KudosStats,
   LatestGiftee,
+  SpotlightLatestKudo,
   SpotlightRecipient,
 } from "@/types/kudo";
 
@@ -738,6 +739,7 @@ function hashToUnit(input: string, salt: number): number {
 export async function getSpotlight(): Promise<{
   total: number;
   recipients: SpotlightRecipient[];
+  latestKudos: SpotlightLatestKudo[];
 }> {
   const supabase = await createClient();
 
@@ -805,6 +807,7 @@ export async function getSpotlight(): Promise<{
   const recipients: SpotlightRecipient[] = Array.from(byId.values())
     .sort((a, b) => (b.weight - a.weight) || a.name.localeCompare(b.name))
     .map((a) => ({
+      id: a.id,
       name: a.name,
       x: hashToUnit(a.id, 0x9e3779b1),
       y: hashToUnit(a.id, 0x7f4a7c15),
@@ -815,8 +818,28 @@ export async function getSpotlight(): Promise<{
       },
     }));
 
+  // Global-latest feed — flat list of the 4 most recent kudos across all
+  // recipients (spec §B.7 live activity feed). Each row is one actual
+  // kudo, so the same recipient can appear twice if they received two
+  // recent kudos in a row.
+  const latestKudos: SpotlightLatestKudo[] = typed
+    .flatMap((row) => {
+      const recipient = pickOne(row.recipient);
+      const kudo = pickOne(row.kudo);
+      if (!recipient || !kudo?.created_at) return [];
+      return [
+        {
+          recipientName: recipient.display_name?.trim() || "Sunner",
+          time: kudo.created_at,
+          preview: (kudo.body ?? "").slice(0, 80),
+        },
+      ];
+    })
+    .sort((a, b) => b.time.localeCompare(a.time))
+    .slice(0, 6);
+
   // Total kudos = sum of all kudo_recipients rows (FR-015 live counter).
-  return { total: rows.length, recipients };
+  return { total: rows.length, recipients, latestKudos };
 }
 
 // Alias exported for spec-table traceability (spec §API Dependencies
@@ -824,6 +847,7 @@ export async function getSpotlight(): Promise<{
 export async function getSpotlightRecipients(): Promise<{
   total: number;
   recipients: SpotlightRecipient[];
+  latestKudos: SpotlightLatestKudo[];
 }> {
   return getSpotlight();
 }
@@ -1036,4 +1060,92 @@ export async function createKudo(
   revalidatePath("/kudos");
 
   return { ok: true, kudoId: data as string };
+}
+
+// --------------------------------------------------------------------
+// Profile preview (US10) — hover/tap on avatar or name
+// --------------------------------------------------------------------
+
+export type ProfilePreview = {
+  userId: string;
+  displayName: string;
+  departmentCode: string | null;
+  honourTitle: string | null;
+  kudosReceivedCount: number;
+  kudosSentCount: number;
+  isSelf: boolean;
+};
+
+/**
+ * Returns the compact profile preview payload for `<ProfilePreviewTooltip>`
+ * (spec §US10 AC1 + design-style §27). Lazy-called on first hover/tap per
+ * user; client memoises with a 60 s TTL.
+ *
+ * Reads:
+ *  - `profiles.display_name`, `profiles.department_id` → `departments.code`,
+ *    `profiles.honour_title` (per Q21, code not hierarchical path)
+ *  - Aggregate `count(*)` on `kudo_recipients` (received) + `kudos`
+ *    (sent) for the 2 stats rows
+ *  - Current viewer's `auth.uid()` → `isSelf` flag to hide the "Gửi KUDO"
+ *    CTA when hovering own avatar (§27.8)
+ */
+export async function getProfilePreview(userId: string): Promise<ProfilePreview | null> {
+  if (!userId) return null;
+  const supabase = await createClient();
+
+  const [
+    { data: { user: viewer } },
+    profileRes,
+    receivedRes,
+    sentRes,
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from("profiles")
+      .select(
+        `id, display_name, honour_title,
+         department:departments!department_id ( code )`,
+      )
+      .eq("id", userId)
+      .maybeSingle(),
+    supabase
+      .from("kudo_recipients")
+      .select("kudo_id", { count: "exact", head: true })
+      .eq("recipient_id", userId),
+    supabase
+      .from("kudos")
+      .select("id", { count: "exact", head: true })
+      .eq("sender_id", userId),
+  ]);
+
+  if (profileRes.error || !profileRes.data) {
+    console.error("[kudos] getProfilePreview profile fetch failed", {
+      userId,
+      err: profileRes.error?.message,
+    });
+    return null;
+  }
+
+  const profile = profileRes.data as {
+    id: string;
+    display_name: string | null;
+    honour_title: string | null;
+    department: { code: string } | { code: string }[] | null;
+  };
+
+  // Supabase types `profiles!department_id` as array-or-object depending on
+  // cardinality; normalise to a single row here.
+  const deptPick = Array.isArray(profile.department)
+    ? (profile.department[0] ?? null)
+    : profile.department;
+
+  return {
+    userId: profile.id,
+    displayName: profile.display_name?.trim() || "Sunner",
+    departmentCode: deptPick?.code ?? null,
+    honourTitle: profile.honour_title,
+    kudosReceivedCount: receivedRes.count ?? 0,
+    kudosSentCount: sentRes.count ?? 0,
+    isSelf: viewer?.id === userId,
+  };
 }

@@ -24,15 +24,17 @@ import {
 } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { track } from "@/libs/analytics/track";
+import { SpotlightCounter } from "./SpotlightCounter";
 import { useDebouncedCallback } from "./hooks/useDebouncedCallback";
 import { useReducedMotion } from "./hooks/useReducedMotion";
 import { usePanZoom, type PanZoomState } from "./hooks/usePanZoom";
 import type { Messages } from "@/libs/i18n/getMessages";
-import type { SpotlightRecipient } from "@/types/kudo";
+import type { SpotlightLatestKudo, SpotlightRecipient } from "@/types/kudo";
 
 type SpotlightBoardProps = {
   recipients: SpotlightRecipient[];
   total: number;
+  latestKudos?: SpotlightLatestKudo[];
   messages: Messages;
 };
 
@@ -42,10 +44,22 @@ const BOARD_W = 1157;
 const BOARD_H = 548;
 
 // Font-size range — weight is mapped linearly into this interval. The
-// smallest recipient is 14 px (still legible at scale 0.5), the largest
-// 48 px per spec US7 #1.
-const FONT_MIN = 14;
-const FONT_MAX = 48;
+// smallest recipient is 8 px (still legible at scale 0.5), the largest
+// 24 px. Tightened from the initial 14–48 after user feedback
+// (2026-04-23) that the top-end felt too large against the 1157×548
+// canvas; the 8–24 band keeps visual hierarchy without shouting.
+const FONT_MIN = 8;
+const FONT_MAX = 24;
+
+// VN-pinned formatter for the bottom-left recent-update log. Matches
+// the pattern used in `src/libs/kudos/formatKudoTimestamp.ts` to avoid
+// server/client timezone mismatches during hydration.
+const RECENT_TIME_FORMATTER = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Asia/Ho_Chi_Minh",
+  hour: "numeric",
+  minute: "2-digit",
+  hour12: true,
+});
 
 /**
  * Compact helper — returns a number in `[FONT_MIN, FONT_MAX]` based on
@@ -60,7 +74,16 @@ function weightToFont(weight: number, min: number, max: number): number {
 // Spacing guard-rail between neighbouring names in px (on top of each
 // name's own bounding box). Tuned against the 1157×548 board.
 const NAME_PADDING = 12;
-const RELAX_ITERATIONS = 60;
+const RELAX_ITERATIONS = 120;
+
+// Pull server-provided `(x, y)` seeds toward the board centre before
+// relaxation. The server uniformly hashes positions into `[0.06, 0.94]`
+// (≈ 88 % of canvas), which makes the cloud fan to the corners with
+// large swaths of empty space between names. Scaling deltas-from-centre
+// by 0.7 collapses seeds into the inner ~62 % of the panel so names
+// cluster visually; the relaxation pass still resolves any overlaps,
+// and the final clamp keeps everyone inside the frame (no clipping).
+const SEED_SPREAD = 0.7;
 
 type LaidOutName = {
   name: string;
@@ -89,16 +112,25 @@ function relaxPositions(
   // `translate(-50%, -50%)`.
   const boxes = items.map((it) => {
     const font = weightToFont(it.weight, minW, maxW);
-    const halfW = Math.max(20, (it.name.length * font * 0.55) / 2);
+    // Slightly wider multiplier (0.6 vs. Montserrat's ~0.55 avg) so the
+    // edge clamp reserves a safer margin for wide glyph runs — prevents
+    // the "Hung V…" clipping seen at the right edge of the panel.
+    const halfW = Math.max(20, (it.name.length * font * 0.6) / 2);
     const halfH = (font * 1.3) / 2;
+    // Pull seed toward board centre via SEED_SPREAD so the cloud
+    // clusters instead of fanning to the corners. `it.{x,y}` are in
+    // [0.06, 0.94]; after this transform they live in the inner ~62 %
+    // of the panel.
+    const seedX = 0.5 + (it.x - 0.5) * SEED_SPREAD;
+    const seedY = 0.5 + (it.y - 0.5) * SEED_SPREAD;
     return {
       name: it.name,
       weight: it.weight,
       font,
       halfW,
       halfH,
-      x: it.x * BOARD_W,
-      y: it.y * BOARD_H,
+      x: seedX * BOARD_W,
+      y: seedY * BOARD_H,
     };
   });
 
@@ -163,10 +195,16 @@ function relaxPositions(
 export function SpotlightBoard({
   recipients,
   total,
+  latestKudos = [],
   messages,
 }: SpotlightBoardProps) {
   const [search, setSearch] = useState("");
   const reducedMotion = useReducedMotion();
+
+  // Roving-tabindex focus index (Q8). -1 = nothing focused yet; first
+  // keyboard entry into the listbox snaps to 0 (highest-weight name).
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const nameRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const panStartedRef = useRef(false);
   const emitPanEvent = useDebouncedCallback(
@@ -236,29 +274,36 @@ export function SpotlightBoard({
   );
   const top20 = useMemo(() => sorted.slice(0, 20), [sorted]);
 
-  // Most-recent 4 activity lines (design §B.7 bottom-left feed). Falls
-  // back to the top-weighted recipients when the payload doesn't carry
-  // per-row timestamps (e.g. demo mock).
-  // Format "2026-04-19T01:09:56.563+00:00" → "01:09AM". Non-ISO inputs
-  // (e.g. the demo mock which already ships "08:30PM") pass through.
+  // Format "2026-04-19T01:09:56.563+00:00" → "08:09AM" (Asia/Ho_Chi_Minh).
+  // ALWAYS rendered in VN time so SSR (UTC runtime on Cloudflare
+  // Workers) and CSR (user's local timezone) produce the identical
+  // string — otherwise `d.getHours()` / `d.getMinutes()` cause
+  // hydration mismatches (same class of bug as `formatKudoTimestamp`).
+  // Non-ISO inputs pass through unchanged (e.g. legacy "08:30PM" strings).
   const formatRecentTime = (raw: string): string => {
     if (!raw) return "";
     const d = new Date(raw);
     if (Number.isNaN(d.getTime())) return raw;
-    let hours = d.getHours();
-    const minutes = d.getMinutes();
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12;
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}${ampm}`;
+    const parts = RECENT_TIME_FORMATTER.formatToParts(d);
+    const pick = (type: Intl.DateTimeFormatPartTypes) =>
+      parts.find((p) => p.type === type)?.value ?? "";
+    const hour12 = pick("hour");
+    const minute = pick("minute");
+    const dayPeriod = pick("dayPeriod").toUpperCase();
+    return `${hour12.padStart(2, "0")}:${minute}${dayPeriod}`;
   };
 
+  // `latestKudos` comes from the server pre-sorted by `kudos.created_at
+  // DESC` (spec §B.7 live activity feed — 4 most recent kudos globally,
+  // may contain the same recipient twice). We just format the timestamp
+  // here and pass through the server-chosen order.
   const recentUpdates = useMemo(
     () =>
-      sorted.slice(0, 4).map((r) => ({
-        name: r.name,
-        time: formatRecentTime(r.recentKudo?.time ?? "") || "08:30PM",
+      latestKudos.map((k) => ({
+        name: k.recipientName,
+        time: formatRecentTime(k.time) || k.time || "08:30PM",
       })),
-    [sorted],
+    [latestKudos],
   );
 
   const onSearchChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -307,8 +352,13 @@ export function SpotlightBoard({
           fill
           priority
           sizes="(max-width: 1200px) 100vw, 1157px"
-          className="pointer-events-none select-none object-cover opacity-60"
+          className="pointer-events-none select-none object-cover opacity-90"
           data-testid="kudos-spotlight-bg-constellation"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[var(--color-brand-900)]/30"
+          data-testid="kudos-spotlight-bg-vignette"
         />
         <Image
           src="/images/kudos/kudo_root-further_bg@2x.png"
@@ -316,27 +366,99 @@ export function SpotlightBoard({
           aria-hidden="true"
           fill
           sizes="(max-width: 1200px) 100vw, 1157px"
-          className="pointer-events-none select-none object-cover opacity-55 mix-blend-screen"
+          className="pointer-events-none select-none object-cover mix-blend-screen"
           data-testid="kudos-spotlight-bg-roots"
         />
-        {/* Dark vignette — pulls the whole backdrop down so the
-            constellation + roots sit at the muted saturation level
-            shown in the Figma mock rather than blowing out bright via
-            `mix-blend: screen`. */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[var(--color-brand-900)]/45"
-          data-testid="kudos-spotlight-bg-vignette"
-        />
 
-        {/* Pan/zoom surface — the inner layer translates + scales. */}
+        {/* Pan/zoom surface — the inner layer translates + scales.
+            Promoted to `role="listbox"` with roving tabindex per Q8 —
+            the whole board is a single tabstop; Arrow keys move focus
+            between name nodes using 2-D nearest-neighbour against the
+            laid-out normalised coords. */}
         <div
-          role="group"
+          role="listbox"
           aria-label={messages.kudos.spotlight.sectionTitle}
-          tabIndex={0}
+          tabIndex={focusedIndex === -1 ? 0 : -1}
+          onFocus={() => {
+            if (focusedIndex === -1 && laidOut.length > 0) {
+              setFocusedIndex(0);
+              nameRefs.current[0]?.focus();
+            }
+          }}
           className="absolute inset-0 cursor-grab outline-none focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[var(--color-accent-cream)]"
           style={{ cursor: isPanning ? "grabbing" : "grab" }}
           {...handlers}
+          onKeyDown={(e) => {
+            // Roving tabindex first (Q8). Claim Home/End/Arrow keys
+            // here; pan-zoom's own onKeyDown (via `handlers`) still
+            // receives `+` / `-` for zoom because we only preventDefault
+            // on the claimed keys.
+            if (laidOut.length === 0) {
+              handlers.onKeyDown(e);
+              return;
+            }
+            if (e.key === "Home") {
+              e.preventDefault();
+              setFocusedIndex(0);
+              nameRefs.current[0]?.focus();
+              return;
+            }
+            if (e.key === "End") {
+              e.preventDefault();
+              const last = laidOut.length - 1;
+              setFocusedIndex(last);
+              nameRefs.current[last]?.focus();
+              return;
+            }
+            const dir = (() => {
+              switch (e.key) {
+                case "ArrowLeft":
+                  return { dx: -1, dy: 0 };
+                case "ArrowRight":
+                  return { dx: 1, dy: 0 };
+                case "ArrowUp":
+                  return { dx: 0, dy: -1 };
+                case "ArrowDown":
+                  return { dx: 0, dy: 1 };
+                default:
+                  return null;
+              }
+            })();
+            if (!dir) {
+              // Not an arrow / Home / End — delegate to pan-zoom (handles zoom shortcuts).
+              handlers.onKeyDown(e);
+              return;
+            }
+            e.preventDefault();
+            const currentIdx = focusedIndex === -1 ? 0 : focusedIndex;
+            const current = laidOut[currentIdx];
+            if (!current) return;
+            // 2-D nearest neighbour in the same half-plane of `dir`.
+            // Score = primary-axis distance + 0.5 * cross-axis distance
+            // so we prefer straight-line neighbours but fall back to
+            // diagonals when the row/column is sparse.
+            let bestIdx = currentIdx;
+            let bestScore = Infinity;
+            for (let i = 0; i < laidOut.length; i++) {
+              if (i === currentIdx) continue;
+              const other = laidOut[i];
+              const dxNorm = other.x - current.x;
+              const dyNorm = other.y - current.y;
+              if (dir.dx !== 0 && Math.sign(dxNorm) !== dir.dx) continue;
+              if (dir.dy !== 0 && Math.sign(dyNorm) !== dir.dy) continue;
+              const primary = dir.dx !== 0 ? Math.abs(dxNorm) : Math.abs(dyNorm);
+              const cross = dir.dx !== 0 ? Math.abs(dyNorm) : Math.abs(dxNorm);
+              const score = primary + cross * 0.5;
+              if (score < bestScore) {
+                bestScore = score;
+                bestIdx = i;
+              }
+            }
+            if (bestIdx !== currentIdx) {
+              setFocusedIndex(bestIdx);
+              nameRefs.current[bestIdx]?.focus();
+            }
+          }}
           data-panning={isPanning ? "true" : "false"}
           data-testid="kudos-spotlight-canvas"
         >
@@ -349,12 +471,21 @@ export function SpotlightBoard({
               willChange: isPanning ? "transform" : undefined,
             }}
           >
-            {laidOut.map((r) => {
+            {laidOut.map((r, i) => {
               const isMatch = !normalisedSearch || matches.has(r.name);
               return (
                 <button
                   key={r.name}
+                  ref={(el) => {
+                    nameRefs.current[i] = el;
+                  }}
                   type="button"
+                  role="option"
+                  aria-selected={focusedIndex === i}
+                  tabIndex={focusedIndex === i ? 0 : -1}
+                  onFocus={() => {
+                    if (focusedIndex !== i) setFocusedIndex(i);
+                  }}
                   className="absolute whitespace-nowrap rounded px-1 font-[family-name:var(--font-montserrat)] font-bold text-white transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-cream)]"
                   style={{
                     left: `${r.x * BOARD_W}px`,
@@ -376,14 +507,15 @@ export function SpotlightBoard({
         </div>
 
         {/* B.7.1 SpotlightCounter — live total "X KUDOS", top-center
-            (design §B.7 — big prominent header). */}
-        <div
+            (design §B.7 — big prominent header). Pulses briefly when
+            `total` changes after the 60 s auto-refresh (Option A live
+            feedback). */}
+        <SpotlightCounter
+          total={total}
+          suffix={messages.kudos.spotlight.counterSuffix}
           className="pointer-events-none absolute left-1/2 top-6 -translate-x-1/2 text-[36px] font-bold leading-[44px] text-white"
-          aria-live="polite"
-          data-testid="kudos-spotlight-counter"
-        >
-          {total} {messages.kudos.spotlight.counterSuffix}
-        </div>
+          testId="kudos-spotlight-counter"
+        />
 
         {/* B.7.3 SpotlightSearch — filter names, top-left (design §B.7). */}
         <div className="absolute left-6 top-6 flex items-center gap-2 rounded-full border border-[var(--color-border-secondary)] bg-[var(--color-brand-900)]/70 px-3 py-2 text-white">
@@ -399,28 +531,39 @@ export function SpotlightBoard({
           />
         </div>
 
-        {/* B.7 Recent update log — bottom-left, 4 most-recent kudos
-            (design §B.7 — live activity feed faded over backdrop). */}
+        {/* B.7 Recent update log — bottom-left stack of up to 6 most
+            recent kudos. Design (2026-04-23) calls for NEWEST at the
+            bottom with older rows fading upward — so the feed reads
+            like a fresh receipt printing out of a machine. We render
+            oldest first (DOM top = faded) and newest last (DOM bottom
+            = fully opaque). Opacity is `0.18 + 0.82·(i/max)` so even
+            the dimmest row stays readable. */}
         {recentUpdates.length > 0 ? (
           <ul
             aria-live="polite"
             data-testid="kudos-spotlight-recent"
-            className="pointer-events-none absolute bottom-6 left-6 flex flex-col gap-1 font-[family-name:var(--font-montserrat)] text-xs font-bold leading-5 text-white/80"
+            className="pointer-events-none absolute bottom-6 left-6 flex flex-col gap-1 font-[family-name:var(--font-montserrat)] text-xs font-bold leading-5 text-white"
           >
-            {recentUpdates.map((u, i) => (
-              <li
-                key={`${u.name}-${i}`}
-                style={{ opacity: 1 - i * 0.18 }}
-                className="whitespace-nowrap"
-              >
-                <span className="text-[var(--color-accent-cream)]">{u.time}</span>
-                {" "}
-                {messages.kudos.spotlight.recentUpdateTemplate
-                  .replace("{time}", "")
-                  .replace("{name}", u.name)
-                  .trim()}
-              </li>
-            ))}
+            {[...recentUpdates]
+              .reverse()
+              .map((u, i, arr) => {
+                const t = arr.length <= 1 ? 1 : i / (arr.length - 1);
+                const opacity = 0.18 + 0.82 * t;
+                return (
+                  <li
+                    key={`${u.name}-${i}`}
+                    style={{ opacity }}
+                    className="whitespace-nowrap"
+                  >
+                    <span className="text-[var(--color-accent-cream)]">{u.time}</span>
+                    {" "}
+                    {messages.kudos.spotlight.recentUpdateTemplate
+                      .replace("{time}", "")
+                      .replace("{name}", u.name)
+                      .trim()}
+                  </li>
+                );
+              })}
           </ul>
         ) : null}
 
@@ -464,12 +607,11 @@ export function SpotlightBoard({
         className="flex flex-col gap-3 rounded-[24px] border border-[var(--color-border-secondary)] bg-[var(--color-panel-surface)] p-4 sm:hidden"
         data-testid="kudos-spotlight-mobile-list"
       >
-        <p
+        <SpotlightCounter
+          total={total}
+          suffix={messages.kudos.spotlight.counterSuffix}
           className="text-sm font-bold uppercase tracking-wide text-[var(--color-accent-cream)]"
-          aria-live="polite"
-        >
-          {total} {messages.kudos.spotlight.counterSuffix}
-        </p>
+        />
         <ol role="list" className="flex flex-col gap-2">
           {top20.map((r, i) => (
             <li

@@ -368,6 +368,33 @@
       "offlineWarning": "You're offline — changes will sync when you're back online.",
       "filterOfflineToast": "Can't load filters while offline.",
       "parkedToast": "Coming soon — this feature is still in the works."
+    },
+    "profilePreview": {
+      "ariaLabel": "Sunner quick info",
+      "departmentLabel": "Department:",
+      "receivedLabel": "Kudos received:",
+      "sentLabel": "Kudos sent:",
+      "ctaLabel": "Send Kudo"
+    },
+    "honour": {
+      "tooltip": {
+        "newHero": {
+          "threshold": "1–4 people have sent you Kudos",
+          "flavor": "The journey of spreading goodness begins — the first thanks and recognitions have reached you."
+        },
+        "risingHero": {
+          "threshold": "5–9 people have sent you Kudos",
+          "flavor": "You're growing in your teammates' hearts through kindness and dedication."
+        },
+        "superHero": {
+          "threshold": "10–19 people have sent you Kudos",
+          "flavor": "You've become a trusted symbol — always ready to help, and remembered by many teammates."
+        },
+        "legendHero": {
+          "threshold": "20 or more people have sent you Kudos",
+          "flavor": "You've become a legend — leaving an unforgettable mark on the team through heart and action."
+        }
+      }
     }
   },
   "compose": {

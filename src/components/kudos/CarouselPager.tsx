@@ -47,9 +47,9 @@ export function CarouselPager({
   const arrowBase =
     "flex h-8 w-8 items-center justify-center rounded-full transition-[background-color,opacity] duration-150 motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-cream)]";
   const arrowEnabled =
-    "text-[var(--color-accent-cream)] hover:bg-[rgba(255,234,158,0.1)]";
+    "text-white hover:bg-white/10";
   const arrowDisabled =
-    "text-[var(--color-accent-cream)] opacity-40 cursor-not-allowed";
+    "text-white opacity-40 cursor-not-allowed";
 
   return (
     <div
@@ -68,13 +68,17 @@ export function CarouselPager({
         <Icon name="chevron-left" size={20} />
       </button>
       <div
-        className="flex items-baseline gap-0.5 font-[family-name:var(--font-montserrat)] font-bold text-[var(--color-accent-cream)]"
+        className="flex items-baseline gap-0.5 font-[family-name:var(--font-montserrat)] font-bold"
         data-testid="kudo-carousel-pager-text"
         aria-label={pagerAria}
         aria-live="polite"
       >
-        <span className="text-[32px] leading-[1] tracking-tight">{current}</span>
-        <span className="text-lg leading-[1] opacity-70">/{total}</span>
+        <span className="text-[32px] leading-[1] tracking-tight text-[var(--color-accent-cream)]">
+          {current}
+        </span>
+        <span className="text-lg leading-[1] text-[color:var(--color-muted-grey)]">
+          /{total}
+        </span>
       </div>
       <button
         type="button"

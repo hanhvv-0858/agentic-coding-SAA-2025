@@ -68,6 +68,11 @@ export function HighlightKudoCard({
             isAnonymous={kudo.is_anonymous ?? false}
             anonymousLabel={card.anonymousSenderLabel}
             anonymousAvatarAlt={card.anonymousAvatarAlt}
+            // Tooltips only on the active (centre) slide. Side slides
+            // are `scale(0.85..0.92)` + `aria-hidden="true"` so a
+            // tooltip floating next to them would land in a confusing
+            // position relative to the visually-shrunken trigger.
+            messages={isActive ? messages : undefined}
           />
         </div>
         <div
@@ -87,6 +92,7 @@ export function HighlightKudoCard({
             <KudoParticipant
               user={primaryRecipient}
               monogramAlt={card.monogramAlt}
+              messages={isActive ? messages : undefined}
             />
           ) : null}
         </div>

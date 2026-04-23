@@ -1,12 +1,17 @@
 import { SpotlightHeader } from "./SpotlightHeader";
 import { SpotlightBoard } from "./SpotlightBoard";
+import { SpotlightAutoRefresh } from "./SpotlightAutoRefresh";
+import { EmptyState } from "./EmptyState";
 import { InlineError } from "./InlineError";
-import { buildSpotlightMock } from "@/libs/kudos/spotlightMock";
 import type { Messages } from "@/libs/i18n/getMessages";
-import type { SpotlightRecipient } from "@/types/kudo";
+import type { SpotlightLatestKudo, SpotlightRecipient } from "@/types/kudo";
 
 type SpotlightSectionProps = {
-  data: { total: number; recipients: SpotlightRecipient[] } | null;
+  data: {
+    total: number;
+    recipients: SpotlightRecipient[];
+    latestKudos: SpotlightLatestKudo[];
+  } | null;
   errored?: boolean;
   messages: Messages;
 };
@@ -15,10 +20,15 @@ type SpotlightSectionProps = {
  * §B SpotlightSection — server wrapper that renders the B.6 header
  * then the B.7 client-side word-cloud island. Data comes from
  * `getSpotlight()` in `actions.ts` via the parent `page.tsx`
- * `Promise.all` tuple (plan §Data flow step 1). When the real endpoint
- * returns zero recipients (pre-launch / empty DB), we fall back to the
- * hand-seeded demo cloud so the section stays visually consistent with
- * the Figma mock (design §B.7 — 388 names across the panel).
+ * `Promise.all` tuple (plan §Data flow step 1).
+ *
+ * State resolution mirrors the All Kudos feed block:
+ *   - errored → `<InlineError block="spotlight" />` (with Retry copy)
+ *   - empty (0 recipients) → `<EmptyState variant="spotlightEmpty" />`
+ *   - otherwise → the real word-cloud
+ *
+ * The pre-launch "demo mock" fallback that used `buildSpotlightMock()`
+ * was removed (2026-04-23, user request) — we only render real DB data.
  */
 export function SpotlightSection({
   data,
@@ -27,8 +37,8 @@ export function SpotlightSection({
 }: SpotlightSectionProps) {
   const recipients = data?.recipients ?? [];
   const total = data?.total ?? 0;
-  const usingMock = !errored && recipients.length === 0;
-  const resolved = usingMock ? buildSpotlightMock() : { recipients, total };
+  const latestKudos = data?.latestKudos ?? [];
+  const isEmpty = !errored && recipients.length === 0;
 
   return (
     <section
@@ -37,13 +47,21 @@ export function SpotlightSection({
       aria-label={messages.kudos.spotlight.sectionTitle}
     >
       <SpotlightHeader messages={messages} />
+      {/* 60 s auto-refresh so the board picks up new kudos without a
+          manual reload. Visibility-gated (pauses when tab is hidden).
+          Mounted here rather than in `page.tsx` so it only runs when
+          the Spotlight is actually on screen. */}
+      <SpotlightAutoRefresh />
       <div className="mt-6 flex w-full justify-center">
         {errored ? (
           <InlineError messages={messages} block="spotlight" />
+        ) : isEmpty ? (
+          <EmptyState messages={messages} variant="spotlightEmpty" />
         ) : (
           <SpotlightBoard
-            recipients={resolved.recipients}
-            total={resolved.total}
+            recipients={recipients}
+            total={total}
+            latestKudos={latestKudos}
             messages={messages}
           />
         )}

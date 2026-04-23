@@ -595,6 +595,37 @@ Implements US1 acceptance scenarios 1–6 + edge cases (empty, > 5 lines,
 | 5.9 | Lighthouse mobile run — verify SC-002 (LCP < 2.5 s, CLS < 0.1, Perf ≥ 80) |
 | 5.10 | Update `SCREENFLOW.md` row 6 → 🟢 shipped; add Discovery Log entry |
 
+### Phase 6 — US10 P2: Profile preview + honour tooltip + Spotlight roving tabindex
+
+Bundled because all three touch the same interaction surfaces (avatar /
+name / honour pill on KudoCards + Spotlight name nodes). Single PR keeps
+the a11y regression review surface small.
+
+**Design source references**:
+- `HonourTooltip` container + typography + layout: **design-style §26**
+  (100% Figma-sourced, node `3241:14991`).
+- `ProfilePreviewTooltip` container + typography + layout:
+  **design-style §27** (inferred — see §29 confidence log for visual-QA
+  expectations after ship).
+- Motion specs for both: **design-style §28**.
+
+| Step | Deliverable |
+|---|---|
+| 6.0 | **Refactor `HONOUR_PILL_MAP`** from [`KudoParticipant.tsx`](../../../src/components/kudos/KudoParticipant.tsx) out into a shared module `src/components/kudos/honourPills.ts` (pure data + type `HonourTier`). Update KudoParticipant to import from new path. Zero behaviour change. This unblocks 6.2 + 6.3 which both reuse the pill asset. |
+| 6.1 | New Server Action `getProfilePreview(userId)` in [`src/app/kudos/actions.ts`](../../../src/app/kudos/actions.ts) — returns `{ displayName, departmentCode, honourTitle, kudosReceivedCount, kudosSentCount, isSelf }`; memoised on the client via an in-memory `Map<userId, payload>` with **60 s TTL** (tier can change mid-session after a new kudo triggers the DB compute function). `departmentCode` reads `departments.code` per Q21 (not a hierarchical path). |
+| 6.2 | New client component [`src/components/kudos/ProfilePreviewTooltip.tsx`](../../../src/components/kudos/ProfilePreviewTooltip.tsx) — Radix-free popover using absolute positioning measured off the trigger's `getBoundingClientRect()`. **Content layout is design-style §27.1–27.8** (380 px card width / navy bg / 6 rows: display name 22px cream truncated → dept line 14px white+grey → tier pill from 6.0 → 1 px divider white/15 → 2 stats rows 16px white+cream → CTA). **CTA rendered inline per §27.7/27.9 snippet** — do not route through `<PrimaryButton>` for this MVP (PrimaryButton signature doesn't match the icon-prefix + full-width shape). **Hide CTA entirely when `isSelf === true`** (§27.8). Interactions: dwell-open 400 ms / pointer-leave-close 200 ms / `Esc` close. Touch branch (`@media (hover: none)`): first tap opens, outside tap / second tap closes (Q20 option a). |
+| 6.3 | New client component [`src/components/kudos/HonourTooltip.tsx`](../../../src/components/kudos/HonourTooltip.tsx) — **layout from design-style §26** (304 px × 194 px min / navy bg / radius 16 / padding 16 / gap 16). Tier pill 218 × 38 from 6.0's shared map, body text a **single `<p>` concatenating threshold + flavor with a space** (not 2 lines — Figma ships as one wrapped text block). `role="tooltip"` + `aria-describedby` wired to the trigger. Static copy from i18n keys `kudos.honour.tooltip.{newHero|risingHero|superHero|legendHero}.{threshold|flavor}`. |
+| 6.4 | Add **13 new i18n keys** to `src/messages/vi.json` + EN stub placeholders: **8 honour tooltip keys** (4 tiers × {threshold, flavor}, verbatim from US10 AC5) + **5 profile preview keys** (`kudos.profilePreview.{ariaLabel, departmentLabel, receivedLabel, sentLabel, ctaLabel}`, per design-style §27.10). |
+| 6.5 | Implement **shared hook `useTooltipAnchor(triggerRef)`** in `src/components/kudos/hooks/useTooltipAnchor.ts` — single source of dwell / pointer-leave / Esc / touch-outside-close logic; returns `{ open, position, handlers }`. Position computed from `triggerRef.current.getBoundingClientRect()` + card size; choose above / below based on available viewport space (fallback below). Mount fade 150 ms / unmount fade 120 ms per design-style §28; instant under `prefers-reduced-motion`. Consumed by both 6.2 and 6.3. |
+| 6.6 | Wire **profile preview triggers**: update `KudoCardSender`, `KudoCardRecipient` (inside [`KudoParticipant.tsx`](../../../src/components/kudos/KudoParticipant.tsx)), the `LatestGiftee` row (inside [`KudoStatsSidebar.tsx`](../../../src/components/kudos/KudoStatsSidebar.tsx)), and `SpotlightBoard` name buttons to host `<ProfilePreviewTooltip>` via the hook from 6.5. Trigger surface = the whole avatar + name block on KudoParticipant; avatar-only on LatestGiftee (name is already click-to-profile); name button on Spotlight. |
+| 6.7 | Wire **honour tooltip triggers**: the **tier pill `<Image>`** inside `KudoParticipant.tsx` (sender + recipient blocks) is the trigger — not a separate "hoa thị count" element (there's no separate count visible in the card; the pill itself is the hover target). Wraps each `<Image>` in a zero-padding `<button>` with `aria-describedby` pointing at the tooltip id. |
+| 6.8 | **Q8 roving tabindex** on `<SpotlightBoard>`: promote outer container to `role="listbox"` + single `tabIndex={0}`; inner name buttons get `tabIndex={focusedIndex === i ? 0 : -1}`. Arrow-keys `←↑↓→` do 2-D nearest-neighbour search using the post-relaxation `(x, y)` coords from `laidOut`; `Home`/`End` focus first/last laid-out name; `Enter`/`Space` on a focused name opens `<ProfilePreviewTooltip>` from 6.2. |
+| 6.9 | Unit tests: `ProfilePreviewTooltip.spec.tsx` (dwell timing with fake timers / Esc close / CTA click routes to `/kudos/new?recipient=:userId` / `isSelf` hides CTA / touch branch / lazy-fetch memoisation); `HonourTooltip.spec.tsx` (4 tier variants render correct copy / `role="tooltip"` / `aria-describedby` linkage); `useTooltipAnchor.spec.ts` (pure hook — dwell + leave + Esc + touch paths with fake timers); extend `SpotlightBoard.spec.tsx` with roving-tabindex assertions. |
+| 6.10 | axe-core regression sweep on `/kudos` with tooltips open (new scenario in `tests/e2e/kudos.a11y.spec.ts`) — assert zero serious/critical violations from the new ARIA (`role="tooltip"`, `role="dialog"` on profile preview, `role="listbox"` + roving `tabindex`). |
+| 6.11 | **Visual QA pass** against user-shared profile preview image — use design-style §29 confidence log as the tuning checklist. Expected ±2 px adjustments on: display name font-size (22 vs 24?), stat-row gap (8 vs 12?), divider margins. Commit tweaks as follow-up diffs; do not revisit Figma ingestion unless layout looks fundamentally off. |
+
+---
+
 ### Production deploy checklist (no separate phase)
 
 Backend ships in Phase 1, so there is no mock-→backend cutover. Before

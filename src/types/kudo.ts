@@ -70,11 +70,25 @@ export type LatestGiftee = {
 };
 
 export type SpotlightRecipient = {
+  /** Recipient `profiles.id` — used by US10 tooltip trigger to fetch
+   *  the profile preview. Optional for backward-compat; post-US10
+   *  all payloads include it. */
+  id?: string;
   name: string;
   x: number;
   y: number;
   weight: number;
   recentKudo: { time: string; preview: string };
+};
+
+// Flat "recent activity feed" rows — one per kudo, global order by
+// `kudos.created_at DESC`. Used for the bottom-left "09:00 AM xx đã
+// nhận được một Kudos mới" block (spec §B.7 live activity feed).
+// Distinct from `SpotlightRecipient.recentKudo` (which is per-person).
+export type SpotlightLatestKudo = {
+  recipientName: string;
+  time: string;
+  preview: string;
 };
 
 export type HeartToggleResult = {

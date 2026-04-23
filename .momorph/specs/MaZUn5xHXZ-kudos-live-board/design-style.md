@@ -1340,3 +1340,269 @@ Each row in the list corresponds to one redemption event:
   `--color-panel-surface`. Wooden backdrop image is a future polish.
 - **OQ-DS-7** (timestamp grey) — kept at `#999999` (decorative metadata
   exception, WCAG 1.4.3).
+
+---
+
+## Implementation Updates (v3 — US10 Profile preview + Honour tooltip) — 2026-04-23
+
+Two new components for US10. `HonourTooltip` values are **fully sourced
+from Figma** (node `3241:14991`) via `list_frame_styles` — 100% confidence.
+`ProfilePreviewTooltip` values are **inferred** from the user-shared image
+reference + pattern consistency with this file's existing tooltip family
+(Dropdown-profile `z4sCl3_Qtk`, HonourTooltip) because the Figma frame
+containing the full preview card (`Infor - HoverAvatar`) is not yet
+ingested into MoMorph — marked `(inferred)` on each row.
+
+### §26 HonourTooltip — B.7 interaction (✅ Figma-sourced)
+
+Figma frame `twC9br89ra` (New Hero) / `IjeDnHmzou` (Rising) /
+`d6zEZ9ccoX` (Super) / `XI0QKVv1qZ` (Legend). Same container across
+all 4 variants; only the tier pill + body copy change per variant.
+
+#### 26.1 Container
+
+| Property | Value | Source |
+|---|---|---|
+| Width | `304px` | Figma |
+| Height (min) | `194px` (Figma; CSS `min-height`, grows with wrapped text) | Figma |
+| Background | `rgba(0, 7, 12, 1)` → token `--color-panel-surface` | Figma |
+| Border-radius | `16px` | Figma |
+| Padding | `16px` on all sides | Figma |
+| Layout | `flex flex-col items-center justify-center gap-4` (16 px gap) | Figma |
+| Box-shadow | `var(--shadow-kudo-card)` (reuse existing token) | pattern |
+| Z-index | `z-50` (above feed, below modal) | pattern |
+
+#### 26.2 Tier pill (badge)
+
+Reuse `HONOUR_PILL_MAP` from [`KudoParticipant.tsx`](../../../src/components/kudos/KudoParticipant.tsx) —
+`/images/the-le/pill-{new|rising|super|legend}@2x.png`. Render size:
+
+| Property | Value | Source |
+|---|---|---|
+| Width | `218px` (Figma; asset auto-heights to 40 px at this width, close to Figma's 38 px) | Figma |
+| Height | `38px` (Figma) | Figma |
+| Border | `1px solid #FFEA9E` (cream) — optional; asset already has decorative border | Figma |
+| Border-radius | `96px` (fully rounded) | Figma |
+| Overlay text (if not baked into asset) | Montserrat **700**, **22.8 px**, line-height **32.6 px** (142.857%), letter-spacing **0.163 px**, color `#FFF` | Figma |
+
+**Impl note**: the pill asset already embeds the tier label artwork. Don't
+re-render "New Hero" text over it — just size the `<Image>` at `w-[218px] h-[38px]`.
+
+#### 26.3 Body text
+
+Single text node concatenating threshold + flavor (Figma renders as one
+paragraph, wraps naturally at 250 px width).
+
+| Property | Value | Source |
+|---|---|---|
+| Width (content area) | `250px` (wrap target) | Figma |
+| Font | Montserrat **700** | Figma |
+| Size | `14px` | Figma |
+| Line-height | `20px` | Figma |
+| Letter-spacing | `0.1px` | Figma |
+| Color | `#999` → token `--color-muted-grey` | Figma |
+| Text-align | left (default) | Figma |
+
+**Copy source**: i18n keys `kudos.honour.tooltip.{newHero|risingHero|superHero|legendHero}.{threshold|flavor}` — render as `{threshold} {flavor}` (space between, no forced line break).
+
+#### 26.4 Tailwind equivalent
+
+```tsx
+<div
+  role="tooltip"
+  className="z-50 flex w-[304px] flex-col items-center justify-center gap-4 rounded-2xl bg-[var(--color-panel-surface)] p-4 shadow-[var(--shadow-kudo-card)]"
+>
+  <Image
+    src={pill.src}
+    alt={tierLabel}
+    width={218}
+    height={38}
+    className="h-[38px] w-[218px]"
+  />
+  <p className="w-[250px] font-[family-name:var(--font-montserrat)] text-sm font-bold leading-5 tracking-[0.1px] text-[var(--color-muted-grey)]">
+    {threshold} {flavor}
+  </p>
+</div>
+```
+
+---
+
+### §27 ProfilePreviewTooltip — US10 primary interaction (🟡 inferred)
+
+All values below are **derived** from the user-shared image + pattern
+consistency with HonourTooltip (§26) + Dropdown-profile (`z4sCl3_Qtk`).
+Marked `(inferred)` — update once MoMorph has the Figma source.
+
+#### 27.1 Container
+
+| Property | Value | Source |
+|---|---|---|
+| Width | `380px` | inferred (matches user image aspect; fits 6 content rows + CTA) |
+| Background | `rgba(0, 7, 12, 1)` → `--color-panel-surface` | pattern (§26.1) |
+| Border-radius | `16px` | pattern (§26.1) |
+| Padding | `24px` | inferred (larger than §26 because more content rows; Tailwind `p-6`) |
+| Layout | `flex flex-col gap-4` (16 px section gap) | inferred |
+| Box-shadow | `var(--shadow-kudo-card)` | pattern |
+| Z-index | `z-50` | pattern |
+
+#### 27.2 Display name row
+
+| Property | Value | Source |
+|---|---|---|
+| Font | Montserrat **700** | pattern (match §26.2 pill text weight) |
+| Size | `22px` | inferred (matches §26.2 pill label scale) |
+| Line-height | `28px` (~1.27 ratio) | inferred |
+| Color | `#FFEA9E` → `--color-accent-cream` | pattern |
+| Letter-spacing | `0.1px` | inferred |
+| Truncation | single line + `truncate` if overflow | inferred |
+
+#### 27.3 Department row ("Tên đơn vị:" + value)
+
+Single `<p>` with inline 2-part structure: label + code.
+
+| Property | Value | Source |
+|---|---|---|
+| Font | Montserrat **700** | pattern (§26.3) |
+| Size | `14px` | pattern |
+| Line-height | `20px` | pattern |
+| Letter-spacing | `0.1px` | pattern |
+| Color (label "Tên đơn vị:") | `#FFF` | inferred from image |
+| Color (code value) | `#999` → `--color-muted-grey` | inferred from image |
+| Value source | `departments.code` (per Q21) | spec |
+| Margin-bottom | `16px` before the tier pill | inferred |
+
+#### 27.4 Tier badge
+
+Same asset as §26.2. Render size kept identical for sharpness:
+
+| Property | Value | Source |
+|---|---|---|
+| Width | `218px` | pattern |
+| Height | `38px` | pattern |
+
+Centered horizontally inside the card. 16 px margin above + below.
+
+#### 27.5 Divider
+
+| Property | Value | Source |
+|---|---|---|
+| Height | `1px` | inferred |
+| Color | `rgba(255, 255, 255, 0.15)` (15% white overlay) | inferred |
+| Horizontal inset | 0 (full card width) | inferred |
+| Margin | 16 px above + below | inferred |
+
+#### 27.6 Stats rows ("Số Kudos nhận được:" + N, "Số Kudos đã gửi:" + N)
+
+Two rows, same pattern. Each row is `flex items-baseline gap-1`.
+
+| Property | Value | Source |
+|---|---|---|
+| Font (label) | Montserrat **700** 16/24 tracking 0.15 | inferred |
+| Font (number) | Montserrat **700** 16/24 tracking 0.15 | inferred |
+| Color (label) | `#FFF` | inferred from image |
+| Color (number) | `#FFEA9E` → `--color-accent-cream` | inferred from image |
+| Gap between label and number | `4px` | inferred |
+| Gap between the 2 stats rows | `8px` | inferred |
+| Margin-bottom | `24px` before the CTA | inferred |
+
+Template: `"Số Kudos nhận được: "` + `<span class="text-cream">25</span>`.
+
+#### 27.7 CTA "Gửi KUDO"
+
+Reuse `<PrimaryButton size="md" variant="primary">` if its base renders
+match; otherwise inline. Icon: `<Icon name="pencil" size={20} />` prefix.
+
+| Property | Value | Source |
+|---|---|---|
+| Width | `100%` (full card width minus padding) | inferred |
+| Height | `48px` (Tailwind `h-12`) | inferred |
+| Background | `#FFEA9E` → `--color-accent-cream` | pattern |
+| Border-radius | `12px` (Tailwind `rounded-xl`) | inferred |
+| Font | Montserrat **700** 16/24 uppercase tracking 0.15 | pattern |
+| Color | `#00101A` → `--color-brand-900` | pattern |
+| Icon gap | `8px` before the label | inferred |
+| Hover | `bg-[var(--color-accent-cream)]/90` (~10% darken) | pattern |
+| Focus-visible | `outline-2 outline-offset-2 outline-[var(--color-accent-cream)]` | pattern |
+
+#### 27.8 isSelf branch
+
+When `isSelf === true` (viewer hovering their own avatar):
+- **Hide CTA** (no self-send flow).
+- Other rows unchanged.
+- Card height reduces proportionally.
+
+#### 27.9 Tailwind equivalent (inferred — tune after Figma sync)
+
+```tsx
+<div
+  role="dialog"
+  aria-label={t("kudos.profilePreview.ariaLabel")}
+  className="z-50 flex w-[380px] flex-col gap-4 rounded-2xl bg-[var(--color-panel-surface)] p-6 shadow-[var(--shadow-kudo-card)]"
+>
+  <h3 className="truncate font-[family-name:var(--font-montserrat)] text-[22px] font-bold leading-7 tracking-[0.1px] text-[var(--color-accent-cream)]">
+    {displayName}
+  </h3>
+  <p className="font-[family-name:var(--font-montserrat)] text-sm font-bold leading-5 tracking-[0.1px] text-white">
+    {t("kudos.profilePreview.departmentLabel")}{" "}
+    <span className="text-[var(--color-muted-grey)]">{departmentCode}</span>
+  </p>
+  <Image src={pill.src} alt={honourTitle} width={218} height={38} className="mx-auto h-[38px] w-[218px]" />
+  <hr className="border-0 border-t border-white/15" />
+  <div className="flex flex-col gap-2">
+    <p className="font-[family-name:var(--font-montserrat)] text-base font-bold leading-6 tracking-[0.15px] text-white">
+      {t("kudos.profilePreview.receivedLabel")}{" "}
+      <span className="text-[var(--color-accent-cream)]">{kudosReceivedCount}</span>
+    </p>
+    <p className="font-[family-name:var(--font-montserrat)] text-base font-bold leading-6 tracking-[0.15px] text-white">
+      {t("kudos.profilePreview.sentLabel")}{" "}
+      <span className="text-[var(--color-accent-cream)]">{kudosSentCount}</span>
+    </p>
+  </div>
+  {!isSelf ? (
+    <button
+      type="button"
+      onClick={() => router.push(`/kudos/new?recipient=${userId}`)}
+      className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-accent-cream)] font-[family-name:var(--font-montserrat)] text-base font-bold uppercase leading-6 tracking-[0.15px] text-[var(--color-brand-900)] transition-colors hover:bg-[rgba(255,234,158,0.9)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent-cream)]"
+    >
+      <Icon name="pencil" size={20} />
+      {t("kudos.profilePreview.ctaLabel")}
+    </button>
+  ) : null}
+</div>
+```
+
+#### 27.10 New i18n keys (add to `kudos.profilePreview.*`)
+
+| Key | VI | EN (TBD) |
+|---|---|---|
+| `kudos.profilePreview.ariaLabel` | `Thông tin nhanh Sunner` | `Sunner quick info` |
+| `kudos.profilePreview.departmentLabel` | `Tên đơn vị:` | `Department:` |
+| `kudos.profilePreview.receivedLabel` | `Số Kudos nhận được:` | `Kudos received:` |
+| `kudos.profilePreview.sentLabel` | `Số Kudos đã gửi:` | `Kudos sent:` |
+| `kudos.profilePreview.ctaLabel` | `Gửi KUDO` | `Send Kudo` |
+
+### §28 Motion + focus for both tooltips
+
+- **Mount**: `opacity 0 → 1` over 150 ms ease-out. Instant under `prefers-reduced-motion: reduce`.
+- **Unmount**: `opacity 1 → 0` over 120 ms ease-in.
+- **Focus ring on trigger**: existing `focus-visible` style unchanged.
+- **Tooltip itself**: not focusable on pointer devices (decorative popover). On touch, the CTA inside ProfilePreviewTooltip receives focus after first tap.
+
+### §29 Confidence log (for dev reference)
+
+| Component | Source | Confidence | Visual QA after ship |
+|---|---|---|---|
+| HonourTooltip container | Figma `list_frame_styles` | 100% | Not required |
+| HonourTooltip pill | Figma + existing `HONOUR_PILL_MAP` | 100% | Not required |
+| HonourTooltip body text | Figma | 100% | Not required |
+| ProfilePreviewTooltip container | Pattern + user image | ~85% | Compare padding/width |
+| ProfilePreviewTooltip display name | Inferred size 22 px | ~75% | May need ±2 px tune |
+| ProfilePreviewTooltip dept row | Pattern | ~80% | Check label/value colour split |
+| ProfilePreviewTooltip tier badge | Reuse §26 | 100% | Check centering |
+| ProfilePreviewTooltip divider | Inferred 15% white | ~85% | Check contrast |
+| ProfilePreviewTooltip stats rows | Inferred spacing | ~80% | Check gap between rows |
+| ProfilePreviewTooltip CTA | Pattern + existing PrimaryButton | ~90% | Check button height |
+| ProfilePreviewTooltip i18n copy | User image | 100% | Not required |
+
+Overall: ProfilePreviewTooltip ~82% confidence — production-ready, with
+~5 minor tuning spots expected in visual QA.

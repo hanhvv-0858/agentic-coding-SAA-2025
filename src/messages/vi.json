@@ -368,6 +368,33 @@
       "offlineWarning": "Bạn đang offline — thao tác sẽ được đồng bộ khi có mạng.",
       "filterOfflineToast": "Không tải được bộ lọc khi offline.",
       "parkedToast": "Đang xây dựng — tính năng sẽ sớm ra mắt."
+    },
+    "profilePreview": {
+      "ariaLabel": "Thông tin nhanh Sunner",
+      "departmentLabel": "Tên đơn vị:",
+      "receivedLabel": "Số Kudos nhận được:",
+      "sentLabel": "Số Kudos đã gửi:",
+      "ctaLabel": "Gửi KUDO"
+    },
+    "honour": {
+      "tooltip": {
+        "newHero": {
+          "threshold": "Có 1–4 người gửi Kudos cho bạn",
+          "flavor": "Hành trình lan tỏa điều tốt đẹp bắt đầu – những lời cảm ơn và ghi nhận đầu tiên đã tìm đến bạn."
+        },
+        "risingHero": {
+          "threshold": "Có 5–9 người gửi Kudos cho bạn",
+          "flavor": "Hình ảnh bạn đang lớn dần trong trái tim đồng đội bằng sự tử tế và cống hiến của mình."
+        },
+        "superHero": {
+          "threshold": "Có 10–19 người gửi Kudos cho bạn",
+          "flavor": "Bạn đã trở thành biểu tượng được tin tưởng và yêu quý, người luôn sẵn sàng hỗ trợ và được nhiều đồng đội nhớ đến."
+        },
+        "legendHero": {
+          "threshold": "Có 20 người trở lên gửi Kudos cho bạn",
+          "flavor": "Bạn đã trở thành huyền thoại – người để lại dấu ấn khó quên trong tập thể bằng trái tim và hành động của mình."
+        }
+      }
     }
   },
   "compose": {

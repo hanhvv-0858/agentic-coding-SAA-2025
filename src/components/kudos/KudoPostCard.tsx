@@ -66,6 +66,7 @@ export function KudoPostCard({
             isAnonymous={kudo.is_anonymous ?? false}
             anonymousLabel={card.anonymousSenderLabel}
             anonymousAvatarAlt={card.anonymousAvatarAlt}
+            messages={messages}
           />
         </div>
         <div
@@ -85,6 +86,7 @@ export function KudoPostCard({
             <KudoParticipant
               user={primaryRecipient}
               monogramAlt={card.monogramAlt}
+              messages={messages}
             />
           ) : null}
         </div>

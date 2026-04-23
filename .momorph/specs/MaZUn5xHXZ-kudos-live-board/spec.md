@@ -174,6 +174,138 @@ The **A.1 Button ghi nhận pill** (`2940:13449`) on the hero is the composer en
 
 ---
 
+### User Story 10 – Profile preview + honour tooltip on hover (Priority: P2)
+
+When a user hovers any **avatar or name** inside the Live board (sender block
+`C.3.1` / recipient block `C.3.2` of a KUDO card, `D.3` latest-giftee list, or
+Spotlight word-cloud name nodes), a **profile preview tooltip** appears after
+a short delay showing that Sunner's essential info. Clicking any of these
+targets navigates to their profile page (route parked — tracked in SCREENFLOW
+as `Profile người khác` frame `w4WUvsJ9KI`).
+
+When a user hovers the **danh hiệu label / hoa-thị count** on a sender or
+recipient block, a separate **honour tooltip** explains the tier rules and the
+user's current status. Four tier variants (Figma):
+
+| Tier | Figma screenId | Threshold (distinct senders) |
+|---|---|---|
+| New Hero | `twC9br89ra` | 1 – 4 |
+| Rising Hero | `IjeDnHmzou` | 5 – 9 |
+| Super Hero | `d6zEZ9ccoX` | 10 – 19 |
+| Legend Hero | `XI0QKVv1qZ` | ≥ 20 |
+
+**Why this priority**: Adds context and social depth without blocking the core
+read/heart/filter loop. P2 because the feed still delivers its value without
+either tooltip; but the tooltip is what turns the board into a browseable
+"who's who".
+
+**Independent Test**:
+1. Hover any sender avatar on a KUDO card → after ~400 ms a popover appears
+   with that user's avatar + display name + department + honour tier.
+2. Hover the `"★ 3"` hoa-thị counter next to a name → after ~400 ms a
+   popover appears showing the current tier (e.g. "New Hero") + the rule copy
+   (e.g. "1–4 người đã gửi kudo cho bạn").
+3. Click any hovered avatar/name → navigation fires to `/profile/:userId` (or
+   a toast "Đang xây dựng" if the route is parked).
+
+**Acceptance Scenarios**:
+
+1. **Given** the pointer enters a sender/recipient avatar or name, **When**
+   the dwell time exceeds 400 ms, **Then** the `<ProfilePreviewTooltip>`
+   fades in anchored to the element (soft-shadowed navy card per Figma
+   frame `721:5827` — screen `Bf5XiTE7AO`). Content (top → bottom):
+   - **Display name** in cream, Montserrat Bold ~22 px (e.g. `"Huỳnh Dương Xuân Nhật"`).
+   - **"Tên đơn vị:" + department code** in white 14/20/500. Per
+     Q21 resolution (2026-04-23), the tooltip uses the plain
+     `departments.code` (same source as the FilterDropdown department
+     chip — e.g. `"CEVC1 - DSV - UI/UX 1"`), **not** the hierarchical
+     slash-path shown in the original Figma mock. When HR provides a
+     full-path column in future, we can swap the source without any
+     UI change.
+   - **Honour tier badge** — same cinematic artwork as the honour
+     tooltip variant (New / Rising / Super / Legend Hero).
+   - **Divider line** (1 px, white/15 opacity).
+   - **"Số Kudos nhận được: N"** — Montserrat, label white, count cream bold.
+   - **"Số Kudos đã gửi: N"** — same style.
+   - **Primary CTA "Gửi KUDO"** — cream pill, full card width, pencil
+     icon + label. Click → navigates to the Viết Kudo composer
+     (`/kudos/new?recipient=:userId`) with the recipient pre-filled.
+     **Hidden when** the tooltip is shown over the viewer's own avatar
+     (no self-send flow).
+2. **Given** the preview is open, **When** the pointer leaves the target +
+   the tooltip surface for > 200 ms, **Then** the tooltip fades out.
+3. **Given** the preview is open, **When** the user presses `Esc`, **Then**
+   the tooltip closes and focus returns to the trigger element.
+4. **Given** the user clicks (pointer) or taps (touch) any avatar/name
+   trigger, **When** the click handler fires, **Then** the
+   `<ProfilePreviewTooltip>` opens (same path as dwell-open hover) —
+   click/tap on the trigger **never** navigates directly. Navigation
+   to the composer happens **only** via the "Gửi KUDO" CTA inside the
+   tooltip (click it → `router.push("/kudos/new?recipient=:userId")`).
+   This unifies pointer + touch into one mental model per Q20 (a).
+5. **Given** the pointer enters the **honour label / hoa-thị count** of
+   either sender or recipient, **When** dwell > 400 ms, **Then** the
+   `<HonourTooltip>` fades in with the tier-appropriate content (dark
+   navy card, ~320 × 210 px, per Figma frames `twC9br89ra` /
+   `IjeDnHmzou` / `d6zEZ9ccoX` / `XI0QKVv1qZ`):
+   - **Tier badge** at top — cinematic artwork variant per tier.
+   - **Threshold line** in white 16/24/700 (locale-resolved):
+     - New Hero: `"Có 1–4 người gửi Kudos cho bạn"`
+     - Rising Hero: `"Có 5–9 người gửi Kudos cho bạn"`
+     - Super Hero: `"Có 10–19 người gửi Kudos cho bạn"`
+     - Legend Hero: `"Có 20 người trở lên gửi Kudos cho bạn"`
+   - **Flavor line** in white 14/22/500:
+     - New Hero: *"Hành trình lan tỏa điều tốt đẹp bắt đầu – những lời
+       cảm ơn và ghi nhận đầu tiên đã tìm đến bạn."*
+     - Rising Hero: *"Hình ảnh bạn đang lớn dần trong trái tim đồng đội
+       bằng sự tử tế và cống hiến của mình."*
+     - Super Hero: *"Bạn đã trở thành biểu tượng được tin tưởng và yêu
+       quý, người luôn sẵn sàng hỗ trợ và được nhiều đồng đội nhớ đến."*
+     - Legend Hero: *"Bạn đã trở thành huyền thoại – người để lại dấu
+       ấn khó quên trong tập thể bằng trái tim và hành động của mình."*
+   - **NOT** a dialog — a lightweight popover, dismissable by
+     pointer-leave or `Esc`. Screen readers announce via `role="tooltip"` +
+     `aria-describedby` on the trigger. **Copy is static** — content does
+     NOT include the viewer's own distinct-sender count (that can be
+     seen in the profile preview tooltip instead).
+   - **Threshold source of truth** — per Q22 resolution (2026-04-23),
+     the DB function `compute_honour_tier()` (migration 0018) is the
+     single source: `New 1–4 / Rising 5–9 / Super 10–19 / Legend ≥20`.
+     The Figma mock originally showed Super `10–20` / Legend `>20` —
+     copy above is rewritten to match the DB instead of the mock
+     (DB change would require backfill + behavioural risk; copy edit
+     is free).
+6. **Given** the user's Hero tier changes mid-session (after a new kudo),
+   **When** the tooltip is re-opened, **Then** the content refetches the
+   latest tier — no stale cache.
+7. **Given** `prefers-reduced-motion: reduce`, **When** either tooltip
+   mounts, **Then** the fade-in transition is instant.
+8. **Given** a touch device (`@media (hover: none)`) where `:hover`
+   doesn't exist, **When** a user taps an avatar/name, **Then** the
+   tooltip opens (AC4 pattern). A second tap on the same trigger, or a
+   tap outside the tooltip surface, **closes** it. The tooltip's
+   "Gửi KUDO" CTA is the only path to navigation — there is no
+   "Xem profile" link (per Q20 resolution and Figma `721:5827` which
+   shows a single CTA).
+
+**Dependencies**:
+- Fetch `<ProfilePreviewTooltip>` payload from a new thin Server Action
+  `getProfilePreview(userId)` OR inline into `getKudoFeed()` so the payload
+  is ready at card render time (see Open Q17 below).
+- `<HonourTooltip>` needs no fetch — content derives from the honour tier
+  already on `profiles.honour_title` + hoa-thị count already on the card.
+
+**Out of scope (deferred to separate specs)**:
+- **Open Secret Box dialog** — Figma indicates the `D.1.8 "Mở quà"` CTA
+  should open an **in-place dialog** (not navigate). This is a significant
+  animated reveal flow (`J3-4YFIpMM`, `K-LuEblC08` variants) and will be
+  captured in its **own spec**. For now, the Live board CTA renders with
+  `aria-label="Mở Secret Box"` but keeps a **TODO click handler** (toast
+  "Đang xây dựng") until the Secret Box spec ships. Reference SCREENFLOW
+  row 17 for the parked design.
+
+---
+
 ### User Story 9 – Reduced-motion, a11y, loading, and offline (Priority: P3)
 
 The Live board ships **first-class accessibility and graceful degradation**: reduced-motion respects the OS preference, the heart button is `aria-pressed`, filter chips are `aria-haspopup="listbox"`, skeletons show during fetches, a global error toast covers 5xx. Keyboard-only navigation works end-to-end.
@@ -238,8 +370,10 @@ The Live board ships **first-class accessibility and graceful degradation**: red
 | `SpotlightSearch` (new — B.7.3) | `2940:14833` | Inline search in the spotlight top-right | Enter → pans/centers matching node |
 | `AllKudosHeader` (new — C.1) | `2940:14221` | Section caption + title "ALL KUDOS" | Static |
 | `KudoPostCard` (new — C.3 / C.5 / C.6 / C.7) | `3127:21871` et al | Cream `#FFF8E1` card, 680×~750, radius 24, padding 40/40/16/40 | See nested interactions below |
-| `KudoCardSender` (new — C.3.1) | `I3127:21871;256:4858` | Avatar + name + hoa thị + danh hiệu | Hover → profile preview (parked); click → profile (parked) |
-| `KudoCardRecipient` (new — C.3.3) | `I3127:21871;256:4860` | Same shape as sender | Same interactions |
+| `KudoCardSender` (new — C.3.1) | `I3127:21871;256:4858` | Avatar + name + hoa thị + danh hiệu | Hover avatar/name → `<ProfilePreviewTooltip>` (US10 AC1); click → `/profile/:userId`; hover hoa-thị/danh hiệu → `<HonourTooltip>` (US10 AC5) |
+| `KudoCardRecipient` (new — C.3.3) | `I3127:21871;256:4860` | Same shape as sender | Same interactions as `KudoCardSender` |
+| `ProfilePreviewTooltip` (new — shared, US10) | Figma `721:5827` (screen `Bf5XiTE7AO`) | Navy card with soft shadow: display name · "Tên đơn vị:" + full department path · honour tier badge · divider · "Số Kudos nhận được: N" · "Số Kudos đã gửi: N" · **"Gửi KUDO" cream pill CTA** with pencil icon | Dwell-open (400 ms) + pointer-leave-close (200 ms) + Esc close. CTA click → `/kudos/new?recipient=:userId`. CTA hidden when hovering own avatar. |
+| `HonourTooltip` (new — shared, US10) | Figma `twC9br89ra` / `IjeDnHmzou` / `d6zEZ9ccoX` / `XI0QKVv1qZ` (4 tier variants) | Navy popover (~320 × 210): tier badge + threshold line + flavor sentence per tier (copy verbatim in US10 AC5) | Dwell-open + pointer-leave-close; static copy (no viewer-specific numbers); `role="tooltip"` |
 | `KudoCardSentIcon` (new — C.3.2) | `I3127:21871;256:5161` | 32×123 arrow icon between sender and recipient | Static |
 | `KudoCardTimestamp` (new — C.3.4) | `I3127:21871;256:5229` | 16/24 700 grey `#999` text "10:00 - 10/30/2025" | Static |
 | `KudoCardContent` (new — C.3.5) | `I3127:21871;256:5155` | Body paragraph, max 5 lines, clamp + ellipsis | Click → detail (parked) |
@@ -249,7 +383,7 @@ The Live board ships **first-class accessibility and graceful degradation**: red
 | `HeartButton` (new — C.4.1) | `I3127:21871;256:5175` | Grey/red heart icon + count text "1.000" | Click → toggle (US2); disabled if user = sender |
 | `CopyLinkButton` (new — C.4.2) | `I3127:21871;256:5216` | Text + link icon | Click → copy URL + toast "Link copied — ready to share!" |
 | `KudoStatsSidebar` (new — D) | `2940:13488` | 422-wide sticky sidebar on desktop | – |
-| `StatsBlock` (new — D.1) | `2940:13489` | 5 metric rows + divider + "Mở quà" CTA | Mở quà click → `/gifts/open` (parked) |
+| `StatsBlock` (new — D.1) | `2940:13489` | 5 metric rows + divider + "Mở Secret Box" CTA | Click → **deferred to separate Secret Box spec** (in-place dialog per Figma). For MVP: renders CTA but click shows toast "Đang xây dựng" (US10 Out of scope). |
 | `LatestGiftRecipients` (new — D.3) | `2940:13510` | Header + vertical list of 10 recipients | Click name/avatar → profile (parked); scrollable if overflow |
 | `QuickActionsFab` (existing) | global | Floating cream pill bottom-right | Click → menu with "Viết Kudo →" |
 | `SiteFooter` (existing) | `2940:13522` | Dark footer with logo + 4 nav links | Nav link clicks |
@@ -596,19 +730,21 @@ All `[predicted]` endpoints to be formalised in `momorph.apispecs` once this spe
 
 ## Out of Scope
 
-- **Kudo detail view** (`/kudos/:id`) — tracked as parked on SCREENFLOW; the Live board links but doesn't implement it.
-- **Viết Kudo compose form** — separate spec (SCREENFLOW row 7, frame `ihQ26W78P2`).
-- **Hashtag dropdown** (`1002:13013`) and **Phòng ban dropdown** (`721:5684`) — separate parked specs; this page defines the filter *trigger* button behaviour only.
-- **Secret box open flow** (`1466:7676`) — separate parked spec.
-- **Profile preview / full profile** — separate parked specs.
-- **Image lightbox** for full-size attachments — parked until Product specifies it; MVP treats image-click as "open detail view".
-- **Real-time WebSocket push** of new kudos while the user is on the page — Open Question Q6; default MVP is polling or manual refresh.
-- **Notifications integration** — the bell icon is in the header, but new-kudo notifications are handled by the existing Notifications feature on SCREENFLOW.
-- **Admin moderation** — hiding/removing a kudo or banning a sender is out of scope for the Live board consumer surface.
-- **Multi-recipient kudos** — Figma shows single sender → single recipient. Team kudos are a future enhancement.
-- **Emoji reactions beyond heart** — only heart is in the Figma.
-- **Export / download** — no "export my kudos" feature.
-- **Print styles** — not in scope.
+Status legend: 🟡 still out of scope · ✅ shipped in a sibling spec · 🟢 in scope (moved into this spec).
+
+- 🟡 **Kudo detail view** (`/kudos/:id`) — still parked on SCREENFLOW. The Live board links a toast "Đang xây dựng" until a detail spec is authored.
+- ✅ **Viết Kudo compose form** — **shipped** as separate spec `ihQ26W78P2` (SCREENFLOW row 7). This board hands off via the A.1 composer pill + `/kudos/new` route.
+- ✅ **Hashtag dropdown** (`p9zO-c4a4x`) and **Phòng ban dropdown** (`WXK5AYB_rG`) — **both shipped** as separate specs. This board owns only the filter *trigger* chip + URL state.
+- 🟡 **Secret box open flow** (`J3-4YFIpMM`) — separate spec to be authored (per US10 "Out of scope" sub-section). The `D.1.8 "Mở Secret Box"` CTA renders but click shows toast "Đang xây dựng" until that spec ships.
+- 🟢 **Profile preview tooltip** — now **in scope** via US10 (`<ProfilePreviewTooltip>`). Full profile page (`/profile/:userId`) is still parked — the tooltip's "Gửi KUDO" CTA is the only navigation path for now.
+- 🟡 **Image lightbox** for full-size attachments — still parked. MVP treats image-click as no-op (toast "Đang xây dựng").
+- ✅ **Real-time / auto-refresh** — **shipped** as 60 s `router.refresh()` polling via `<SpotlightAutoRefresh />` + visibility-gated (see Q6 resolution). WebSocket / SSE not required for MVP.
+- 🟡 **Notifications integration** — bell icon lives in the shared header; new-kudo push notifications are handled by the existing Notifications feature on SCREENFLOW, not by this board.
+- 🟡 **Admin moderation** — hiding/removing a kudo or banning a sender remains out of scope for the Live board consumer surface.
+- 🟡 **Multi-recipient kudos** — current Viết Kudo flow supports one recipient; Team kudos remain a future enhancement.
+- 🟡 **Emoji reactions beyond heart** — only heart remains in scope.
+- 🟡 **Export / download** — no "export my kudos" feature.
+- 🟡 **Print styles** — not in scope.
 
 ---
 
@@ -632,24 +768,31 @@ All `[predicted]` endpoints to be formalised in `momorph.apispecs` once this spe
 
 ## Open Questions
 
-> Flag for Product / Design / Backend. Each open question blocks a specific decision; capture as an assumption if unanswered at implementation time.
+> Flag for Product / Design / Backend. Resolved items kept below as a
+> decision log; still-open items prefixed with 🟡.
 
-- **Q1 (UX)** — **Infinite scroll vs. "Load more"** for the C.2 feed? Figma doesn't show a footer nor a "load more" CTA inside the feed. Default assumption: infinite scroll with IntersectionObserver + a small skeleton row while fetching. Risk: breaks the sticky sidebar on long pages. Alternative: explicit "Load more" button at the bottom — simpler a11y.
-- **Q2 (Product)** — **>5 attachment images** per kudo: hidden entirely in MVP, or show a "+N" badge overlay on the 5th thumbnail that opens a lightbox? Default: hidden until detail view ships.
-- **Q3 (UX)** — **HIGHLIGHT carousel default slide**: slide 1 or slide 3 (center-biased)? Figma visually centers slide 3. Default: slide 3 to match the reference image; arrows jump to slide 1 / slide 5 at edges.
-- **Q4 (Product)** — **Spotlight weight** source: hearts received, kudos received count, or hand-curated? Default: hearts received (biggest = most beloved) — but this excludes new Sunners with few hearts. Alternative: kudos-received count (fairer for new joiners).
-- **Q5 (UX)** — **Mobile sidebar D collapse**: stack below C, OR collapse into an accordion "Thống kê của tôi" at the top of the page? Default: stack below (simpler) — but personal stats may feel buried. Confirm with Product.
-- **Q6 (Technical)** — **Real-time updates**: polling every 60 s (cheap, good enough), SSE (one-way server push, better freshness), or WebSocket (bidirectional, overkill)? Default: polling on the Spotlight counter every 60 s; manual pull-to-refresh on the feed. Revisit at 500+ concurrent users.
-- **Q7 (UX)** — **Mobile Spotlight**: the pan/zoom board is cumbersome on small screens. Default fallback: render as a vertical list of the top 20 recipients with their last-kudo time. Confirm with Design.
-- **Q8 (a11y)** — **Spotlight keyboard nav**: single tabstop with arrow-key navigation between names (roving tabindex)? Or each name a separate tabstop (120 tabstops)? Default: roving tabindex.
-- **Q9 (Technical)** — **Pan/zoom dependency**: `react-zoom-pan-pinch` (~12 KB) vs. hand-roll. Hand-roll is feasible in ~100 LOC with Pointer Events and meets the "no unnecessary deps" constitution principle. Default: hand-roll.
-- **Q10 (Tokens)** — **Active heart colour reuse** `--color-nav-dot: #D4271D` or introduce a dedicated `--color-heart-active`? Semantically different use-cases — recommend a dedicated token with the same initial value, aliased if needed.
-- **Q11 (Product)** — **Body format**: plain text only, or limited markdown (bold + italic + emoji)? Figma shows unformatted text. Default: plain text with auto-linkification of URLs + emoji rendering.
-- **Q12 (Data)** — **Department filter semantics**: is a kudo's department derived from the **sender**'s team, the **recipient**'s team, or both (match-either)? Default: recipient's team — "show me kudos sent to my department". Confirm with Product.
-- **Q13 (Design)** — **Special-day heart multiplier**: per C.4.1 description, on admin-configured special days the sender gets +2 hearts instead of +1. Where does the client learn this flag? Option A: server returns `{ multiplier: 2, reason: "ngày đặc biệt" }` in the heart-toggle response, and the UI shows a micro-confetti; Option B: flag is hidden and only reflected in stats silently. Default: Option A — delight users.
-- **Q14 (Product)** — **Composer pill A.1** opens a full route (`/kudos/new`) or a modal overlay on `/kudos`? Modal wins on "don't lose feed scroll position"; full-route wins on URL shareability. Tied to the Viết Kudo spec (SCREENFLOW row 7). Default: modal, fallback to full-route if deep-linkable compose becomes a need.
-- **Q15 (Product)** — **Sunner search A.1 secondary pill** (`2940:13450`): does it filter the current page or navigate to a separate search screen? Figma doesn't show a result panel. Default: same-page overlay showing matching Sunners as a dropdown.
-- **Q16 (Technical)** — **B.7 Spotlight layout algorithm**: precomputed server-side (CSS x/y coords) or live client-side (e.g. d3-cloud)? Default: precomputed server-side → simpler client, predictable FPS.
+- **Q1 (UX)** — ✅ **Resolved 2026-04-23**: explicit **"Load more" button** shipped in [`KudoListClient.tsx`](../../../src/components/kudos/KudoListClient.tsx) (simpler a11y than infinite scroll; sticky sidebar stays well-behaved on long pages).
+- **Q2 (Product)** — ✅ **Resolved 2026-04-23**: **Upstream hard cap at 5** inside the Viết Kudo composer — [`ImageUploader.tsx`](../../../src/components/kudos/ImageUploader.tsx) enforces `MAX_FILES = 5`. The card renders up to 5 thumbnails (line-clamp by design); because the composer refuses a 6th upload there is no "overflow" state to surface on the Live board. Lightbox / detail view unaffected.
+- **Q3 (UX)** — ✅ **Resolved 2026-04-23**: carousel opens on **slide 3** (`defaultIndex={2}`, 0-indexed) per Figma's center-biased reference. Shipped in [`kudos/page.tsx`](../../../src/app/kudos/page.tsx).
+- **Q4 (Product)** — ✅ **Resolved 2026-04-23**: **kudos-received count** (fair for new joiners). Server computes `weight = count of kudo_recipients rows per recipient` in [`getSpotlight()`](../../../src/app/kudos/actions.ts).
+- **Q5 (UX)** — ✅ **Resolved 2026-04-23**: mobile/tablet **stack sidebar D below feed** (`grid-cols-1` → `lg:grid-cols-[minmax(0,1fr)_422px]`). No accordion — simpler; measurement can revisit if sidebar feels buried.
+- **Q6 (Technical)** — ✅ **Resolved 2026-04-23**: **60 s client polling** via `router.refresh()` in [`SpotlightAutoRefresh.tsx`](../../../src/components/kudos/SpotlightAutoRefresh.tsx), paused when tab hidden. No SSE / WebSocket. Counter pulses briefly when total changes.
+- **Q7 (UX)** — ✅ **Resolved 2026-04-23**: mobile Spotlight shows a **vertical top-20 list** sorted by weight DESC (not pan/zoom board) — implemented as the `sm:hidden` branch of [`SpotlightBoard.tsx`](../../../src/components/kudos/SpotlightBoard.tsx).
+- **Q8 (a11y)** — ✅ **Resolved 2026-04-23**: implement **roving tabindex** (option b) on `<SpotlightBoard>` — single board-level tabstop (`role="listbox"`), inner name `<button>` elements receive focus via `Arrow ←↑↓→`; `Home`/`End` jump to first/last; `Tab` exits the board. Work item tracked in the same PR as the US10 profile-preview tooltip (see plan.md §Phase N / tasks.md TN — roving tabindex bundled with tooltip work because both touch `SpotlightBoard` name buttons).
+- **Q9 (Technical)** — ✅ **Resolved 2026-04-23**: **hand-rolled `usePanZoom` hook** (zero new dep, ~290 LOC) shipped at [`hooks/usePanZoom.ts`](../../../src/components/kudos/hooks/usePanZoom.ts).
+- **Q10 (Tokens)** — ✅ **Resolved 2026-04-23**: dedicated **`--color-heart-active`** CSS custom property exists in [`globals.css`](../../../src/app/globals.css), aliased to `--color-nav-dot` for the initial value.
+- **Q11 (Product)** — ✅ **Resolved 2026-04-23**: **rich HTML body** (TipTap StarterKit + Link + Mention + CharacterCount) — shipped in the Viết Kudo compose spec (`ihQ26W78P2`). Feed renders HTML via `dangerouslySetInnerHTML` with a whitelist of supported tags.
+- **Q12 (Data)** — ✅ **Resolved 2026-04-23**: department filter narrows by **sender's team** (`sender.department_id`) — see `getKudoFeed()` filter branch. Rationale: "show me kudos from CEVC1 people" is the common mental model.
+- 🟡 **Q13 (Design)** — ⏸ **Deferred 2026-04-23**: keep the current server contract (`HeartToggleResult.multiplier: 1 | 2`) as-is. No admin config surface, no UI confetti, no banner in MVP. Revisit when **Product confirms a concrete schedule** (ceremony day, weekly boost, etc.) and an admin panel is scoped. If only one ceremony day needs the boost, a 1-hour env-var flip (`NEXT_PUBLIC_HEART_MULTIPLIER_VALUE`) can be the shortest path — tracked here but not planned yet.
+- **Q14 (Product)** — ✅ **Resolved 2026-04-23**: composer uses **full route `/kudos/new`** (not modal). URL shareability + simpler SSR outweighed the scroll-position concern.
+- **Q15 (Product)** — ✅ **Resolved 2026-04-23**: A.1 secondary search pill renders **same-page overlay** via [`SunnerSearchPill.tsx`](../../../src/components/kudos/SunnerSearchPill.tsx). No separate search screen.
+- **Q16 (Technical)** — ✅ **Resolved 2026-04-23**: Spotlight layout is **server-precomputed** (per-recipient `x, y` coords derived from deterministic `hashToUnit(user_id)` inside `getSpotlight()`). Client runs a light relaxation pass for collision avoidance. No `d3-cloud` dependency.
+- **Q17 (Data — US10)** — ✅ **Resolved 2026-04-23**: **lazy-fetch** profile preview payload via a new `getProfilePreview(userId)` Server Action on first hover per user, client-side memoised for the session. Payload: `{ displayName, departmentCode, honourTitle, kudosReceivedCount, kudosSentCount, isSelf }` — 5 data fields + `isSelf` flag to hide the CTA when hovering own avatar. Re-fetch on session-level tier change handled in AC6.
+- **Q18 (Design — US10)** — ✅ **Resolved 2026-04-23**: profile preview fields locked to **display_name + department code + honour tier badge + Kudos nhận được + Kudos đã gửi + "Gửi KUDO" CTA**.
+- **Q19 (Design — US10)** — ✅ **Resolved 2026-04-23**: honour tooltip copy is **static** per tier, verbatim in US10 AC5 (adjusted to DB thresholds per Q22). i18n keys `kudos.honour.tooltip.{newHero|risingHero|superHero|legendHero}.threshold` + `.flavor`. EN translations TBD by Product.
+- **Q20 (UX — US10)** — ✅ **Resolved 2026-04-23**: Option **(a) Tap-to-open, CTA-to-commit**. On touch devices (`@media (hover: none)`), the first tap on an avatar/name opens the profile preview tooltip; the user then taps the "Gửi KUDO" CTA inside the tooltip to navigate to the composer. A tap outside the tooltip (or a second tap on the same trigger) closes it. Pointer devices (`@media (hover: hover)`) keep dwell-open hover + tooltip stays on pointer-dwell; click on avatar/name on pointer devices **still** opens the tooltip (no click-to-navigate on the trigger itself — navigation is always via the CTA). This keeps behaviour identical across input modes for simpler mental model.
+- **Q21 (Data — US10)** — ✅ **Resolved 2026-04-23**: use the existing `departments.code` (locale-resolved via `getKudoDepartments()` pattern — currently `name_vi == name_en == code`) as the "Tên đơn vị" value. **No migration needed**. Future: if HR provides a proper hierarchical path, add a `full_path` column and swap the source — the tooltip UI stays unchanged.
+- **Q22 (Data — US10)** — ✅ **Resolved 2026-04-23**: **keep DB as-is** (Super `10–19`, Legend `≥20`). Tooltip copy rewritten to match DB in US10 AC5. Figma mock considered out-of-date; no SQL migration needed.
 
 ---
 

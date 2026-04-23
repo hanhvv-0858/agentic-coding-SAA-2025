@@ -109,4 +109,65 @@ describe("<SpotlightBoard />", () => {
     render(<SpotlightBoard recipients={[]} total={0} messages={messages} />);
     expect(screen.getByTestId("kudos-spotlight-empty")).toBeTruthy();
   });
+
+  // T124 — Q8 roving tabindex assertions (design-style §28 + spec US10).
+  describe("roving tabindex (Q8)", () => {
+    it("marks the canvas as listbox + initial single tabstop", () => {
+      render(
+        <SpotlightBoard recipients={recipients} total={16} messages={messages} />,
+      );
+      const canvas = screen.getByTestId("kudos-spotlight-canvas");
+      expect(canvas.getAttribute("role")).toBe("listbox");
+      expect(canvas.getAttribute("tabindex")).toBe("0");
+      // All name buttons start with tabindex=-1 (none focused yet).
+      const names = screen.getAllByTestId("kudos-spotlight-name");
+      names.forEach((btn) => expect(btn.getAttribute("tabindex")).toBe("-1"));
+    });
+
+    it("Home focuses the first laid-out name", () => {
+      render(
+        <SpotlightBoard recipients={recipients} total={16} messages={messages} />,
+      );
+      const canvas = screen.getByTestId("kudos-spotlight-canvas");
+      fireEvent.keyDown(canvas, { key: "Home" });
+      const names = screen.getAllByTestId("kudos-spotlight-name");
+      expect(names[0].getAttribute("tabindex")).toBe("0");
+      expect(names[0].getAttribute("aria-selected")).toBe("true");
+    });
+
+    it("End key triggers name focus (tabindex moves away from initial)", () => {
+      render(
+        <SpotlightBoard recipients={recipients} total={16} messages={messages} />,
+      );
+      const canvas = screen.getByTestId("kudos-spotlight-canvas");
+      fireEvent.keyDown(canvas, { key: "End" });
+      // After End, at least one name should no longer be tabindex=-1
+      // (a name button took over the tabstop). We don't assert which
+      // specific DOM index because relaxation can reorder vs. input;
+      // what matters is that the roving handoff happened.
+      const names = screen.getAllByTestId("kudos-spotlight-name");
+      const focusedNames = names.filter(
+        (n) => n.getAttribute("tabindex") === "0",
+      );
+      expect(focusedNames.length).toBe(1);
+    });
+
+    it("ArrowRight moves focus to a name in the +x half-plane", () => {
+      render(
+        <SpotlightBoard recipients={recipients} total={16} messages={messages} />,
+      );
+      const canvas = screen.getByTestId("kudos-spotlight-canvas");
+      // Start at index 0 (An Nguyễn @ x=0.2)
+      fireEvent.keyDown(canvas, { key: "Home" });
+      fireEvent.keyDown(canvas, { key: "ArrowRight" });
+      // Expect focus to move to either "Bình Trần" (x=0.6) or "Cường Lê" (x=0.4) — both are +x.
+      // Actual selection depends on nearest-neighbour scoring.
+      const names = screen.getAllByTestId("kudos-spotlight-name");
+      const focused = names.find(
+        (n) => n.getAttribute("aria-selected") === "true",
+      );
+      expect(focused).not.toBeUndefined();
+      expect(focused?.dataset.name).not.toBe("An Nguyễn");
+    });
+  });
 });
