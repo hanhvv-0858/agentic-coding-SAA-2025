@@ -51,7 +51,6 @@ export default async function TheLePage({ searchParams }: PageProps) {
   const languageAria = messages.common.language.toggle[locale];
   const profileLabels = messages.common.profile;
   const notificationLabel = messages.common.notification.unread;
-  const skipLabel = messages.homepage.skipToMain;
 
   const role = (user.app_metadata as { role?: string } | null)?.role;
   const isAdmin = role === "admin";
@@ -85,12 +84,6 @@ export default async function TheLePage({ searchParams }: PageProps) {
 
   return (
     <>
-      <a
-        href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded focus:bg-[var(--color-accent-cream)] focus:px-4 focus:py-2 focus:text-[var(--color-brand-900)]"
-      >
-        {skipLabel}
-      </a>
       <SiteHeader navItems={HEADER_NAV} right={headerRight} sticky bgVariant="brand-700" />
       <main id="main" className="flex flex-1 flex-col bg-[var(--color-brand-900)]">
         <RulesDismisser>

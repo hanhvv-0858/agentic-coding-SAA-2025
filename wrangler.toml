@@ -3,18 +3,27 @@ main = ".open-next/worker.js"
 compatibility_date = "2026-04-17"
 compatibility_flags = ["nodejs_compat"]
 
+# Explicit deploy targets (silence Wrangler warnings).
+# workers_dev = true → publish to <worker>.<subdomain>.workers.dev.
+# preview_urls = false → skip the per-version preview URLs (not needed
+# for a personal learning project and keeps attack surface smaller).
+workers_dev = true
+preview_urls = false
+
 # Static assets produced by @opennextjs/cloudflare.
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
 
-# Placeholder for non-secret public env vars. Real secrets (service role key,
-# OAuth credentials) MUST be set via `wrangler secret put` — never committed.
-# [vars]
-# NEXT_PUBLIC_SITE_URL = ""
-# NEXT_PUBLIC_SUPABASE_URL = ""
-# NEXT_PUBLIC_SUPABASE_ANON_KEY = ""
-# ALLOWED_EMAIL_DOMAINS = "sun-asterisk.com"
+# Server-runtime env vars only. Real secrets (service role key) are set
+# via `wrangler secret put` — never committed.
+#
+# NEXT_PUBLIC_* vars are NOT listed here: Next.js inlines those into the
+# client bundle at BUILD time, so wrangler.toml [vars] would be silently
+# ignored. Set those in `.env.production.local` instead (read by
+# `next build` via NODE_ENV=production precedence).
+[vars]
+ALLOWED_EMAIL_DOMAINS = "sun-asterisk.com,gmail.com"
 
 # Response-header transforms for the OAuth-friendly CSP + baseline security
 # headers (plan T073). Adjust CSP sources once a final analytics vendor /

@@ -1,11 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/libs/supabase/middleware";
 
-// Next.js 16 renamed the `middleware` file convention to `proxy`. The
-// exported function + `config.matcher` contract is unchanged; only the
-// filename and the exported symbol name are different.
-// See: https://nextjs.org/docs/messages/middleware-to-proxy
-export async function proxy(request: NextRequest) {
+// Next.js 16 introduced the `proxy.ts` convention that runs on the Node
+// runtime. OpenNext for Cloudflare Workers only supports the legacy
+// Edge-runtime `middleware.ts` convention; keeping this file at the old
+// name + old exported symbol is the officially recommended workaround
+// until OpenNext ships Node-proxy support. See:
+// https://nextjs.org/docs/messages/middleware-to-proxy
+export async function middleware(request: NextRequest) {
   // Prelaunch dispatch — rewrite `/` → `/countdown` while the event hasn't
   // started yet. This branch intentionally SKIPS `updateSession(request)`:
   // prelaunch visitors are typically anonymous, and signed-in users who
@@ -34,7 +36,7 @@ export const config = {
     // Root path explicit — the negative-lookahead pattern below requires
     // at least one character after the leading slash, so `/` needs its
     // own entry. Without this, prelaunch rewrite on `/` would silently
-    // skip the proxy and the homepage would render through.
+    // skip the middleware and the homepage would render through.
     "/",
     // Everything else except static assets and Next.js internals.
     "/((?!_next/static|_next/image|favicon.ico|images/|icons/).*)",

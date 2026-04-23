@@ -63,7 +63,6 @@ export default async function AwardsPage() {
   const fabLabels = messages.common.fab;
   const profileLabels = messages.common.profile;
   const notificationLabel = messages.common.notification.unread;
-  const skipLabel = messages.homepage.skipToMain;
   const awardsNav = messages.awards.nav;
 
   const role = (user.app_metadata as { role?: string } | null)?.role;
@@ -101,12 +100,6 @@ export default async function AwardsPage() {
 
   return (
     <>
-      <a
-        href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded focus:bg-[var(--color-accent-cream)] focus:px-4 focus:py-2 focus:text-[var(--color-brand-900)]"
-      >
-        {skipLabel}
-      </a>
       <SiteHeader
         navItems={HEADER_NAV}
         right={headerRight}

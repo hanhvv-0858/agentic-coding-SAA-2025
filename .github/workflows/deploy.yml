@@ -1,0 +1,61 @@
+name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches: [main]
+  # Allow manual "Run workflow" button from the Actions tab.
+  workflow_dispatch:
+
+# Queue concurrent runs so two pushes in quick succession don't fight over
+# the same Worker. `cancel-in-progress: false` means the in-flight deploy
+# finishes cleanly, then the newer one runs.
+concurrency:
+  group: cloudflare-workers-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Enable Yarn v1 via corepack
+        run: |
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+          yarn --version
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # Reconstruct `.env.production.local` from GitHub Actions config so
+      # NEXT_PUBLIC_* values are inlined into the client bundle at build
+      # time. The file is gitignored; GitHub repo vars + secrets are the
+      # source of truth for CI deploys.
+      - name: Create .env.production.local
+        run: |
+          cat > .env.production.local <<'EOF'
+          NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_SUPABASE_URL=${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SITE_LAUNCH_AT=${{ vars.NEXT_PUBLIC_SITE_LAUNCH_AT }}
+          NEXT_PUBLIC_CEREMONY_AT=${{ vars.NEXT_PUBLIC_CEREMONY_AT }}
+          EOF
+
+      - name: Build Worker bundle
+        run: yarn cf:build
+
+      # Wrangler picks up CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID
+      # from the environment automatically.
+      - name: Deploy to Cloudflare Workers
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: yarn cf:deploy

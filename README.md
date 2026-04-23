@@ -111,6 +111,85 @@ node scripts/check-bundle-size.mjs      # fails CI if any route exceeds its gzip
 node scripts/check-bundle-secrets.mjs   # fails CI if server-only secret names leak into the client bundle (SC-006)
 ```
 
+## Deployment (Cloudflare Workers)
+
+The app ships to Cloudflare Workers via [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare). Config lives in [wrangler.toml](wrangler.toml) + [.env.production.local](#) (gitignored) + Cloudflare Worker secrets.
+
+### First-time setup
+
+1. **Cloudflare account + Wrangler login**
+   ```sh
+   npx wrangler login         # OAuth into your CF account
+   npx wrangler whoami        # verify
+   ```
+
+2. **Register your `workers.dev` subdomain** (one-time, per account)
+   Dashboard → *Workers & Pages* → *Overview* → "Your subdomain" → set e.g. `yourname`. Must be globally unique; if taken, pick another.
+
+3. **Create `.env.production.local`** (gitignored) with client-facing env vars baked into the production bundle at build time:
+   ```env
+   NEXT_PUBLIC_SITE_URL=https://agentic-coding-saa-2025.<your-subdomain>.workers.dev
+   NEXT_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+   NEXT_PUBLIC_SITE_LAUNCH_AT=2026-04-22T00:00:00Z
+   NEXT_PUBLIC_CEREMONY_AT=2026-05-05T11:30:00Z
+   ```
+   > ⚠️ `NEXT_PUBLIC_*` vars are **inlined at build time** — they must live in `.env.production.local`, NOT `wrangler.toml [vars]` (which only affect server runtime).
+
+4. **Set server-runtime vars** (already in [wrangler.toml](wrangler.toml)): `ALLOWED_EMAIL_DOMAINS` is committed; the service role key is a secret:
+   ```sh
+   npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+   # Paste the Supabase "service_role" key (NOT anon). Wrangler will offer
+   # to create the Worker if it doesn't exist yet — answer "y".
+   ```
+   Verify: `npx wrangler secret list`
+
+5. **Register Supabase Auth Redirect URLs**
+   Supabase Dashboard → *Authentication* → *URL Configuration*:
+   - **Site URL**: `https://agentic-coding-saa-2025.<your-subdomain>.workers.dev`
+   - **Redirect URLs** (allow-list, add BOTH for dev + prod to work):
+     ```
+     http://localhost:3000/auth/callback
+     https://agentic-coding-saa-2025.<your-subdomain>.workers.dev/auth/callback
+     ```
+
+### Deploy
+
+```sh
+yarn cf:build              # next build → opennextjs-cloudflare build → .open-next/worker.js
+yarn cf:preview            # (optional) test locally at http://localhost:8787
+yarn cf:deploy             # upload + activate
+```
+
+Deploy output includes the public URL — smoke-test the login flow + `/kudos` feed + image upload there before announcing.
+
+### Observability
+
+```sh
+npx wrangler tail                  # stream live logs (runtime errors, console.log)
+npx wrangler deployments list      # deployment history
+npx wrangler rollback              # rollback to previous version if a deploy breaks prod
+```
+
+### Redeploying after env changes
+
+| What changed | Steps |
+|---|---|
+| `NEXT_PUBLIC_*` in `.env.production.local` | `yarn cf:build && yarn cf:deploy` |
+| `[vars]` in `wrangler.toml` (server-runtime only) | `yarn cf:deploy` (no rebuild needed) |
+| Secret via `wrangler secret put` | Immediate — applied to currently-deployed worker |
+| App code | `yarn cf:build && yarn cf:deploy` |
+
+### Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| Login → `redirect_uri_mismatch` | Step 5 missing — add Workers URL to Supabase Redirect URLs |
+| Countdown shows wrong date after redeploy | Client-baked at build — update `.env.production.local` then rebuild (NOT wrangler.toml) |
+| 500 "Invalid API key" in `wrangler tail` | `wrangler secret put SUPABASE_SERVICE_ROLE_KEY` — paste the real `service_role` key |
+| `Node.js middleware is not currently supported` during build | Use `src/middleware.ts` (Edge runtime) — not `src/proxy.ts` (Node); OpenNext only supports the former |
+| Wrangler prompts for subdomain during deploy | Register it via Dashboard first (step 2) — CLI prompt is glitchy |
+
 ## Documentation
 
 - [AGENTS.md](AGENTS.md) — MoMorph agent command reference
