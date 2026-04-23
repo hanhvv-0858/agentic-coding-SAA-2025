@@ -67,9 +67,9 @@ describe("<KudoPostCard />", () => {
     expect(heart.textContent).toContain("3");
   });
 
-  it("applies the 5-line clamp class on the body (FR-012)", () => {
+  it("applies the 4-line clamp class on the body (FR-012)", () => {
     render(<KudoPostCard kudo={baseKudo()} messages={messages} locale="vi" />);
-    expect(screen.getByTestId("kudo-body").className).toMatch(/line-clamp-5/);
+    expect(screen.getByTestId("kudo-body").className).toMatch(/line-clamp-4/);
   });
 
   it("renders exactly 5 hashtag pills when the kudo has 6", () => {

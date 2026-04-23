@@ -6,7 +6,7 @@ Snapshot ERD of the public schema after all 21 migrations. Source of truth for t
 
 - **`||--||`** = one-to-one (e.g. `auth_users` ↔ `profiles`, `kudos` ↔ `kudo_recipients` — current spec is single-recipient per kudo)
 - **`||--o{`** = one-to-many (standard FK relationship)
-- **`PK_FK`** marks junction-table columns that are both primary-key and foreign-key (composite-PK pattern used by `kudo_recipients` / `kudo_hashtags` / `kudo_hearts`)
+- **`PK`** marks the primary key. On junction tables (`kudo_recipients` / `kudo_hashtags` / `kudo_hearts`) the composite PK columns are also foreign keys to their parent tables — Mermaid's `erDiagram` syntax only supports a single marker per row, so FK semantics are noted in the column comment where helpful.
 
 ## ERD
 
@@ -40,7 +40,7 @@ erDiagram
     }
 
     profiles {
-        uuid id PK_FK "references auth.users"
+        uuid id PK "references auth.users"
         text email
         text display_name
         text avatar_url
@@ -68,18 +68,18 @@ erDiagram
     }
 
     kudo_recipients {
-        uuid kudo_id PK_FK
-        uuid recipient_id PK_FK
+        uuid kudo_id PK
+        uuid recipient_id PK
     }
 
     kudo_hashtags {
-        uuid kudo_id PK_FK
-        uuid hashtag_id PK_FK
+        uuid kudo_id PK
+        uuid hashtag_id PK
     }
 
     kudo_hearts {
-        uuid kudo_id PK_FK
-        uuid user_id PK_FK
+        uuid kudo_id PK
+        uuid user_id PK
         timestamptz created_at
     }
 

@@ -21,7 +21,7 @@ describe("<EmptyState />", () => {
 
   it("uses gifteesEmpty copy when variant='gifteesEmpty'", () => {
     render(<EmptyState messages={messages} variant="gifteesEmpty" />);
-    expect(screen.getByText("Bạn chưa gửi Kudo nào.")).toBeInTheDocument();
+    expect(screen.getByText("Chưa có Sunner nào nhận quà.")).toBeInTheDocument();
   });
 
   it("exposes role='status' for screen readers and a data-variant attr", () => {

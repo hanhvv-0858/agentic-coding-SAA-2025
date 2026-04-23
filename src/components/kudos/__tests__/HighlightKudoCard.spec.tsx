@@ -66,7 +66,7 @@ describe("<HighlightKudoCard />", () => {
     expect(heart.textContent).toContain("42");
   });
 
-  it("applies 3-line clamp class on the body (design-style §B.3)", () => {
+  it("applies 4-line clamp class on the body (design-style §B.3)", () => {
     render(
       <HighlightKudoCard
         kudo={baseKudo()}
@@ -75,7 +75,7 @@ describe("<HighlightKudoCard />", () => {
       />,
     );
     expect(screen.getByTestId("kudo-highlight-body").className).toMatch(
-      /line-clamp-3/,
+      /line-clamp-4/,
     );
   });
 
