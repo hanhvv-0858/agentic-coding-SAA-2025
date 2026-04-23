@@ -35,8 +35,10 @@ const baseKudo = (overrides: Partial<Kudo> = {}): Kudo => ({
   id: "k1",
   body: "Cảm ơn bạn rất nhiều vì đã giúp đỡ mình trong dự án.",
   title: null,
-  // Fixed local-time — 10:00 on Oct 30 2025 → "10:00 - 10/30/2025".
-  created_at: new Date(2025, 9, 30, 10, 0, 0).toISOString(),
+  // Fixed UTC moment that formats to 10:00 VN on Oct 30 2025. Uses
+  // `Date.UTC` so the test passes regardless of runner timezone (the
+  // formatter is pinned to Asia/Ho_Chi_Minh = UTC+7).
+  created_at: new Date(Date.UTC(2025, 9, 30, 3, 0, 0)).toISOString(),
   sender_id: "u-sender",
   hearts_count: 3,
   is_anonymous: false,
