@@ -1,3 +1,16 @@
+# Database Design — Sun\* Annual Awards 2025
+
+Snapshot ERD of the public schema after all 21 migrations. Source of truth for table shapes and relationships lives in [database-schema.sql](database-schema.sql).
+
+## Reading the diagram
+
+- **`||--||`** = one-to-one (e.g. `auth_users` ↔ `profiles`, `kudos` ↔ `kudo_recipients` — current spec is single-recipient per kudo)
+- **`||--o{`** = one-to-many (standard FK relationship)
+- **`PK_FK`** marks junction-table columns that are both primary-key and foreign-key (composite-PK pattern used by `kudo_recipients` / `kudo_hashtags` / `kudo_hearts`)
+
+## ERD
+
+```mermaid
 erDiagram
     auth_users ||--|| profiles : "owns"
     departments ||--o{ profiles : "groups"
@@ -94,3 +107,4 @@ erDiagram
         timestamptz opened_at "null when unopened"
         timestamptz created_at
     }
+```

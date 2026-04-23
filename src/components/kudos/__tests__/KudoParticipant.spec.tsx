@@ -44,18 +44,9 @@ describe("<KudoParticipant />", () => {
     expect(screen.getByText("Tran Thi B")).toBeInTheDocument();
   });
 
-  it("does NOT render the honorific span when omitted", () => {
-    const { container } = render(
-      <KudoParticipant user={NO_AVATAR} monogramAlt="Default" />,
-    );
-    // Only two spans: name + (no honorific) = 1 span
-    expect(container.querySelectorAll("span").length).toBe(1);
-  });
-
-  it("renders the honorific when provided", () => {
-    render(
-      <KudoParticipant user={NO_AVATAR} monogramAlt="Default" honorific="★ ★ ★" />,
-    );
-    expect(screen.getByText("★ ★ ★")).toBeInTheDocument();
-  });
+  // The old string-based `honorific` prop was removed — honour rendering
+  // now derives from `user.honour_title` + `user.department_code` and
+  // renders as a pill <Image> (see honourPills.ts). The two legacy tests
+  // that exercised the string prop were deleted; coverage for the new
+  // pill/department rendering lives in the US10 HonourTooltip specs.
 });
