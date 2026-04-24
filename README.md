@@ -72,7 +72,7 @@ src/
 ├── messages/              # vi.json + en.json
 └── types/
 
-supabase/migrations/       # 21 migrations (0001 → 0021)
+supabase/migrations/       # 22 migrations (0001 → 0022)
 scripts/                   # Seeders + CI guards
 .momorph/                  # Specs, plans, design styles, schema context
 tests/ + *__tests__/       # Vitest + Playwright
@@ -82,7 +82,7 @@ tests/ + *__tests__/       # Vitest + Playwright
 
 Single-file snapshot of the current schema — 10 tables + 1 view + 5 functions + 3 triggers + 22 RLS policies + Supabase Storage bucket + policies:
 
-- [.momorph/contexts/database-schema.sql](.momorph/contexts/database-schema.sql) — consolidated DDL (state after all 21 migrations)
+- [.momorph/contexts/database-schema.sql](.momorph/contexts/database-schema.sql) — consolidated DDL (state after all 22 migrations)
 - [.momorph/contexts/DATABASE_DESIGN.mmd](.momorph/contexts/DATABASE_DESIGN.mmd) — Mermaid ERD (preview in VSCode with *Markdown Preview Mermaid Support*)
 
 Replayable migration history lives under [supabase/migrations/](supabase/migrations/).
@@ -153,6 +153,7 @@ The app ships to Cloudflare Workers via [`@opennextjs/cloudflare`](https://openn
      https://agentic-coding-saa-2025.<your-subdomain>.workers.dev/auth/callback
      ```
 
+
 ### Deploy
 
 ```sh
@@ -162,6 +163,8 @@ yarn cf:deploy             # upload + activate
 ```
 
 Deploy output includes the public URL — smoke-test the login flow + `/kudos` feed + image upload there before announcing.
+
+https://agentic-coding-saa-2025.vuvanhanh.workers.dev/kudos
 
 ### Observability
 

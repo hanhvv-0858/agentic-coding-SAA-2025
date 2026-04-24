@@ -596,31 +596,48 @@ const SAMPLE_GIFTS = [
   "hộp quà Secret Box",
 ] as const;
 
-async function seedGiftRedemptions(profiles: Profile[]): Promise<void> {
-  // 10 fixture redemptions across the fixture users so §D.3 has stable
-  // demo data. Idempotent by `(user_id, gift_name, redeemed_at)` — we
-  // skip any row whose (user, gift, redeemed_at) already exists.
+async function seedGiftRedemptions(
+  senders: Profile[],
+  extras: Profile[],
+): Promise<void> {
+  // Business rule: each Sunner can redeem only ONE gift. Demo data
+  // therefore seeds exactly 10 DISTINCT recipients, each with a
+  // different gift from SAMPLE_GIFTS[0..9]. The §D.3 "10 Sunner nhận
+  // quà mới nhất" panel should never show a duplicated name.
+  //
+  // Because previous seeder versions could have written duplicate rows
+  // (same user across multiple iterations), we first DELETE any fixture
+  // gift_redemption rows before re-inserting a clean slate — idempotent
+  // and self-healing on repeat runs.
   const now = Date.now();
-  let inserted = 0;
-  let skipped = 0;
+  const pool = [...senders, ...extras];
+  if (pool.length < 10) {
+    console.warn(
+      `Gift redemptions: only ${pool.length} fixture users available — need 10.`,
+    );
+    return;
+  }
 
+  // Wipe any existing rows for fixture users (clears pre-existing
+  // duplicates from older seeder versions).
+  const fixtureIds = pool.map((p) => p.id);
+  const { error: deleteErr } = await admin
+    .from("gift_redemptions")
+    .delete()
+    .in("user_id", fixtureIds);
+  if (deleteErr) {
+    console.error(`gift_redemptions delete failed: ${deleteErr.message}`);
+    return;
+  }
+
+  let inserted = 0;
   for (let i = 0; i < 10; i++) {
-    const user = profiles[i % profiles.length];
-    const gift = SAMPLE_GIFTS[i % SAMPLE_GIFTS.length];
-    // Redemptions 45 minutes apart so §D.3 list has stable ordering.
+    const user = pool[i]; // distinct user per iteration — no cycling
+    const gift = SAMPLE_GIFTS[i]; // 10 gifts, exactly one per user
+    // Redemptions 45 minutes apart so the §D.3 list has stable
+    // newest-first ordering (i=0 is most recent).
     const redeemedAt = new Date(now - i * 45 * 60 * 1000).toISOString();
 
-    const { data: existing } = await admin
-      .from("gift_redemptions")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("gift_name", gift)
-      .eq("redeemed_at", redeemedAt)
-      .limit(1);
-    if ((existing?.length ?? 0) > 0) {
-      skipped++;
-      continue;
-    }
     const { error } = await admin.from("gift_redemptions").insert({
       user_id: user.id,
       gift_name: gift,
@@ -635,7 +652,7 @@ async function seedGiftRedemptions(profiles: Profile[]): Promise<void> {
     inserted++;
   }
   console.log(
-    `Gift redemptions seeded: ${inserted} new, ${skipped} already present.`,
+    `Gift redemptions seeded: ${inserted} distinct recipients × 1 gift each.`,
   );
 }
 
@@ -672,7 +689,7 @@ async function main(): Promise<void> {
 
   await seedKudos(profiles, hashtags ?? []);
   await seedKudosForExtras(profiles, extras, hashtags ?? []);
-  await seedGiftRedemptions(profiles);
+  await seedGiftRedemptions(profiles, extras);
   await seedSecretBoxes(profiles);
   console.log("Done.");
 }

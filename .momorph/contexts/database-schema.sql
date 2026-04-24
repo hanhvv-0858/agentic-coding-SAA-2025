@@ -144,10 +144,12 @@ CREATE INDEX kudo_images_kudo_id_position ON public.kudo_images (kudo_id, positi
 -- ----------------------------------------------------------------------------
 -- gift_redemptions — Ledger of physical-prize redemptions (Secret Box unlocks
 -- or other gift sources). Backend-only writes via service_role.
+-- Business rule (migration 0022): each Sunner can redeem AT MOST one gift,
+-- enforced via a UNIQUE constraint on user_id.
 -- ----------------------------------------------------------------------------
 CREATE TABLE public.gift_redemptions (
   id           uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id      uuid        NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  user_id      uuid        NOT NULL UNIQUE REFERENCES public.profiles(id) ON DELETE CASCADE,
   gift_name    text        NOT NULL,
   quantity     integer     NOT NULL DEFAULT 1 CHECK (quantity > 0),
   source       text        NOT NULL DEFAULT 'secret_box',
