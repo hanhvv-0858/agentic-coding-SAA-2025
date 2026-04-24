@@ -113,7 +113,9 @@ node scripts/check-bundle-secrets.mjs   # fails CI if server-only secret names l
 
 ## Deployment (Cloudflare Workers)
 
-The app ships to Cloudflare Workers via [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare). Config lives in [wrangler.toml](wrangler.toml) + [.env.production.local](#) (gitignored) + Cloudflare Worker secrets.
+The app ships to Cloudflare Workers via [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare). Config lives in [wrangler.toml](wrangler.toml) + `.env.production.local` (gitignored) + Cloudflare Worker secrets.
+
+> **Hướng dẫn chi tiết** — first-time setup, troubleshooting đầy đủ, CI/CD, rollback: [docs/deployment.md](docs/deployment.md). Section dưới đây là quick reference.
 
 ### First-time setup
 
