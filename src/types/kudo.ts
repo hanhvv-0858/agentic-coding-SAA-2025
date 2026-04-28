@@ -34,7 +34,14 @@ export type Hashtag = Pick<HashtagRow, "slug"> & { label: string };
 // locale; the UI only consumes `{ code, label }`.
 export type Department = Pick<DepartmentRow, "code"> & { label: string };
 
-export type Kudo = KudoStatsRow & {
+// `status` is a backend moderation field (active / soft_hidden / spam)
+// added by migration 0022 (app/). Non-author viewers never see anything
+// other than `active` because the view's WHERE clause filters it out
+// server-side. The UI surfaces nothing from it today, so we omit it
+// from the domain type to avoid forcing every fixture and helper to
+// thread a value through. If a moderation banner ever lands, lift the
+// field back into `Kudo` and update fixtures accordingly.
+export type Kudo = Omit<KudoStatsRow, "status"> & {
   sender: KudoUser;
   recipients: KudoUser[];
   hashtags: Hashtag[];

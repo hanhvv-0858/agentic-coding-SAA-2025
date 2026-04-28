@@ -110,11 +110,18 @@ export async function getKudoFeed(
     }
   }
 
+  // Migration 0022 (app/) replaced `kudos_with_stats`'s plumbing: it now
+  // wraps `kudos_feed` which redacts `sender_id` via a CASE expression
+  // for anonymous kudos viewed by non-authors. PostgREST cannot trace a
+  // computed column back to a foreign key, so the previous
+  // `sender:profiles!sender_id (...)` embed throws "Could not find a
+  // relationship between 'kudos_with_stats' and 'profiles'". Workaround:
+  // drop the sender embed, fetch sender profiles in one batched lookup
+  // after the main query, and stitch in JS.
   let query = supabase
     .from("kudos_with_stats")
     .select(
       `id, body, title, created_at, sender_id, hearts_count, is_anonymous, anonymous_alias,
-       sender:profiles!sender_id ( id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code ) ),
        kudo_recipients ( recipient:profiles!recipient_id ( id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code ) ) ),
        kudo_hashtags ( hashtags ( id, slug, label_vi, label_en ) ),
        kudo_images ( url, position )`,
@@ -174,7 +181,6 @@ export async function getKudoFeed(
     hearts_count: number | null;
     is_anonymous: boolean | null;
     anonymous_alias: string | null;
-    sender: MaybeRelated<RelatedProfile>;
     kudo_recipients:
       | { recipient: MaybeRelated<RelatedProfile> }[]
       | null
@@ -189,6 +195,32 @@ export async function getKudoFeed(
     Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
 
   const typedRows = rows as unknown as RawRow[];
+
+  // Sender profile batch-fetch (replaces the dropped `profiles!sender_id`
+  // embed). Anonymous-non-author rows surface `sender_id = NULL` via
+  // `kudos_feed`'s redaction, so we only look up non-null ids.
+  const senderIds = Array.from(
+    new Set(
+      typedRows
+        .map((r) => r.sender_id)
+        .filter((id): id is string => typeof id === "string"),
+    ),
+  );
+  const senderById = new Map<string, RelatedProfile>();
+  if (senderIds.length > 0) {
+    const { data: senderRows, error: senderErr } = await supabase
+      .from("profiles")
+      .select(
+        "id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code )",
+      )
+      .in("id", senderIds);
+    if (senderErr) {
+      throw new Error(`getKudoFeed: ${senderErr.message}`);
+    }
+    for (const p of (senderRows ?? []) as unknown as RelatedProfile[]) {
+      senderById.set(p.id, p);
+    }
+  }
 
   // Batch-sign all image paths in one round-trip. kudo_images.url stores
   // the Storage PATH (spec Q4 2026-04-21); `next/image` needs an absolute
@@ -221,7 +253,7 @@ export async function getKudoFeed(
   // Hashtag + department filters are now applied server-side (see
   // pre-query `.in()` narrowing above); rows here are already final.
   const items = typedRows.map((r) => {
-    const senderProfile = pickOne(r.sender);
+    const senderProfile = r.sender_id ? senderById.get(r.sender_id) ?? null : null;
     const orderedImages = [...(r.kudo_images ?? [])]
       .sort((a, b) => a.position - b.position)
       .map((img) => signedUrlByPath.get(img.url) ?? "")
@@ -359,11 +391,14 @@ export async function getHighlightKudos(
     if (departmentSenderIds.length === 0) return [];
   }
 
+  // See getKudoFeed: `kudos_with_stats` no longer supports the
+  // `profiles!sender_id` embed because migration 0022 (app/) introduced
+  // a CASE-based redaction on `sender_id`. Sender profiles are fetched
+  // in a separate batch below.
   let query = supabase
     .from("kudos_with_stats")
     .select(
       `id, body, title, created_at, sender_id, hearts_count, is_anonymous, anonymous_alias,
-       sender:profiles!sender_id ( id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code ) ),
        kudo_recipients ( recipient:profiles!recipient_id ( id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code ) ) ),
        kudo_hashtags ( hashtags ( id, slug, label_vi, label_en ) ),
        kudo_images ( url, position )`,
@@ -417,7 +452,6 @@ export async function getHighlightKudos(
     hearts_count: number | null;
     is_anonymous: boolean | null;
     anonymous_alias: string | null;
-    sender: MaybeRelated<RelatedProfile>;
     kudo_recipients:
       | { recipient: MaybeRelated<RelatedProfile> }[]
       | null
@@ -432,6 +466,30 @@ export async function getHighlightKudos(
     Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
 
   const typedRows = rows as unknown as RawRow[];
+
+  // Sender profile batch-fetch (see getKudoFeed for rationale).
+  const senderIds = Array.from(
+    new Set(
+      typedRows
+        .map((r) => r.sender_id)
+        .filter((id): id is string => typeof id === "string"),
+    ),
+  );
+  const senderById = new Map<string, RelatedProfile>();
+  if (senderIds.length > 0) {
+    const { data: senderRows, error: senderErr } = await supabase
+      .from("profiles")
+      .select(
+        "id, display_name, avatar_url, department_id, honour_title, department:departments!department_id ( code )",
+      )
+      .in("id", senderIds);
+    if (senderErr) {
+      throw new Error(`getHighlightKudos: ${senderErr.message}`);
+    }
+    for (const p of (senderRows ?? []) as unknown as RelatedProfile[]) {
+      senderById.set(p.id, p);
+    }
+  }
 
   // Batch-sign all image paths (see getKudoFeed for rationale).
   const allImagePaths = Array.from(
@@ -459,7 +517,7 @@ export async function getHighlightKudos(
   }
 
   return typedRows.map((r) => {
-    const senderProfile = pickOne(r.sender);
+    const senderProfile = r.sender_id ? senderById.get(r.sender_id) ?? null : null;
     const orderedImages = [...(r.kudo_images ?? [])]
       .sort((a, b) => a.position - b.position)
       .map((img) => signedUrlByPath.get(img.url) ?? "")
@@ -870,9 +928,13 @@ export async function getMyKudosStats(): Promise<KudosStats> {
   };
   if (!user) return emptyStats;
 
-  // sent_count: total rows in `kudos` authored by this user.
+  // sent_count: total rows authored by this user. Migration 0022 (app/)
+  // revoked direct SELECT on `public.kudos` from `authenticated`, so we
+  // count via the `kudos_with_stats` read surface. For self-authored
+  // rows the redaction CASE preserves `sender_id = auth.uid()`, so this
+  // count is exact (anonymous + non-anonymous).
   const sentRes = await supabase
-    .from("kudos")
+    .from("kudos_with_stats")
     .select("id", { count: "exact", head: true })
     .eq("sender_id", user.id);
   const sentCount = sentRes.count ?? 0;
@@ -1112,8 +1174,12 @@ export async function getProfilePreview(userId: string): Promise<ProfilePreview 
       .from("kudo_recipients")
       .select("kudo_id", { count: "exact", head: true })
       .eq("recipient_id", userId),
+    // Sent count via `kudos_with_stats`: direct table SELECT was revoked
+    // by migration 0022 (app/). When viewing someone else's profile,
+    // the redaction CASE hides anonymous rows from the count by design
+    // — that is the new privacy contract for anonymous kudos.
     supabase
-      .from("kudos")
+      .from("kudos_with_stats")
       .select("id", { count: "exact", head: true })
       .eq("sender_id", userId),
   ]);

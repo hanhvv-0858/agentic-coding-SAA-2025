@@ -39,6 +39,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      awards: {
+        Row: {
+          artwork_asset_key: string
+          created_at: string
+          description_en: string
+          description_vi: string
+          display_order: number
+          kind: Database["public"]["Enums"]["award_kind"]
+          title_en: string
+          title_vi: string
+          updated_at: string
+        }
+        Insert: {
+          artwork_asset_key: string
+          created_at?: string
+          description_en: string
+          description_vi: string
+          display_order: number
+          kind: Database["public"]["Enums"]["award_kind"]
+          title_en: string
+          title_vi: string
+          updated_at?: string
+        }
+        Update: {
+          artwork_asset_key?: string
+          created_at?: string
+          description_en?: string
+          description_vi?: string
+          display_order?: number
+          kind?: Database["public"]["Enums"]["award_kind"]
+          title_en?: string
+          title_vi?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       departments: {
         Row: {
           code: string
@@ -95,7 +131,7 @@ export type Database = {
           {
             foreignKeyName: "gift_redemptions_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -157,6 +193,13 @@ export type Database = {
             foreignKeyName: "kudo_hashtags_kudo_id_fkey"
             columns: ["kudo_id"]
             isOneToOne: false
+            referencedRelation: "kudos_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kudo_hashtags_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
             referencedRelation: "kudos_with_stats"
             referencedColumns: ["id"]
           },
@@ -190,87 +233,19 @@ export type Database = {
             foreignKeyName: "kudo_hearts_kudo_id_fkey"
             columns: ["kudo_id"]
             isOneToOne: false
+            referencedRelation: "kudos_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kudo_hearts_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
             referencedRelation: "kudos_with_stats"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "kudo_hearts_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      kudo_recipients: {
-        Row: {
-          kudo_id: string
-          recipient_id: string
-        }
-        Insert: {
-          kudo_id: string
-          recipient_id: string
-        }
-        Update: {
-          kudo_id?: string
-          recipient_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "kudo_recipients_kudo_id_fkey"
-            columns: ["kudo_id"]
-            isOneToOne: false
-            referencedRelation: "kudos"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "kudo_recipients_kudo_id_fkey"
-            columns: ["kudo_id"]
-            isOneToOne: false
-            referencedRelation: "kudos_with_stats"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "kudo_recipients_recipient_id_fkey"
-            columns: ["recipient_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      kudos: {
-        Row: {
-          anonymous_alias: string | null
-          body: string
-          created_at: string | null
-          id: string
-          is_anonymous: boolean
-          sender_id: string
-          title: string | null
-        }
-        Insert: {
-          anonymous_alias?: string | null
-          body: string
-          created_at?: string | null
-          id?: string
-          is_anonymous?: boolean
-          sender_id: string
-          title?: string | null
-        }
-        Update: {
-          anonymous_alias?: string | null
-          body?: string
-          created_at?: string | null
-          id?: string
-          is_anonymous?: boolean
-          sender_id?: string
-          title?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "kudos_sender_id_fkey"
-            columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -307,6 +282,248 @@ export type Database = {
             referencedRelation: "kudos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "kudo_images_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
+            referencedRelation: "kudos_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kudo_images_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
+            referencedRelation: "kudos_with_stats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kudo_moderation_events: {
+        Row: {
+          actor: string | null
+          created_at: string
+          criterion: string | null
+          id: string
+          kudo_id: string
+          new_status: Database["public"]["Enums"]["kudo_status"]
+          prev_status: Database["public"]["Enums"]["kudo_status"]
+        }
+        Insert: {
+          actor?: string | null
+          created_at?: string
+          criterion?: string | null
+          id?: string
+          kudo_id: string
+          new_status: Database["public"]["Enums"]["kudo_status"]
+          prev_status: Database["public"]["Enums"]["kudo_status"]
+        }
+        Update: {
+          actor?: string | null
+          created_at?: string
+          criterion?: string | null
+          id?: string
+          kudo_id?: string
+          new_status?: Database["public"]["Enums"]["kudo_status"]
+          prev_status?: Database["public"]["Enums"]["kudo_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kudo_moderation_events_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
+            referencedRelation: "kudos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kudo_moderation_events_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
+            referencedRelation: "kudos_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kudo_moderation_events_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
+            referencedRelation: "kudos_with_stats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kudo_recipients: {
+        Row: {
+          kudo_id: string
+          recipient_id: string
+        }
+        Insert: {
+          kudo_id: string
+          recipient_id: string
+        }
+        Update: {
+          kudo_id?: string
+          recipient_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kudo_recipients_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
+            referencedRelation: "kudos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kudo_recipients_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
+            referencedRelation: "kudos_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kudo_recipients_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
+            referencedRelation: "kudos_with_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kudo_recipients_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kudo_reports: {
+        Row: {
+          created_at: string
+          id: string
+          kudo_id: string
+          note: string | null
+          reason_slug: string
+          reporter_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kudo_id: string
+          note?: string | null
+          reason_slug: string
+          reporter_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kudo_id?: string
+          note?: string | null
+          reason_slug?: string
+          reporter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kudo_reports_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
+            referencedRelation: "kudos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kudo_reports_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
+            referencedRelation: "kudos_feed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kudo_reports_kudo_id_fkey"
+            columns: ["kudo_id"]
+            isOneToOne: false
+            referencedRelation: "kudos_with_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kudo_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kudos: {
+        Row: {
+          anonymous_alias: string | null
+          body: string
+          created_at: string | null
+          id: string
+          is_anonymous: boolean
+          sender_id: string
+          status: Database["public"]["Enums"]["kudo_status"]
+          title: string | null
+        }
+        Insert: {
+          anonymous_alias?: string | null
+          body: string
+          created_at?: string | null
+          id?: string
+          is_anonymous?: boolean
+          sender_id: string
+          status?: Database["public"]["Enums"]["kudo_status"]
+          title?: string | null
+        }
+        Update: {
+          anonymous_alias?: string | null
+          body?: string
+          created_at?: string | null
+          id?: string
+          is_anonymous?: boolean
+          sender_id?: string
+          status?: Database["public"]["Enums"]["kudo_status"]
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kudos_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          read_at: string | null
+          recipient_id: string
+          type: Database["public"]["Enums"]["notification_type"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          read_at?: string | null
+          recipient_id: string
+          type: Database["public"]["Enums"]["notification_type"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          read_at?: string | null
+          recipient_id?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
@@ -316,12 +533,7 @@ export type Database = {
           department_id: string | null
           display_name: string | null
           email: string
-          honour_title:
-            | "Legend Hero"
-            | "Rising Hero"
-            | "Super Hero"
-            | "New Hero"
-            | null
+          honour_title: Database["public"]["Enums"]["honour_title"] | null
           id: string
         }
         Insert: {
@@ -330,12 +542,7 @@ export type Database = {
           department_id?: string | null
           display_name?: string | null
           email: string
-          honour_title?:
-            | "Legend Hero"
-            | "Rising Hero"
-            | "Super Hero"
-            | "New Hero"
-            | null
+          honour_title?: Database["public"]["Enums"]["honour_title"] | null
           id: string
         }
         Update: {
@@ -344,12 +551,7 @@ export type Database = {
           department_id?: string | null
           display_name?: string | null
           email?: string
-          honour_title?:
-            | "Legend Hero"
-            | "Rising Hero"
-            | "Super Hero"
-            | "New Hero"
-            | null
+          honour_title?: Database["public"]["Enums"]["honour_title"] | null
           id?: string
         }
         Relationships: [
@@ -364,21 +566,33 @@ export type Database = {
       }
       secret_boxes: {
         Row: {
+          badge_kind: Database["public"]["Enums"]["badge_kind"] | null
           created_at: string
           id: string
           opened_at: string | null
+          prize_asset_key: string | null
+          prize_name: string | null
+          prize_type: string | null
           user_id: string
         }
         Insert: {
+          badge_kind?: Database["public"]["Enums"]["badge_kind"] | null
           created_at?: string
           id?: string
           opened_at?: string | null
+          prize_asset_key?: string | null
+          prize_name?: string | null
+          prize_type?: string | null
           user_id: string
         }
         Update: {
+          badge_kind?: Database["public"]["Enums"]["badge_kind"] | null
           created_at?: string
           id?: string
           opened_at?: string | null
+          prize_asset_key?: string | null
+          prize_name?: string | null
+          prize_type?: string | null
           user_id?: string
         }
         Relationships: [
@@ -393,6 +607,39 @@ export type Database = {
       }
     }
     Views: {
+      kudos_feed: {
+        Row: {
+          anonymous_alias: string | null
+          body: string | null
+          created_at: string | null
+          id: string | null
+          is_anonymous: boolean | null
+          sender_id: string | null
+          status: Database["public"]["Enums"]["kudo_status"] | null
+          title: string | null
+        }
+        Insert: {
+          anonymous_alias?: string | null
+          body?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_anonymous?: boolean | null
+          sender_id?: never
+          status?: Database["public"]["Enums"]["kudo_status"] | null
+          title?: string | null
+        }
+        Update: {
+          anonymous_alias?: string | null
+          body?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_anonymous?: boolean | null
+          sender_id?: never
+          status?: Database["public"]["Enums"]["kudo_status"] | null
+          title?: string | null
+        }
+        Relationships: []
+      }
       kudos_with_stats: {
         Row: {
           anonymous_alias: string | null
@@ -402,6 +649,7 @@ export type Database = {
           id: string | null
           is_anonymous: boolean | null
           sender_id: string | null
+          status: Database["public"]["Enums"]["kudo_status"] | null
           title: string | null
         }
         Relationships: [
@@ -416,21 +664,69 @@ export type Database = {
       }
     }
     Functions: {
+      compute_honour_tier: {
+        Args: { p_user_id: string }
+        Returns: Database["public"]["Enums"]["honour_title"]
+      }
       create_kudo: {
         Args: {
-          p_title: string
+          p_anonymous_alias?: string
           p_body: string
-          p_is_anonymous: boolean
-          p_recipient_id: string
           p_hashtag_slugs: string[]
           p_image_paths: string[]
-          p_anonymous_alias?: string | null
+          p_is_anonymous: boolean
+          p_recipient_id: string
+          p_title: string
         }
         Returns: string
       }
+      open_secret_box: {
+        Args: never
+        Returns: {
+          badge_kind: Database["public"]["Enums"]["badge_kind"] | null
+          created_at: string
+          id: string
+          opened_at: string | null
+          prize_asset_key: string | null
+          prize_name: string | null
+          prize_type: string | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "secret_boxes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
-      [_ in never]: never
+      award_kind:
+        | "mvp"
+        | "best_manager"
+        | "signature_creator"
+        | "top_project"
+        | "top_project_leader"
+        | "top_talent"
+      badge_kind:
+        | "revival"
+        | "touch_of_light"
+        | "stay_gold"
+        | "flow_to_horizon"
+        | "beyond_the_boundary"
+        | "root_further"
+      honour_title: "Legend Hero" | "Rising Hero" | "Super Hero" | "New Hero"
+      kudo_status: "active" | "soft_hidden" | "spam"
+      notification_type:
+        | "kudos_received"
+        | "kudos_liked"
+        | "secret_box_granted"
+        | "level_up"
+        | "content_soft_hidden"
+        | "badge_collected"
+        | "admin_review_request"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1010,7 +1306,35 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      award_kind: [
+        "mvp",
+        "best_manager",
+        "signature_creator",
+        "top_project",
+        "top_project_leader",
+        "top_talent",
+      ],
+      badge_kind: [
+        "revival",
+        "touch_of_light",
+        "stay_gold",
+        "flow_to_horizon",
+        "beyond_the_boundary",
+        "root_further",
+      ],
+      honour_title: ["Legend Hero", "Rising Hero", "Super Hero", "New Hero"],
+      kudo_status: ["active", "soft_hidden", "spam"],
+      notification_type: [
+        "kudos_received",
+        "kudos_liked",
+        "secret_box_granted",
+        "level_up",
+        "content_soft_hidden",
+        "badge_collected",
+        "admin_review_request",
+      ],
+    },
   },
   storage: {
     Enums: {
